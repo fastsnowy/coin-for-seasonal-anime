@@ -11,6 +11,7 @@ export function AnimeCard({ work }: workProps) {
       radius='md'
       p='lg'
       className='transition ease-in-out delay-120 hover:-translate-y-1'
+      key={work.annictId}
     >
       {work.image?.facebookOgImageUrl && (
         <Card.Section>
