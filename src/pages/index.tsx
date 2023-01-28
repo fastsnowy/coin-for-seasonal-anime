@@ -20,7 +20,9 @@ const Home = ({ searchWorks }: searchWorksProps) => {
       <Container size='xl'>
         <SimpleGrid cols={3}>
           {searchWorks.nodes.map((work) => (
-            <AnimeCard work={work} />
+            <div key={work.annictId}>
+              <AnimeCard work={work} />
+            </div>
           ))}
         </SimpleGrid>
       </Container>
