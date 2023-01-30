@@ -4,8 +4,19 @@ import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core
 import '@/styles/globals.css'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 import { RecoilRoot } from 'recoil'
+import { ReactElement, ReactNode } from 'react'
+import { NextPage } from 'next'
 
-export default function App(props: AppProps) {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+  colorScheme: ColorScheme
+}
+
+export default function App(props: AppPropsWithLayout) {
   const { Component, pageProps } = props
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
@@ -17,6 +28,7 @@ export default function App(props: AppProps) {
 
   useHotkeys([['mod+J', () => toggleColorScheme()]])
 
+  const getLayout = Component.getLayout ?? ((page) => page)
   return (
     <>
       <Head>
@@ -26,7 +38,7 @@ export default function App(props: AppProps) {
       <RecoilRoot>
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
           <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
-            <Component {...pageProps} />
+            {getLayout(<Component {...pageProps} />)}
           </MantineProvider>
         </ColorSchemeProvider>
       </RecoilRoot>
