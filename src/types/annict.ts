@@ -10,6 +10,7 @@ export type nodes = {
   officialSiteUrl: string | undefined
   title: string
   twitterUsername: string | undefined
+  watchersCount: number
 }
 
 type _images = {
