@@ -1,15 +1,17 @@
 import { GetStaticProps, NextPage } from 'next'
-import { Container, SimpleGrid, Stack, Title } from '@mantine/core'
+import { AppShell, Container, SimpleGrid, Stack, Title } from '@mantine/core'
 import type { annictWorks } from '@/types/annict'
 import { GET_ANIME_DETAILS } from '@/gql'
 import { headers, ANNICT_URL } from '@/libs/annict'
 import { AnimeCard } from '@/components/AnimeCard'
+import { Layout } from '@/layouts'
+import { ReactElement } from 'react'
 
 type searchWorksProps = {
   searchWorks: annictWorks
 }
 
-const Home = ({ searchWorks }: searchWorksProps) => {
+export default function Home({ searchWorks }: searchWorksProps) {
   return (
     <>
       <Stack align='center' justify='center'>
@@ -18,7 +20,13 @@ const Home = ({ searchWorks }: searchWorksProps) => {
         </Title>
       </Stack>
       <Container size='xl'>
-        <SimpleGrid cols={3}>
+        <SimpleGrid
+          cols={3}
+          breakpoints={[
+            { maxWidth: 'sm', cols: 2 },
+            { maxWidth: 'xs', cols: 1 },
+          ]}
+        >
           {searchWorks.nodes.map((work) => (
             <div key={work.annictId}>
               <AnimeCard work={work} />
@@ -30,7 +38,9 @@ const Home = ({ searchWorks }: searchWorksProps) => {
   )
 }
 
-export default Home
+Home.getLayout = function getLayout(page: ReactElement) {
+  return <Layout>{page}</Layout>
+}
 
 export const getStaticProps: GetStaticProps = async () => {
   const response = await fetch(ANNICT_URL, {
