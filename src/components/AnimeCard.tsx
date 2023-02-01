@@ -12,26 +12,17 @@ import {
 } from '@mantine/core'
 import { nodes } from '@/types/annict'
 import { FaTwitter } from 'react-icons/fa'
-import { atom, useRecoilState } from 'recoil'
+import { useRecoilState } from 'recoil'
+import { betCoinValueAtomFamily } from '@/global'
 
 type workProps = {
   work: nodes
 }
 
-export const betCoinAtom = (betAnnictId: number) => {
-  return atom({ key: `betCoin/${betAnnictId}`, default: 0 })
-}
-
 export function AnimeCard({ work }: workProps) {
-  const [betValue, setBetValue] = useRecoilState(betCoinAtom(work.annictId))
+  const [betValue, setBetValue] = useRecoilState(betCoinValueAtomFamily(work.annictId))
   return (
-    <Card
-      shadow='md'
-      radius='md'
-      p='lg'
-      // className='transition ease-in-out delay-120 hover:-translate-y-1'
-      key={work.annictId}
-    >
+    <Card shadow='md' radius='md' p='lg' key={work.annictId}>
       {work.image?.recommendedImageUrl ? (
         <Card.Section component='a' target='_blank' href={work.officialSiteUrl}>
           <AspectRatio ratio={16 / 9}>
@@ -39,7 +30,6 @@ export function AnimeCard({ work }: workProps) {
               src={work.image?.recommendedImageUrl}
               className='transform duration-300 hover:scale-110'
               withPlaceholder
-              //   src={`https://placehold.jp/665266/ffffff/1600x900.png?text=${work.title}`}
             />
           </AspectRatio>
         </Card.Section>
@@ -75,7 +65,6 @@ export function AnimeCard({ work }: workProps) {
           {work.title}
         </Text>
       </Card.Section>
-      {/* スライダー部分 */}
       <Card.Section p='xs'>
         <Group position='center'>
           <Text size='lg'>🪙{betValue}</Text>
