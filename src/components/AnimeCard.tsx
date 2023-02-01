@@ -9,11 +9,13 @@ import {
   Group,
   ActionIcon,
   Flex,
+  Tooltip,
 } from '@mantine/core'
 import { nodes } from '@/types/annict'
 import { FaTwitter } from 'react-icons/fa'
 import { useRecoilState } from 'recoil'
 import { betCoinValueAtomFamily } from '@/global'
+import { TbLetterA } from 'react-icons/tb'
 
 type workProps = {
   work: nodes
@@ -50,14 +52,25 @@ export function AnimeCard({ work }: workProps) {
             <Badge color='gray' radius={0}>
               {work.media}
             </Badge>
-            <ActionIcon
-              component='a'
-              target='_blank'
-              href={`https://twitter.com/${work.twitterUsername}`}
-              className=''
-            >
-              <FaTwitter />
-            </ActionIcon>
+            <Tooltip label='Twitter'>
+              <ActionIcon
+                component='a'
+                target='_blank'
+                href={`https://twitter.com/${work.twitterUsername}`}
+                className=''
+              >
+                <FaTwitter />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label='Annict'>
+              <ActionIcon
+                component='a'
+                target='_blank'
+                href={`https://annict.com/works/${work.annictId}`}
+              >
+                <TbLetterA />
+              </ActionIcon>
+            </Tooltip>
           </Group>
           <Text align='center'>{work.watchersCount} watchers</Text>
         </Flex>
