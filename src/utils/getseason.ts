@@ -1,5 +1,7 @@
-export const seasons = () => {
+export const getSeasons = () => {
   const currentDate = new Date()
+  const nextDate = new Date()
+  nextDate.setMonth(currentDate.getMonth() + 3)
   const SEASONS = {
     winter: 'winter',
     spring: 'spring',
@@ -18,9 +20,7 @@ export const seasons = () => {
     }
   }
   return {
-    current: {
-      year: currentDate.getFullYear(),
-      season: getMonth2Season(currentDate.getMonth()),
-    },
+    current: `${currentDate.getFullYear()}-${getMonth2Season(currentDate.getMonth())}`,
+    next: `${nextDate.getFullYear()}-${getMonth2Season(nextDate.getMonth())}`,
   }
 }
