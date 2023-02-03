@@ -1,34 +1,27 @@
-import {
-  AppShell,
-  Aside,
-  Badge,
-  Flex,
-  Footer,
-  Group,
-  Header,
-  MediaQuery,
-  Text,
-} from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import Link from 'next/link'
 import { ReactElement } from 'react'
-import { CurrentStatus } from '@/components/CurrentStatus'
+
+import { AppShell, Footer, Header, Text } from '@mantine/core'
+
 import { ActionToggle } from '@/components/ColorSchemeButton'
+import { CurrentStatus, NextStatus } from '@/components/StatusBar'
+
 type LayoutProps = Required<{
   readonly children: ReactElement
 }>
 
 export const LayoutHeader = () => {
   return (
-    <Header height={{ base: 40, md: 50 }} className='flex px-4'>
-      <Flex className='justify-between items-center text-center'>
-        <Text>サイトタイトル</Text>
-        <ActionToggle />
-      </Flex>
+    <Header height={{ base: 40, md: 50 }} className='flex justify-between items-center px-4'>
+      <Link href='/' className='text-inherit no-underline'>
+        <Text className='text-2xl text-red-300'>サイトタイトル</Text>
+      </Link>
+      <ActionToggle />
     </Header>
   )
 }
 
-export const LayoutFooter = () => {
+export const LayoutCurrentSeasonFooter = () => {
   return (
     <Footer height={50} p='md' className='flex px-4 justify-center'>
       <CurrentStatus />
@@ -36,18 +29,14 @@ export const LayoutFooter = () => {
   )
 }
 
-const LayoutAside = () => {
+export const LayoutNextSeasonFooter = () => {
   return (
-    <Aside width={{ lg: 200 }} hiddenBreakpoint='sm'>
-      <CurrentStatus />
-    </Aside>
+    <Footer height={50} p='md' className='flex px-4 justify-center'>
+      <NextStatus />
+    </Footer>
   )
 }
 
 export function Layout({ children }: LayoutProps) {
-  return (
-    <AppShell header={<LayoutHeader />} footer={<LayoutFooter />}>
-      {children}
-    </AppShell>
-  )
+  return <AppShell header={<LayoutHeader />}>{children}</AppShell>
 }
