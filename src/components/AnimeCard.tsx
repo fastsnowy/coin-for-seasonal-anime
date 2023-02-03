@@ -1,6 +1,11 @@
+/* eslint-disable jsx-a11y/alt-text */
+import { memo } from 'react'
+import { FaTwitter } from 'react-icons/fa'
+import { TbLetterA } from 'react-icons/tb'
+import { useRecoilState } from 'recoil'
+
 import {
   Card,
-  Title,
   Image,
   Text,
   AspectRatio,
@@ -11,18 +16,38 @@ import {
   Flex,
   Tooltip,
 } from '@mantine/core'
+
+import { AtomFamilybetCoinValue } from '@/global/atoms'
 import { nodes } from '@/types/annict'
-import { FaTwitter } from 'react-icons/fa'
-import { useRecoilState } from 'recoil'
-import { betCoinValueAtomFamily } from '@/global'
-import { TbLetterA } from 'react-icons/tb'
 
 type workProps = {
   work: nodes
 }
 
+const SliderCoin = ({ work }: workProps) => {
+  const [betValue, setBetValue] = useRecoilState(AtomFamilybetCoinValue(work.annictId))
+
+  return (
+    <div>
+      <Group position='center'>
+        <Text size='lg'>🪙{betValue}</Text>
+      </Group>
+      <Slider
+        step={10}
+        px='lg'
+        py='md'
+        color='cyan'
+        value={betValue}
+        onChange={(val) => {
+          setBetValue(val)
+        }}
+      />
+    </div>
+  )
+}
+const MemoSiliderCoin = memo(SliderCoin)
+
 export function AnimeCard({ work }: workProps) {
-  const [betValue, setBetValue] = useRecoilState(betCoinValueAtomFamily(work.annictId))
   return (
     <Card shadow='md' radius='md' p='lg' key={work.annictId}>
       {work.image?.recommendedImageUrl ? (
@@ -79,17 +104,7 @@ export function AnimeCard({ work }: workProps) {
         </Text>
       </Card.Section>
       <Card.Section p='xs'>
-        <Group position='center'>
-          <Text size='lg'>🪙{betValue}</Text>
-        </Group>
-        <Slider
-          step={10}
-          px='lg'
-          py='md'
-          color='cyan'
-          value={betValue}
-          onChange={(val) => setBetValue(val)}
-        />
+        <MemoSiliderCoin work={work} />
       </Card.Section>
     </Card>
   )
