@@ -6,7 +6,7 @@ export type nodes = {
   __typename: string
   annictId: number
   media: string
-  image: _images | undefined
+  image: _images
   officialSiteUrl: string | undefined
   title: string
   twitterUsername: string | undefined
