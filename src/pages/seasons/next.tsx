@@ -24,8 +24,13 @@ export default function NextSeason({ searchWorks }: searchWorksProps) {
   return (
     <>
       <Stack align='center' justify='center'>
-        <Title order={1} className='underline text-red-300 p-3 px-2'>
-          表示: {seasons}
+        <Title order={1} className='text-red-300 p-3 px-2 drop-shadow-lg'>
+          {seasons
+            .replace('winter', '冬')
+            .replace('spring', '春')
+            .replace('summer', '夏')
+            .replace('autumn', '秋')}
+          アニメ一覧
         </Title>
       </Stack>
       <Container size='xl'>

@@ -7,6 +7,7 @@ import { AppShell, Container, SimpleGrid, Stack, Title } from '@mantine/core'
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
+import { ResultCurrentModal } from '@/components/results/ResultsModal'
 import { AtomFetchThisSeason } from '@/global/atoms'
 import { GET_ANIME_DETAILS } from '@/gql'
 import { LayoutCurrentSeasonFooter, LayoutHeader } from '@/layouts'
@@ -23,9 +24,15 @@ export default function Season({ searchWorks }: searchWorksProps) {
   setSearchWorks(searchWorks)
   return (
     <>
+      <ResultCurrentModal />
       <Stack align='center' justify='center'>
-        <Title order={1} className='underline text-red-300 p-3 px-2'>
-          表示: {seasons}
+        <Title order={1} className=' p-3 px-2'>
+          {seasons
+            .replace('winter', '冬')
+            .replace('spring', '春')
+            .replace('summer', '夏')
+            .replace('autumn', '秋')}
+          アニメ一覧
         </Title>
       </Stack>
       <Container size='xl'>
