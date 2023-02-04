@@ -15,6 +15,8 @@ import {
   ActionIcon,
   Flex,
   Tooltip,
+  Container,
+  NumberInput,
 } from '@mantine/core'
 
 import { AtomFamilybetCoinValue } from '@/global/atoms'
@@ -30,18 +32,31 @@ const SliderCoin = ({ work }: workProps) => {
   return (
     <div>
       <Group position='center'>
-        <Text size='lg'>🪙{betValue}</Text>
+        <NumberInput
+          hideControls
+          defaultValue={0}
+          value={betValue}
+          icon='🪙'
+          onChange={(val) => {
+            if (val != null) {
+              setBetValue(val)
+            }
+          }}
+          styles={{ input: { width: 120, textAlign: 'center' } }}
+        />
       </Group>
-      <Slider
-        step={10}
-        px='lg'
-        py='md'
-        color='cyan'
-        value={betValue}
-        onChange={(val) => {
-          setBetValue(val)
-        }}
-      />
+      <Container size='xs'>
+        <Slider
+          step={10}
+          px='xl'
+          py='md'
+          color='cyan'
+          value={betValue}
+          onChange={(val) => {
+            setBetValue(val)
+          }}
+        />
+      </Container>
     </div>
   )
 }
@@ -97,7 +112,9 @@ export function AnimeCard({ work }: workProps) {
               </ActionIcon>
             </Tooltip>
           </Group>
-          <Text align='center'>{work.watchersCount} watchers</Text>
+          <Tooltip label='視聴者数'>
+            <Text align='center'>{work.watchersCount} watchers</Text>
+          </Tooltip>
         </Flex>
         <Text px='md' className='font-medium text-center justify-center'>
           {work.title}
