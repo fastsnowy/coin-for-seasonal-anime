@@ -1,12 +1,10 @@
+import { TbSun, TbMoon } from 'react-icons/tb'
+
 import {
   useMantineColorScheme,
-  SegmentedControl,
   Group,
-  Center,
-  Box,
   ActionIcon,
 } from '@mantine/core'
-import { TbSun, TbMoon } from 'react-icons/tb'
 
 export function ActionToggle() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
