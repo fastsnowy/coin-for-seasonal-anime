@@ -1,11 +1,12 @@
+import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
+import { ReactElement, ReactNode } from 'react'
+import { RecoilRoot } from 'recoil'
+
 import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core'
 import '@/styles/globals.css'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
-import { RecoilRoot } from 'recoil'
-import { ReactElement, ReactNode } from 'react'
-import { NextPage } from 'next'
 
 export type NextPageWithLayout<P = unknown, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -20,7 +21,7 @@ export default function App(props: AppPropsWithLayout) {
   const { Component, pageProps } = props
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'mantine-color-scheme',
-    defaultValue: 'light',
+    defaultValue: 'dark',
     getInitialValueInEffect: true,
   })
   const toggleColorScheme = (value?: ColorScheme) =>
