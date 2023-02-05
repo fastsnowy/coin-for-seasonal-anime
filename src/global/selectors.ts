@@ -64,3 +64,17 @@ export const selectorGetBetAnimeListNextSeason = selector({
     return { betAnimeList, coinValueList }
   },
 })
+
+export const selectorClearBetAnimeListCurrentSeason = selector({
+  key: 'selector/ClearBetAnimeListCurrentSeason',
+  get: ({ get }) => {
+    const currentSearchWorks = get(AtomFetchCurrentSeason)
+    return currentSearchWorks
+  },
+  set: ({ reset, get }) => {
+    const currentSearchWorks = get(AtomFetchCurrentSeason)
+    currentSearchWorks.nodes.map((work) => {
+      reset(AtomFamilybetCoinValue(work.annictId))
+    })
+  },
+})
