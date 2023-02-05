@@ -35,6 +35,7 @@ const SliderCoin = ({ work }: workProps) => {
         <NumberInput
           hideControls
           defaultValue={0}
+          min={0}
           value={betValue}
           icon='🪙'
           onChange={(val) => {
