@@ -12,15 +12,15 @@ export const AtomtotalCoinCount = atom({
   default: 0,
 })
 
-export const AtomFetchThisSeason = atom<annictWorks>({
-  key: 'Data/ThisSeason',
+export const AtomFetchCurrentSeason = atom<annictWorks>({
+  key: 'fetch/currentSeason',
 })
 
 export const AtomFetchNextSeason = atom<annictWorks>({
-  key: 'Data/NextSeason',
+  key: 'fetch/NextSeason',
 })
 
 export const AtomIsCurrentModalOpened = atom({
-  key: 'isModalOpened',
+  key: 'isCurrentSeasonModalOpened',
   default: false,
 })

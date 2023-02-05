@@ -1,13 +1,12 @@
 import { selector } from 'recoil'
 
-import { AtomFamilybetCoinValue, AtomFetchNextSeason, AtomFetchThisSeason } from './atoms'
-
+import { AtomFamilybetCoinValue, AtomFetchNextSeason, AtomFetchCurrentSeason } from '@/global/atoms'
 import { nodes } from '@/types/annict'
 
 export const selectorTotalCoinCurrentSeason = selector({
   key: 'selector/TotalCoinCurrentSeason',
   get: ({ get }) => {
-    const currentSearchWorks = get(AtomFetchThisSeason)
+    const currentSearchWorks = get(AtomFetchCurrentSeason)
     const cointValueList: number[] = []
     currentSearchWorks.nodes.map((work) => {
       const coinValue = get(AtomFamilybetCoinValue(work.annictId))
@@ -35,7 +34,7 @@ export const selectorTotalCoinNextSeason = selector({
 export const selectorGetBetAnimeListCurrentSeason = selector({
   key: 'selector/GetBetAnimeListCurrentSeason',
   get: ({ get }) => {
-    const currentSearchWorks = get(AtomFetchThisSeason)
+    const currentSearchWorks = get(AtomFetchCurrentSeason)
     const betAnimeList: nodes[] = []
     const coinValueList: number[] = []
     currentSearchWorks.nodes.map((work) => {
