@@ -7,6 +7,7 @@ import { RecoilRoot } from 'recoil'
 import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core'
 import '@/styles/globals.css'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
+import { NotificationsProvider } from '@mantine/notifications'
 
 export type NextPageWithLayout<P = unknown, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
@@ -39,7 +40,9 @@ export default function App(props: AppPropsWithLayout) {
       <RecoilRoot>
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
           <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
-            {getLayout(<Component {...pageProps} />)}
+            <NotificationsProvider autoClose={3000}>
+              {getLayout(<Component {...pageProps} />)}
+            </NotificationsProvider>
           </MantineProvider>
         </ColorSchemeProvider>
       </RecoilRoot>
