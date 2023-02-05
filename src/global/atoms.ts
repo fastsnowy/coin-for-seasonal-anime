@@ -24,3 +24,8 @@ export const AtomIsCurrentModalOpened = atom({
   key: 'isCurrentSeasonModalOpened',
   default: false,
 })
+
+export const AtomIsNextModalOpened = atom({
+  key: 'isNextSeasonModalOpened',
+  default: false,
+})
