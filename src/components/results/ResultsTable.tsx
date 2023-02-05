@@ -18,9 +18,9 @@ export function ResultsCurrentTable() {
           target='_blank'
           href={work.officialSiteUrl}
           sx={(theme) => ({
-            backgroundImage: work.image.recommendedImageUrl
-              ? `url(${work.image.recommendedImageUrl})`
-              : `url(${work.image.facebookOgImageUrl})`,
+            backgroundImage: work.image?.recommendedImageUrl
+              ? `url(${work.image?.recommendedImageUrl})`
+              : `url(${work.image?.facebookOgImageUrl})`,
             backgroundColor: 'rgba(30,30,30,0.6)',
             backgroundBlendMode: 'darken',
             height: 90,
@@ -42,7 +42,7 @@ export function ResultsCurrentTable() {
         </Paper>
       </td>
       <td>
-        <Text>🪙{coinValueList[idx]}</Text>
+        <Text>🪙{coinValueList[idx].toLocaleString()}</Text>
         <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
           <Progress
             value={(coinValueList[idx] / totalBet) * 100}
