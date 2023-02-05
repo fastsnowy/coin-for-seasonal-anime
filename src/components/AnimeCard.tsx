@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { memo } from 'react'
+import { memo, useRef } from 'react'
 import { FaTwitter } from 'react-icons/fa'
 import { TbLetterA } from 'react-icons/tb'
 import { useRecoilState } from 'recoil'
@@ -9,14 +9,13 @@ import {
   Image,
   Text,
   AspectRatio,
-  Slider,
   Badge,
   Group,
   ActionIcon,
   Flex,
   Tooltip,
-  Container,
   NumberInput,
+  NumberInputHandlers,
 } from '@mantine/core'
 
 import { AtomFamilybetCoinValue } from '@/global/atoms'
@@ -28,15 +27,24 @@ type workProps = {
 
 const SliderCoin = ({ work }: workProps) => {
   const [betValue, setBetValue] = useRecoilState(AtomFamilybetCoinValue(work.annictId))
-
+  const numberInputHandlers = useRef<NumberInputHandlers>()
   return (
     <div>
-      <Group position='center'>
+      <Group position='center' spacing={8}>
+        <ActionIcon
+          size={30}
+          variant='default'
+          onClick={() => numberInputHandlers.current?.decrement()}
+        >
+          -
+        </ActionIcon>
         <NumberInput
           hideControls
           defaultValue={0}
           min={0}
+          step={10}
           value={betValue}
+          handlersRef={numberInputHandlers}
           icon='🪙'
           onChange={(val) => {
             if (val != null) {
@@ -45,19 +53,14 @@ const SliderCoin = ({ work }: workProps) => {
           }}
           styles={{ input: { width: 120, textAlign: 'center' } }}
         />
+        <ActionIcon
+          size={30}
+          variant='default'
+          onClick={() => numberInputHandlers.current?.increment()}
+        >
+          +
+        </ActionIcon>
       </Group>
-      <Container size='xs'>
-        <Slider
-          step={10}
-          px='xl'
-          py='md'
-          color='cyan'
-          value={betValue}
-          onChange={(val) => {
-            setBetValue(val)
-          }}
-        />
-      </Container>
     </div>
   )
 }
