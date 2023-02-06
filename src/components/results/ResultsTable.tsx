@@ -52,7 +52,7 @@ export function ResultsCurrentTable() {
           </Stack>
         </Card>
       </td>
-      <td>
+      <td className='whitespace-nowrap'>
         <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
         <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
           <Progress
@@ -118,7 +118,7 @@ export function ResultsNextTable() {
           </Stack>
         </Card>
       </td>
-      <td>
+      <td className='whitespace-nowrap'>
         <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
         <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
           <Progress
