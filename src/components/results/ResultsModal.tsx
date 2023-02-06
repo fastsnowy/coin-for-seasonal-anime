@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { TbPhoto, TbTable } from 'react-icons/tb'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
-import { Button, Container, Group, Mark, Modal, Tabs, Text } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Image, Mark, Modal, Tabs } from '@mantine/core'
 
 import { ResultCurrentCard, ResultNextCard } from './ResultsCard'
 import { ResultsCurrentTable, ResultsNextTable } from './ResultsTable'
@@ -22,9 +23,13 @@ export function ResultCurrentModal() {
       // title='結果'
       overlayBlur={3}
     >
-      <Text size='lg' align='center'>
-        合計🪙<Mark>{totalBet.toLocaleString()}枚</Mark>のコインを賭けました
-      </Text>
+      <Group position='center'>
+        合計
+        <ActionIcon size='xs' variant='transparent' disabled>
+          <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+        </ActionIcon>
+        <Mark>{totalBet.toLocaleString()}枚</Mark>のコインを賭けました
+      </Group>
       <Tabs defaultValue='table'>
         <Tabs.List position='right'>
           <Tabs.Tab value='table' icon={<TbTable size={14} />}></Tabs.Tab>
@@ -63,9 +68,13 @@ export function ResultNextModal() {
       // title='結果'
       overlayBlur={3}
     >
-      <Text size='lg' align='center'>
-        合計🪙<Mark>{totalBet.toLocaleString()}枚</Mark>のコインを賭けました
-      </Text>
+      <Group position='center'>
+        合計
+        <ActionIcon size='xs' variant='transparent' disabled>
+          <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+        </ActionIcon>
+        <Mark>{totalBet.toLocaleString()}枚</Mark>のコインを賭けました
+      </Group>
       <Tabs defaultValue='table'>
         <Tabs.List position='right'>
           <Tabs.Tab value='table' icon={<TbTable size={14} />}></Tabs.Tab>

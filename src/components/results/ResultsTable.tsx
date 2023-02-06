@@ -1,6 +1,17 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { useRecoilValue } from 'recoil'
 
-import { Flex, Paper, Progress, Table, Text, Tooltip } from '@mantine/core'
+import {
+  ActionIcon,
+  Card,
+  Group,
+  Image,
+  Progress,
+  Stack,
+  Table,
+  Text,
+  Tooltip,
+} from '@mantine/core'
 
 import {
   selectorGetBetAnimeListCurrentSeason,
@@ -15,35 +26,34 @@ export function ResultsCurrentTable() {
   const tableItems = betAnimeList.map((work, idx) => (
     <tr key={work.annictId}>
       <td>
-        <Paper
-          component='a'
-          target='_blank'
-          href={work.officialSiteUrl}
+        <Card
+          shadow='md'
+          radius='md'
+          p='lg'
           sx={(theme) => ({
             backgroundImage: work.image?.recommendedImageUrl
               ? `url(${work.image?.recommendedImageUrl})`
               : `url(${work.image?.facebookOgImageUrl})`,
             backgroundColor: 'rgba(30,30,30,0.6)',
             backgroundBlendMode: 'darken',
-            height: 90,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
-            color: theme.colorScheme === 'dark' ? theme.white : theme.colors.gray[0],
+            color: theme.colorScheme === 'dark' ? theme.white : theme.colors.gray[4],
           })}
         >
-          <Flex align='end' justify='flex-end' px='md'>
+          <Stack align='flex-start'>
             <Tooltip label='視聴者数'>
               <Text>{work.watchersCount.toLocaleString()} watchers</Text>
             </Tooltip>
-          </Flex>
-          <Text align='center' size='lg' weight='bold' className='items-center text-center'>
-            {betAnimeList[idx].title}
-          </Text>
-        </Paper>
+            <Text align='center' size='lg' weight='bold' className='items-center text-center'>
+              {betAnimeList[idx].title}
+            </Text>
+          </Stack>
+        </Card>
       </td>
       <td>
-        <Text>🪙{coinValueList[idx].toLocaleString()}</Text>
+        <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
         <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
           <Progress
             value={(coinValueList[idx] / totalBet) * 100}
@@ -57,6 +67,20 @@ export function ResultsCurrentTable() {
   ))
   return (
     <Table fontSize='md' verticalSpacing='md'>
+      <thead>
+        <tr>
+          <th>
+            <Text align='center'>作品名</Text>
+          </th>
+          <th>
+            <Group position='center'>
+              <ActionIcon size='xs' variant='transparent' disabled>
+                <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+              </ActionIcon>
+            </Group>
+          </th>
+        </tr>
+      </thead>
       <tbody className='items-center text-center'>{tableItems}</tbody>
     </Table>
   )
@@ -68,35 +92,34 @@ export function ResultsNextTable() {
   const tableItems = betAnimeList.map((work, idx) => (
     <tr key={work.annictId}>
       <td>
-        <Paper
-          component='a'
-          target='_blank'
-          href={work.officialSiteUrl}
+        <Card
+          shadow='md'
+          radius='md'
+          p='lg'
           sx={(theme) => ({
             backgroundImage: work.image?.recommendedImageUrl
               ? `url(${work.image?.recommendedImageUrl})`
               : `url(${work.image?.facebookOgImageUrl})`,
             backgroundColor: 'rgba(30,30,30,0.6)',
             backgroundBlendMode: 'darken',
-            height: 90,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
-            color: theme.colorScheme === 'dark' ? theme.white : theme.colors.gray[0],
+            color: theme.colorScheme === 'dark' ? theme.white : theme.colors.gray[4],
           })}
         >
-          <Flex align='end' justify='flex-end' px='md'>
+          <Stack align='flex-start'>
             <Tooltip label='視聴者数'>
               <Text>{work.watchersCount.toLocaleString()} watchers</Text>
             </Tooltip>
-          </Flex>
-          <Text align='center' size='lg' weight='bold' className='items-center text-center'>
-            {betAnimeList[idx].title}
-          </Text>
-        </Paper>
+            <Text align='center' size='lg' weight='bold' className='items-center text-center'>
+              {betAnimeList[idx].title}
+            </Text>
+          </Stack>
+        </Card>
       </td>
       <td>
-        <Text>🪙{coinValueList[idx].toLocaleString()}</Text>
+        <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
         <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
           <Progress
             value={(coinValueList[idx] / totalBet) * 100}
@@ -110,6 +133,20 @@ export function ResultsNextTable() {
   ))
   return (
     <Table fontSize='md' verticalSpacing='md'>
+      <thead>
+        <tr>
+          <th>
+            <Text align='center'>作品名</Text>
+          </th>
+          <th>
+            <Group position='center'>
+              <ActionIcon size='xs' variant='transparent' disabled>
+                <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+              </ActionIcon>
+            </Group>
+          </th>
+        </tr>
+      </thead>
       <tbody className='items-center text-center'>{tableItems}</tbody>
     </Table>
   )

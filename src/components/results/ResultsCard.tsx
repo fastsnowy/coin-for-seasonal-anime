@@ -78,9 +78,14 @@ export function ResultCurrentCard() {
         </Text>
       </Card.Section>
       <Card.Section py='xs'>
-        <Text size='lg' align='center'>
-          🪙{coinValueList[idx].toLocaleString()}
-        </Text>
+        <Group position='center'>
+          <ActionIcon size='xs' variant='transparent' disabled>
+            <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+          </ActionIcon>
+          <Text size='lg' align='center'>
+            {coinValueList[idx].toLocaleString()}
+          </Text>
+        </Group>
       </Card.Section>
     </Card>
   ))
@@ -155,9 +160,14 @@ export function ResultNextCard() {
         </Text>
       </Card.Section>
       <Card.Section py='xs'>
-        <Text size='lg' align='center'>
-          🪙{coinValueList[idx].toLocaleString()}
-        </Text>
+        <Group position='center'>
+          <ActionIcon size='xs' variant='transparent' disabled>
+            <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+          </ActionIcon>
+          <Text size='lg' align='center'>
+            {coinValueList[idx].toLocaleString()}
+          </Text>
+        </Group>
       </Card.Section>
     </Card>
   ))
