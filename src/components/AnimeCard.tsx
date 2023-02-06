@@ -41,7 +41,7 @@ const SliderCoin = ({ work }: workProps) => {
         <NumberInput
           hideControls
           defaultValue={0}
-          max={999999999}
+          max={80000}
           min={0}
           step={10}
           value={betValue}
