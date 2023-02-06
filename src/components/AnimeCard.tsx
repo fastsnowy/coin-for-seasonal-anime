@@ -41,11 +41,16 @@ const SliderCoin = ({ work }: workProps) => {
         <NumberInput
           hideControls
           defaultValue={0}
+          max={999999999}
           min={0}
           step={10}
           value={betValue}
           handlersRef={numberInputHandlers}
-          icon='🪙'
+          icon={
+            <ActionIcon size='xs' variant='transparent'>
+              <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+            </ActionIcon>
+          }
           onChange={(val) => {
             if (val != null) {
               setBetValue(val)
@@ -53,6 +58,7 @@ const SliderCoin = ({ work }: workProps) => {
           }}
           styles={{ input: { width: 120, textAlign: 'center' } }}
         />
+
         <ActionIcon
           size={30}
           variant='default'
@@ -68,7 +74,15 @@ const MemoSiliderCoin = memo(SliderCoin)
 
 export function AnimeCard({ work }: workProps) {
   return (
-    <Card shadow='md' radius='md' p='lg' key={work.annictId}>
+    <Card
+      shadow='md'
+      radius='md'
+      p='lg'
+      key={work.annictId}
+      sx={(theme) => ({
+        color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.dark,
+      })}
+    >
       {work.image?.recommendedImageUrl ? (
         <Card.Section component='a' target='_blank' href={work.officialSiteUrl}>
           <AspectRatio ratio={16 / 9}>
