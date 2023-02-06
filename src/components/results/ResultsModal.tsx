@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { TbBrandTwitter, TbPhoto, TbTable } from 'react-icons/tb'
-import { TwitterShareButton } from 'react-share'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { ActionIcon, Button, Container, Group, Image, Mark, Modal, Tabs } from '@mantine/core'
+
+import { TwitterIntentTweet } from '../TwitterShare'
 
 import { ResultCurrentCard, ResultNextCard } from './ResultsCard'
 import { ResultsCurrentTable, ResultsNextTable } from './ResultsTable'
@@ -54,11 +55,16 @@ export function ResultCurrentModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <TwitterShareButton title={shareText} url={DEPLOY_URL}>
-            <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
-              ツイート
-            </Button>
-          </TwitterShareButton>
+          <Button
+            component={TwitterIntentTweet}
+            text={shareText}
+            url={DEPLOY_URL}
+            color='blue'
+            leftIcon={<TbBrandTwitter />}
+            size='sm'
+          >
+            ツイート
+          </Button>
           <Button variant='default' onClick={() => setModalOpened(false)} size='sm'>
             閉じる
           </Button>
@@ -109,11 +115,16 @@ export function ResultNextModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <TwitterShareButton title={shareText} url={DEPLOY_URL}>
-            <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
-              ツイート
-            </Button>
-          </TwitterShareButton>
+          <Button
+            component={TwitterIntentTweet}
+            text={shareText}
+            url={DEPLOY_URL}
+            color='blue'
+            leftIcon={<TbBrandTwitter />}
+            size='sm'
+          >
+            ツイート
+          </Button>
           <Button variant='default' onClick={() => setModalOpened(false)} size='sm'>
             閉じる
           </Button>
