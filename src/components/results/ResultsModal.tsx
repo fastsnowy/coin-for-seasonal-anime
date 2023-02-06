@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { TbPhoto, TbTable } from 'react-icons/tb'
+import { TbBrandTwitter, TbPhoto, TbTable } from 'react-icons/tb'
+import { TwitterShareButton } from 'react-share'
 import { useRecoilState, useRecoilValue } from 'recoil'
 
 import { ActionIcon, Button, Container, Group, Image, Mark, Modal, Tabs } from '@mantine/core'
@@ -9,18 +10,24 @@ import { ResultsCurrentTable, ResultsNextTable } from './ResultsTable'
 
 import { AtomIsCurrentModalOpened, AtomIsNextModalOpened } from '@/global/atoms'
 import { selectorTotalCoinCurrentSeason, selectorTotalCoinNextSeason } from '@/global/selectors'
+import { getSeasons } from '@/utils/getseason'
 
 export function ResultCurrentModal() {
   const [modalOpened, setModalOpened] = useRecoilState(AtomIsCurrentModalOpened)
   const totalBet = useRecoilValue(selectorTotalCoinCurrentSeason)
+  const season = getSeasons()
+  const seasonsText = season.current
+    .replace('winter', '冬')
+    .replace('spring', '春')
+    .replace('summer', '夏')
+    .replace('autumn', '秋')
+  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のアニメコインを賭けました！`
   return (
     <Modal
       opened={modalOpened}
       onClose={() => setModalOpened(false)}
       centered
       fullScreen
-      size='90%'
-      // title='結果'
       overlayBlur={3}
     >
       <Group position='center'>
@@ -36,7 +43,7 @@ export function ResultCurrentModal() {
           <Tabs.Tab value='card' icon={<TbPhoto size={14} />}></Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='table' pt='xs'>
-          <Container size='xl'>
+          <Container size='md'>
             <ResultsCurrentTable />
           </Container>
         </Tabs.Panel>
@@ -46,7 +53,12 @@ export function ResultCurrentModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <Button variant='default' onClick={() => setModalOpened(false)}>
+          <TwitterShareButton title={shareText} url='https://anime-coin.vercel.app'>
+            <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
+              ツイート
+            </Button>
+          </TwitterShareButton>
+          <Button variant='default' onClick={() => setModalOpened(false)} size='sm'>
             閉じる
           </Button>
         </Group>
@@ -58,14 +70,19 @@ export function ResultCurrentModal() {
 export function ResultNextModal() {
   const [modalOpened, setModalOpened] = useRecoilState(AtomIsNextModalOpened)
   const totalBet = useRecoilValue(selectorTotalCoinNextSeason)
+  const season = getSeasons()
+  const seasonsText = season.next
+    .replace('winter', '冬')
+    .replace('spring', '春')
+    .replace('summer', '夏')
+    .replace('autumn', '秋')
+  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のアニメコインを賭けました！`
   return (
     <Modal
       opened={modalOpened}
       onClose={() => setModalOpened(false)}
       centered
       fullScreen
-      size='90%'
-      // title='結果'
       overlayBlur={3}
     >
       <Group position='center'>
@@ -91,7 +108,12 @@ export function ResultNextModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <Button variant='default' onClick={() => setModalOpened(false)}>
+          <TwitterShareButton title={shareText} url='https://anime-coin.vercel.app'>
+            <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
+              ツイート
+            </Button>
+          </TwitterShareButton>
+          <Button variant='default' onClick={() => setModalOpened(false)} size='sm'>
             閉じる
           </Button>
         </Group>
