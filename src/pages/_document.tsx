@@ -10,7 +10,12 @@ export default class _Document extends Document {
   render() {
     return (
       <Html lang='ja'>
-        <Head />
+        <Head>
+          <link
+            rel='icon'
+            href='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
+          />
+        </Head>
         <body>
           <Main />
           <NextScript />

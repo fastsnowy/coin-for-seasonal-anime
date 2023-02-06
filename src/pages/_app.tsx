@@ -34,12 +34,18 @@ export default function App(props: AppPropsWithLayout) {
   return (
     <>
       <Head>
-        <title>Page title</title>
+        <title>アニメコイン</title>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       </Head>
       <RecoilRoot>
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-          <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme }}>
+          <MantineProvider
+            withGlobalStyles
+            withNormalizeCSS
+            theme={{
+              colorScheme,
+            }}
+          >
             <NotificationsProvider autoClose={3000}>
               {getLayout(<Component {...pageProps} />)}
             </NotificationsProvider>

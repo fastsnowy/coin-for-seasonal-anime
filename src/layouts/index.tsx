@@ -12,9 +12,15 @@ type LayoutProps = Required<{
 
 export const LayoutHeader = () => {
   return (
-    <Header height={{ base: 40, md: 50 }} className='flex justify-between items-center px-4'>
+    <Header
+      height={{ base: 50 }}
+      className='flex justify-between items-center px-4'
+      sx={(theme) => ({
+        color: theme.colorScheme === 'dark' ? theme.colors.yellow[3] : theme.colors.yellow[7],
+      })}
+    >
       <Link href='/' className='text-inherit no-underline'>
-        <Text className='text-2xl text-red-300'>サイトタイトル</Text>
+        <Text className='text-2xl font-bold'>アニメコイン</Text>
       </Link>
       <ActionToggle />
     </Header>
@@ -23,7 +29,7 @@ export const LayoutHeader = () => {
 
 export const LayoutCurrentSeasonFooter = () => {
   return (
-    <Footer height={50} p='md' className='flex px-4 justify-center'>
+    <Footer height={50} p='xs' className='flex justify-center'>
       <CurrentStatus />
     </Footer>
   )
