@@ -38,7 +38,7 @@ export default function Season({ searchWorks }: searchWorksProps) {
       >
         <ResultCurrentModal />
         <Stack align='center' justify='center'>
-          <Title order={1} className=' p-3 px-2'>
+          <Title order={2} className=' p-3 px-2'>
             {seasons
               .replace('winter', '冬')
               .replace('spring', '春')

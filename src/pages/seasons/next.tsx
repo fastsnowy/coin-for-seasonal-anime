@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { ReactElement } from 'react'
 import { useSetRecoilState } from 'recoil'
 
-import { AppShell, Container, SimpleGrid, Stack, Title } from '@mantine/core'
+import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/core'
 
 import type { annictWorks } from '@/types/annict'
 
@@ -29,36 +29,41 @@ export default function NextSeason({ searchWorks }: searchWorksProps) {
   const setSearchWorks = useSetRecoilState(AtomFetchNextSeason)
   const setModalOpened = useSetRecoilState(AtomIsNextModalOpened)
   setSearchWorks(searchWorks)
-  console.log(searchWorks)
   setModalOpened(false)
   return (
     <>
-      <ResultNextModal />
-      <Stack align='center' justify='center'>
-        <Title order={1} className='text-red-300 p-3 px-2 drop-shadow-lg'>
-          {seasons
-            .replace('winter', '冬')
-            .replace('spring', '春')
-            .replace('summer', '夏')
-            .replace('autumn', '秋')}
-          アニメ一覧
-        </Title>
-      </Stack>
-      <Container size='xl'>
-        <SimpleGrid
-          cols={3}
-          breakpoints={[
-            { maxWidth: 'sm', cols: 2 },
-            { maxWidth: 'xs', cols: 1 },
-          ]}
-        >
-          {searchWorks.nodes.map((work) => (
-            <div key={work.annictId}>
-              <AnimeCard work={work} />
-            </div>
-          ))}
-        </SimpleGrid>
-      </Container>
+      <Box
+        sx={(theme) => ({
+          color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
+        })}
+      >
+        <ResultNextModal />
+        <Stack align='center' justify='center'>
+          <Title order={2} className='p-3 px-2 '>
+            {seasons
+              .replace('winter', '冬')
+              .replace('spring', '春')
+              .replace('summer', '夏')
+              .replace('autumn', '秋')}
+            アニメ一覧
+          </Title>
+        </Stack>
+        <Container size='xl'>
+          <SimpleGrid
+            cols={3}
+            breakpoints={[
+              { maxWidth: 'sm', cols: 2 },
+              { maxWidth: 'xs', cols: 1 },
+            ]}
+          >
+            {searchWorks.nodes.map((work) => (
+              <div key={work.annictId}>
+                <AnimeCard work={work} />
+              </div>
+            ))}
+          </SimpleGrid>
+        </Container>
+      </Box>
     </>
   )
 }
