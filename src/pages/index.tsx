@@ -52,7 +52,7 @@ export default function Home() {
               >
                 Annict GraphQL API
               </Text>
-              を用いてアニメの情報を取得しています。 作った人→@pixy_slp
+              を用いてアニメの情報を取得しています。
             </Text>
           </Alert>
           <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
