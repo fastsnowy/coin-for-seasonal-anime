@@ -8,6 +8,7 @@ import { ActionIcon, Button, Container, Group, Image, Mark, Modal, Tabs } from '
 import { ResultCurrentCard, ResultNextCard } from './ResultsCard'
 import { ResultsCurrentTable, ResultsNextTable } from './ResultsTable'
 
+import { DEPLOY_URL } from '@/configs'
 import { AtomIsCurrentModalOpened, AtomIsNextModalOpened } from '@/global/atoms'
 import { selectorTotalCoinCurrentSeason, selectorTotalCoinNextSeason } from '@/global/selectors'
 import { getSeasons } from '@/utils/getseason'
@@ -53,7 +54,7 @@ export function ResultCurrentModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <TwitterShareButton title={shareText} url='https://anime-coin.vercel.app'>
+          <TwitterShareButton title={shareText} url={DEPLOY_URL}>
             <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
               ツイート
             </Button>
@@ -108,7 +109,7 @@ export function ResultNextModal() {
       </Tabs>
       <Container>
         <Group position='center'>
-          <TwitterShareButton title={shareText} url='https://anime-coin.vercel.app'>
+          <TwitterShareButton title={shareText} url={DEPLOY_URL}>
             <Button color='blue' leftIcon={<TbBrandTwitter />} size='sm'>
               ツイート
             </Button>
