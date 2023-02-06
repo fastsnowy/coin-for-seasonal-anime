@@ -15,6 +15,7 @@ export default class _Document extends Document {
             rel='icon'
             href='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
           />
+          <meta property='og:title' content='anime-coin' />
         </Head>
         <body>
           <Main />

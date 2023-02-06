@@ -1,10 +1,12 @@
+/* eslint-disable jsx-a11y/alt-text */
 import Link from 'next/link'
 import { ReactElement } from 'react'
 
-import { AppShell, Footer, Header, Text } from '@mantine/core'
+import { ActionIcon, AppShell, Footer, Group, Header, Image, Text } from '@mantine/core'
 
 import { ActionToggle } from '@/components/ColorSchemeButton'
 import { CurrentStatus, NextStatus } from '@/components/StatusBar'
+import { GITHUB_URL } from '@/configs'
 
 type LayoutProps = Required<{
   readonly children: ReactElement
@@ -20,7 +22,12 @@ export const LayoutHeader = () => {
       })}
     >
       <Link href='/' className='text-inherit no-underline'>
-        <Text className='text-2xl font-bold'>アニメコイン</Text>
+        <Group>
+          <ActionIcon size='md' variant='transparent' disabled>
+            <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
+          </ActionIcon>
+          <Text className='text-2xl font-bold'>アニメコイン</Text>
+        </Group>
       </Link>
       <ActionToggle />
     </Header>
@@ -44,5 +51,17 @@ export const LayoutNextSeasonFooter = () => {
 }
 
 export function Layout({ children }: LayoutProps) {
-  return <AppShell header={<LayoutHeader />}>{children}</AppShell>
+  return (
+    <div>
+      <AppShell header={<LayoutHeader />}>{children}</AppShell>
+      <Text
+        component='a'
+        target='_blank'
+        href={GITHUB_URL}
+        className='flex sticky justify-center underline'
+      >
+        Github
+      </Text>
+    </div>
+  )
 }
