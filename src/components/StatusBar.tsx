@@ -29,7 +29,7 @@ export function CurrentStatus() {
   return (
     <Flex align='center' gap='xl' justify='center'>
       <Tooltip label='リセット'>
-        <ActionIcon variant='light' color='orange' onClick={() => resetBetCoin()}>
+        <ActionIcon variant='light' color='orange' size='lg' onClick={() => resetBetCoin()}>
           <GrPowerReset />
         </ActionIcon>
       </Tooltip>
@@ -44,6 +44,7 @@ export function CurrentStatus() {
         <ActionIcon
           variant='light'
           color='cyan'
+          size='lg'
           onClick={() => {
             totalValue > 0 ? setModalOpened(true) : notificationError()
           }}
@@ -62,7 +63,7 @@ export function NextStatus() {
   return (
     <Flex align='center' gap='xl' justify='center'>
       <Tooltip label='リセット'>
-        <ActionIcon variant='light' color='orange' onClick={() => resetBetCoin()}>
+        <ActionIcon variant='light' color='orange' size='lg' onClick={() => resetBetCoin()}>
           <GrPowerReset />
         </ActionIcon>
       </Tooltip>
@@ -77,6 +78,7 @@ export function NextStatus() {
         <ActionIcon
           variant='light'
           color='cyan'
+          size='lg'
           onClick={() => {
             totalValue > 0 ? setModalOpened(true) : notificationError()
           }}

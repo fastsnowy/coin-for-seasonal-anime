@@ -52,7 +52,7 @@ export default function NextSeason({ searchWorks }: searchWorksProps) {
           <SimpleGrid
             cols={3}
             breakpoints={[
-              { maxWidth: 'sm', cols: 2 },
+              { maxWidth: 'md', cols: 2 },
               { maxWidth: 'xs', cols: 1 },
             ]}
           >
