@@ -81,6 +81,10 @@ export const getStaticProps: GetStaticProps = async () => {
     headers: headers,
     body: JSON.stringify(GET_ANIME_DETAILS(seasons)),
   })
+  if (!response.ok) {
+    const error = new Error(`${response.status} data fetching error`)
+    throw error
+  }
   const data = await response.json()
 
   return {
