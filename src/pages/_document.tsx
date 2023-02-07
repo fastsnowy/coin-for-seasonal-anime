@@ -24,7 +24,6 @@ export default class _Document extends Document {
             property='og:description'
             content='アニメに対する期待度を「アニメコイン」を賭けて表そう!'
           />
-          <meta name='twitter:card' content='summary_large_image' />
           <meta property='og:image' content={`${DEPLOY_URL}/api/og`} />
         </Head>
         <body>
