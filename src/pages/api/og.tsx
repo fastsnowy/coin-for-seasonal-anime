@@ -9,7 +9,7 @@ export default async function handler() {
     (
       <div
         style={{
-          fontSize: 100,
+          fontSize: 180,
           color: 'black',
           background: 'white',
           width: '100%',
@@ -20,7 +20,7 @@ export default async function handler() {
           alignItems: 'center',
         }}
       >
-        🪙アニメコイン🪙
+        🪙 🎁
       </div>
     ),
     {

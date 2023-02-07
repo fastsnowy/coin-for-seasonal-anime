@@ -20,6 +20,10 @@ export default class _Document extends Document {
           <meta property='og:title' content='アニメコイン' />
           <meta property='og:site_name' content='アニメコイン' />
           <meta property='og:url' content={DEPLOY_URL} />
+          <meta
+            property='og:description'
+            content='アニメに対する期待度を「アニメコイン」を賭けて表そう!'
+          />
           <meta property='og:image' content={`${DEPLOY_URL}/api/og`} />
         </Head>
         <body>
