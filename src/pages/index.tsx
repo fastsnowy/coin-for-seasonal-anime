@@ -18,7 +18,7 @@ export default function Home() {
           </Text>
           <Group position='center' p='md'>
             <Link href='/seasons/current'>
-              <Button variant='outline'>
+              <Button variant='light' color='cyan' size='lg'>
                 今期(
                 {season.current
                   .replace('winter', '冬')
@@ -29,7 +29,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href='/seasons/next'>
-              <Button variant='outline'>
+              <Button variant='light' color='cyan' size='lg'>
                 来期(
                 {season.next
                   .replace('winter', '冬')
@@ -41,7 +41,13 @@ export default function Home() {
             </Link>
           </Group>
 
-          <Alert title='about' icon={<TiLightbulb />}>
+          <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>
+            <Text>
+              気になるアニメにアニメコインを賭ける（老後に備えて各8万枚まで賭けることが可能）
+            </Text>
+            <Text>結果をスクリーンショットしシェア</Text>
+          </Alert>
+          <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
             <Text>
               このサイトは
               <Text
@@ -52,12 +58,10 @@ export default function Home() {
               >
                 Annict GraphQL API
               </Text>
-              を用いてアニメの情報を取得しています。
+              を用いて各シーズンのアニメの情報を取得しています。
             </Text>
-          </Alert>
-          <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
             <Text>
-              このサイトはネタサイトです。「アニメコイン」は実際の金融通貨等と一切関係ありません。
+              ※ このサイトはネタサイトです。「アニメコイン」は実際の金融通貨等と一切関係ありません。
             </Text>
           </Alert>
         </SimpleGrid>
