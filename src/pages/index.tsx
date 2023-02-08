@@ -42,9 +42,7 @@ export default function Home() {
           </Group>
 
           <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>
-            <Text>
-              気になるアニメにアニメコインを賭ける（老後に備えて各8万枚まで賭けることが可能）
-            </Text>
+            <Text>気になるアニメにアニメコインを賭ける</Text>
             <Text>結果をスクリーンショットしシェア</Text>
           </Alert>
           <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
