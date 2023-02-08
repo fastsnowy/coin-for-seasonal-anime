@@ -45,7 +45,7 @@ export function ResultCurrentModal() {
           <Tabs.Tab value='card' icon={<TbPhoto size={14} />}></Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value='table' pt='xs'>
-          <Container size='md'>
+          <Container size='xl'>
             <ResultsCurrentTable />
           </Container>
         </Tabs.Panel>
