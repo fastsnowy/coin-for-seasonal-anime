@@ -17,6 +17,7 @@ export default class _Document extends Document {
             rel='icon'
             href='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
           />
+          <meta name='twitter:card' content='summary' />
           <meta property='og:title' content='アニメコイン' />
           <meta property='og:site_name' content='アニメコイン' />
           <meta property='og:url' content={DEPLOY_URL} />
