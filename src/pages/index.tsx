@@ -4,6 +4,7 @@ import { TiLightbulb, TiWarningOutline } from 'react-icons/ti'
 
 import { Alert, Button, Container, Group, SimpleGrid, Text } from '@mantine/core'
 
+import { TWITTER_URL } from '@/configs'
 import { Layout } from '@/layouts'
 import { getSeasons } from '@/utils/getseason'
 
@@ -46,6 +47,12 @@ export default function Home() {
             <Text>結果をスクリーンショットしシェア</Text>
           </Alert>
           <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
+            <Text>
+              作った人→
+              <Text component='a' target='_blank' href={TWITTER_URL} className='underline'>
+                Twitter
+              </Text>
+            </Text>
             <Text>
               このサイトは
               <Text
