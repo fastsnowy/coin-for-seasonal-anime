@@ -4,6 +4,7 @@ import { TiLightbulb, TiWarningOutline } from 'react-icons/ti'
 
 import { Alert, Button, Container, Group, SimpleGrid, Text } from '@mantine/core'
 
+import { TWITTER_URL } from '@/configs'
 import { Layout } from '@/layouts'
 import { getSeasons } from '@/utils/getseason'
 
@@ -14,7 +15,7 @@ export default function Home() {
       <Container p='md' size='md'>
         <SimpleGrid cols={1} spacing='xs'>
           <Text align='center' size='xl'>
-            アニメに対する期待度を「アニメコイン」を賭けて表そう！
+            アニメに対する期待度を「コイン」を賭けて表そう！
           </Text>
           <Group position='center' p='md'>
             <Link href='/seasons/current'>
@@ -42,10 +43,16 @@ export default function Home() {
           </Group>
 
           <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>
-            <Text>気になるアニメにアニメコインを賭ける</Text>
+            <Text>気になるアニメに「コイン」を賭ける</Text>
             <Text>結果をスクリーンショットしシェア</Text>
           </Alert>
           <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
+            <Text>
+              作った人→
+              <Text component='a' target='_blank' href={TWITTER_URL} className='underline'>
+                Twitter
+              </Text>
+            </Text>
             <Text>
               このサイトは
               <Text
@@ -59,7 +66,8 @@ export default function Home() {
               を用いて各シーズンのアニメの情報を取得しています。
             </Text>
             <Text>
-              ※ このサイトはネタサイトです。「アニメコイン」は実際の金融通貨等と一切関係ありません。
+              ※
+              このサイトはネタサイトです。ここで言う「コイン」とは一般名称であり、実際の金融通貨等と一切関係ありません。
             </Text>
           </Alert>
         </SimpleGrid>

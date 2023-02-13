@@ -23,7 +23,7 @@ export function ResultCurrentModal() {
     .replace('spring', '春')
     .replace('summer', '夏')
     .replace('autumn', '秋')
-  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のアニメコインを賭けました！`
+  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のコインを賭けました！`
   return (
     <Modal
       opened={modalOpened}
@@ -83,7 +83,7 @@ export function ResultNextModal() {
     .replace('spring', '春')
     .replace('summer', '夏')
     .replace('autumn', '秋')
-  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のアニメコインを賭けました！`
+  const shareText = `${seasonsText}アニメに合計${totalBet.toLocaleString()}枚のコインを賭けました！`
   return (
     <Modal
       opened={modalOpened}
