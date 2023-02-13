@@ -34,7 +34,7 @@ export default function App(props: AppPropsWithLayout) {
   return (
     <>
       <Head>
-        <title>アニメコイン</title>
+        <title>毎期のコイン</title>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       </Head>
       <RecoilRoot>
