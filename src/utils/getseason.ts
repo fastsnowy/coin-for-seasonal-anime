@@ -1,6 +1,7 @@
 export const getSeasons = () => {
   const currentDate = new Date()
-  const nextDate = new Date()
+  currentDate.setDate(1)
+  const nextDate = new Date(currentDate)
   nextDate.setMonth(currentDate.getMonth() + 3)
   const SEASONS = {
     winter: 'winter',
