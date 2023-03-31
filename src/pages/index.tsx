@@ -18,7 +18,7 @@ export default function Home() {
             アニメに対する期待度を「コイン」を賭けて表そう！
           </Text>
           <Group position='center' p='md'>
-            <Link href='/seasons/current'>
+            <Link href={`/seasons/${season.current}`}>
               <Button variant='light' color='cyan' size='lg'>
                 今期(
                 {season.current
@@ -29,7 +29,7 @@ export default function Home() {
                 )に賭ける
               </Button>
             </Link>
-            <Link href='/seasons/next'>
+            <Link href={`/seasons/${season.next}`}>
               <Button variant='light' color='cyan' size='lg'>
                 来期(
                 {season.next
