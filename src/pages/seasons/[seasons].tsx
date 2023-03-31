@@ -36,7 +36,7 @@ export default function Season({ searchWorks, seasonName }: searchWorksProps) {
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
         })}
       >
-        <ResultCurrentModal />
+        <ResultCurrentModal seasonName={seasonName} />
         <Stack align='center' justify='center'>
           <Title order={2} className=' p-3 px-2'>
             {seasonName

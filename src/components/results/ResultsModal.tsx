@@ -14,11 +14,14 @@ import { AtomIsCurrentModalOpened, AtomIsNextModalOpened } from '@/global/atoms'
 import { selectorTotalCoinCurrentSeason, selectorTotalCoinNextSeason } from '@/global/selectors'
 import { getSeasons } from '@/utils/getseason'
 
-export function ResultCurrentModal() {
+type modalProps = {
+  seasonName: string
+}
+
+export function ResultCurrentModal({ seasonName }: modalProps) {
   const [modalOpened, setModalOpened] = useRecoilState(AtomIsCurrentModalOpened)
   const totalBet = useRecoilValue(selectorTotalCoinCurrentSeason)
-  const season = getSeasons()
-  const seasonsText = season.current
+  const seasonsText = seasonName
     .replace('winter', '冬')
     .replace('spring', '春')
     .replace('summer', '夏')
