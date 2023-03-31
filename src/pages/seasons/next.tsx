@@ -90,6 +90,6 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: { searchWorks: data.data.searchWorks },
-    revalidate: 60 * 15,
+    revalidate: 60,
   }
 }
