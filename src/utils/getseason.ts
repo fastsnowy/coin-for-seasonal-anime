@@ -1,7 +1,9 @@
+import utcToZonedTime from 'date-fns-tz/utcToZonedTime'
+
 export const getSeasons = () => {
-  const currentDate = new Date()
+  const currentDate = utcToZonedTime(new Date(), 'Asia/Tokyo')
   currentDate.setDate(1)
-  const nextDate = new Date(currentDate)
+  const nextDate = utcToZonedTime(new Date(currentDate), 'Asia/Tokyo')
   nextDate.setMonth(currentDate.getMonth() + 3)
   const SEASONS = {
     winter: 'winter',
