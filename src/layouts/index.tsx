@@ -6,7 +6,7 @@ import { SiGithub } from 'react-icons/si'
 import { ActionIcon, AppShell, Footer, Group, Header, Image, Text } from '@mantine/core'
 
 import { ActionToggle } from '@/components/ColorSchemeButton'
-import { CurrentStatus, NextStatus } from '@/components/StatusBar'
+import { CurrentStatus } from '@/components/StatusBar'
 import { GITHUB_URL } from '@/configs'
 
 type LayoutProps = Required<{
@@ -39,14 +39,6 @@ export const LayoutCurrentSeasonFooter = () => {
   return (
     <Footer height={50} p='xs' className='flex justify-center'>
       <CurrentStatus />
-    </Footer>
-  )
-}
-
-export const LayoutNextSeasonFooter = () => {
-  return (
-    <Footer height={50} p='md' className='flex px-4 justify-center'>
-      <NextStatus />
     </Footer>
   )
 }
