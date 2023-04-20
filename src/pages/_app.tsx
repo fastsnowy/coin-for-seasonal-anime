@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
@@ -48,6 +49,7 @@ export default function App(props: AppPropsWithLayout) {
           >
             <NotificationsProvider autoClose={3000}>
               {getLayout(<Component {...pageProps} />)}
+              <Analytics />
             </NotificationsProvider>
           </MantineProvider>
         </ColorSchemeProvider>
