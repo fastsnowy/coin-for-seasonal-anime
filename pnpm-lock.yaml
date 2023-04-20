@@ -34,6 +34,9 @@ dependencies:
   '@types/react-dom':
     specifier: 18.0.10
     version: 18.0.10
+  '@vercel/analytics':
+    specifier: ^1.0.0
+    version: 1.0.0(react@18.2.0)
   '@vercel/og':
     specifier: ^0.1.0
     version: 0.1.0
@@ -1132,6 +1135,14 @@ packages:
     dependencies:
       graphql: 16.6.0
       wonka: 6.1.2
+    dev: false
+
+  /@vercel/analytics@1.0.0(react@18.2.0):
+    resolution: {integrity: sha512-RQmj7pv82JwGDHrnKeRc6TtSw2U7rWNubc2IH0ernTzWTj02yr9zvIYiYJeztsBzrJtWv7m8Nz6vxxb+cdEtJw==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /@vercel/og@0.1.0:
