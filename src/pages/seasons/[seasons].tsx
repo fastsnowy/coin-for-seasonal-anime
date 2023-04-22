@@ -9,10 +9,12 @@ import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
 import { ResultCurrentModal } from '@/components/results/ResultsModal'
+import { DATABASE_NAME } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
 import { GET_ANIME_DETAILS } from '@/gql'
 import { LayoutHeader } from '@/layouts'
 import { headers, ANNICT_URL } from '@/libs/annict'
+import { supabase } from '@/libs/supabaseClient'
 import { getSeasons } from '@/utils/getseason'
 
 const LayoutCurrentSeasonFooter = dynamic(
@@ -22,13 +24,15 @@ const LayoutCurrentSeasonFooter = dynamic(
 type searchWorksProps = {
   searchWorks: annictWorks
   seasonName: string
+  totalCoin: { annict_id: number; total_coin_value: number }[]
 }
 
-export default function Season({ searchWorks, seasonName }: searchWorksProps) {
+export default function Season({ searchWorks, seasonName, totalCoin }: searchWorksProps) {
   const setSearchWorks = useSetRecoilState(AtomFetchCurrentSeason)
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
   setModalOpened(false)
   setSearchWorks(searchWorks)
+  console.log(totalCoin)
   return (
     <>
       <Box
@@ -57,7 +61,7 @@ export default function Season({ searchWorks, seasonName }: searchWorksProps) {
           >
             {searchWorks.nodes.map((work) => (
               <div key={work.annictId}>
-                <AnimeCard work={work} />
+                <AnimeCard work={work} totalCoin={totalCoin} />
               </div>
             ))}
           </SimpleGrid>
@@ -97,8 +101,22 @@ export const getStaticProps: GetStaticProps = async (context) => {
     throw error
   }
   const data = await response.json()
+  // supabaseからデータを取得
+  const { data: totalCoinValue, error } = await supabase
+    .from(DATABASE_NAME)
+    .select('annict_id, total_coin_value')
+    .eq('season', seasonName)
+  if (error) {
+    console.log(error)
+  }
+  console.log(totalCoinValue)
+
   return {
-    props: { searchWorks: data.data.searchWorks, seasonName: seasonName },
+    props: {
+      searchWorks: data.data.searchWorks,
+      seasonName: seasonName,
+      totalCoin: totalCoinValue,
+    },
     revalidate: 60,
   }
 }
