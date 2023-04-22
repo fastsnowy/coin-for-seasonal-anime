@@ -18,11 +18,16 @@ import {
   NumberInputHandlers,
 } from '@mantine/core'
 
-import { AtomFamilybetCoinValue } from '@/global/atoms'
+import { AtomFamilyTotalCoinValue, AtomFamilybetCoinValue } from '@/global/atoms'
 import { nodes } from '@/types/annict'
 
 type workProps = {
   work: nodes
+}
+
+type animeCardProps = {
+  work: nodes
+  totalCoin: { annict_id: number; total_coin_value: number }[]
 }
 
 const SliderCoin = ({ work }: workProps) => {
@@ -72,7 +77,15 @@ const SliderCoin = ({ work }: workProps) => {
 }
 const MemoSiliderCoin = memo(SliderCoin)
 
-export function AnimeCard({ work }: workProps) {
+export function AnimeCard({ work, totalCoin }: animeCardProps) {
+  const [totalCoinValue, setTotalCoinValue] = useRecoilState(
+    AtomFamilyTotalCoinValue(work.annictId),
+  )
+  totalCoin.map((item) => {
+    if (item.annict_id === work.annictId) {
+      setTotalCoinValue(item.total_coin_value)
+    }
+  })
   return (
     <Card
       shadow='md'
@@ -130,6 +143,7 @@ export function AnimeCard({ work }: workProps) {
               </ActionIcon>
             </Tooltip>
           </Group>
+
           <Tooltip label='視聴者数'>
             <Text align='center'>{work.watchersCount} watchers</Text>
           </Tooltip>
@@ -137,6 +151,13 @@ export function AnimeCard({ work }: workProps) {
         <Text px='md' className='font-medium text-center justify-center'>
           {work.title}
         </Text>
+      </Card.Section>
+      <Card.Section>
+        <Tooltip label='合計コイン'>
+          <Text className='text-center justify-center'>
+            {totalCoinValue.toLocaleString()} coins
+          </Text>
+        </Tooltip>
       </Card.Section>
       <Card.Section p='xs'>
         <MemoSiliderCoin work={work} />
