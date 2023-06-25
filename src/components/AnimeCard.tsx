@@ -151,7 +151,7 @@ export function AnimeCard({ work, totalCoin }: animeCardProps) {
       </Card.Section>
       <Card.Section px='xs'>
         <Flex className='justify-end text-right'>
-          <Tooltip label='合計コイン'>
+          <Tooltip label='コイン総数'>
             <Text color='yellow'>{totalCoinValue.toLocaleString()} coins</Text>
           </Tooltip>
         </Flex>
