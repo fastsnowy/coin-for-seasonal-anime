@@ -10,8 +10,8 @@ import {
   Container,
   Group,
   Image,
-  Mark,
   SimpleGrid,
+  Stack,
   Table,
   Tabs,
   Text,
@@ -77,17 +77,19 @@ export default function Result({
   )
   return (
     <Container size='xl' p='md'>
-      <Group position='center' className='text-lg'>
-        {seasonsText}アニメに合計
-        <ActionIcon size='sm' variant='transparent' disabled>
-          <Image
-            src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
-            alt='coin-icon'
-          />
-        </ActionIcon>
-        <Mark>{totalCoinValueSum.toLocaleString()}</Mark>
-        枚のコインを賭けました！
-      </Group>
+      <Stack>
+        <Group position='center' className='text-lg'>
+          <Text>{seasonsText}アニメに</Text>
+          <ActionIcon size='sm' variant='transparent' disabled>
+            <Image
+              src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
+              alt='coin-icon'
+            />
+          </ActionIcon>
+          <Text>{totalCoinValueSum.toLocaleString()}</Text>
+          のコインを賭けました！
+        </Group>
+      </Stack>
       <Tabs defaultValue='card'>
         <Tabs.List position='right'>
           <Tooltip label='カード'>
@@ -165,9 +167,6 @@ export const getServerSideProps = async ({
       throw error
     }
     const annictData = await annictResponse.json()
-    console.log(betAnimes)
-    console.log(annictIds)
-    console.log(annictData.data.searchWorks)
     return {
       props: {
         seasonName: seasonName,

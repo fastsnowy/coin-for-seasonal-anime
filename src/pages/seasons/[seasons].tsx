@@ -32,7 +32,6 @@ export default function Season({ searchWorks, seasonName, totalCoin }: searchWor
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
   setModalOpened(false)
   setSearchWorks(searchWorks)
-  console.log(totalCoin)
   return (
     <>
       <Box
