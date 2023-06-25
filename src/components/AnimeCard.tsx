@@ -148,16 +148,18 @@ export function AnimeCard({ work, totalCoin }: animeCardProps) {
             <Text align='center'>{work.watchersCount} watchers</Text>
           </Tooltip>
         </Flex>
+      </Card.Section>
+      <Card.Section px='xs'>
+        <Flex className='justify-end text-right'>
+          <Tooltip label='合計コイン'>
+            <Text color='yellow'>{totalCoinValue.toLocaleString()} coins</Text>
+          </Tooltip>
+        </Flex>
+      </Card.Section>
+      <Card.Section>
         <Text px='md' className='font-medium text-center justify-center'>
           {work.title}
         </Text>
-      </Card.Section>
-      <Card.Section>
-        <Tooltip label='合計コイン'>
-          <Text className='text-center justify-center'>
-            {totalCoinValue.toLocaleString()} coins
-          </Text>
-        </Tooltip>
       </Card.Section>
       <Card.Section p='xs'>
         <MemoSiliderCoin work={work} />
