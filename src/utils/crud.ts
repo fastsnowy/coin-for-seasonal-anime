@@ -1,5 +1,6 @@
 import { showNotification } from '@mantine/notifications'
 
+import { BET_COINS } from '@/configs'
 import { supabase } from '@/libs/supabaseClient'
 
 const notificationPostError = () => {
@@ -18,7 +19,7 @@ export const createBetData = async (
   }[],
 ) => {
   try {
-    const { error } = await supabase.from('coins').insert(annictIdsWithCoinValues)
+    const { error } = await supabase.from(BET_COINS).insert(annictIdsWithCoinValues)
     if (error) throw error
   } catch (error) {
     console.error(error)
