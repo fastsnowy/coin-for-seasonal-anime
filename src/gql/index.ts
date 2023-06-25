@@ -22,3 +22,29 @@ export const GET_ANIME_DETAILS = (season: string) => {
   `,
   }
 }
+
+export const GET_ANIME_DETAILS_BY_IDS = (annictIds: number[]) => {
+  return {
+    query: `
+    query {
+      searchWorks(annictIds: [${annictIds}]) {
+        nodes {
+          __typename
+          annictId
+          officialSiteUrl
+          title
+          twitterUsername
+          watchersCount
+          media
+          image {
+            __typename
+            recommendedImageUrl
+            facebookOgImageUrl
+          }
+        }
+
+      }
+    }
+  `,
+  }
+}

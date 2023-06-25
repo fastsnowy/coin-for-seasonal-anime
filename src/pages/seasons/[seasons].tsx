@@ -8,8 +8,8 @@ import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/cor
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
-import { ResultCurrentModal } from '@/components/results/ResultsModal'
-import { DATABASE_NAME } from '@/configs'
+import { ConfirmModal } from '@/components/ConfirmModal'
+import { TOTAL_COIN_VALUE_VIEW } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
 import { GET_ANIME_DETAILS } from '@/gql'
 import { LayoutHeader } from '@/layouts'
@@ -40,7 +40,8 @@ export default function Season({ searchWorks, seasonName, totalCoin }: searchWor
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
         })}
       >
-        <ResultCurrentModal seasonName={seasonName} />
+        {/* <ResultCurrentModal seasonName={seasonName} /> */}
+        <ConfirmModal seasonName={seasonName} />
         <Stack align='center' justify='center'>
           <Title order={2} className=' p-3 px-2'>
             {seasonName
@@ -103,13 +104,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const data = await response.json()
   // supabaseからデータを取得
   const { data: totalCoinValue, error } = await supabase
-    .from(DATABASE_NAME)
+    .from(TOTAL_COIN_VALUE_VIEW)
     .select('annict_id, total_coin_value')
     .eq('season', seasonName)
   if (error) {
     console.log(error)
   }
-  console.log(totalCoinValue)
 
   return {
     props: {
