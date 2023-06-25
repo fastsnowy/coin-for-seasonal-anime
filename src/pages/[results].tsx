@@ -10,8 +10,8 @@ import {
   Container,
   Group,
   Image,
+  Mark,
   SimpleGrid,
-  Stack,
   Table,
   Tabs,
   Text,
@@ -77,19 +77,19 @@ export default function Result({
   )
   return (
     <Container size='xl' p='md'>
-      <Stack>
-        <Group position='center' className='text-lg'>
-          <Text>{seasonsText}アニメに</Text>
-          <ActionIcon size='sm' variant='transparent' disabled>
-            <Image
-              src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
-              alt='coin-icon'
-            />
-          </ActionIcon>
-          <Text>{totalCoinValueSum.toLocaleString()}</Text>
-          のコインを賭けました！
-        </Group>
-      </Stack>
+      <Text align='center' className='text-lg'>
+        {seasonsText}アニメに
+      </Text>
+      <Group position='center' className='text-lg'>
+        <ActionIcon size='sm' variant='transparent' disabled>
+          <Image
+            src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
+            alt='coin-icon'
+          />
+        </ActionIcon>
+        <Mark>{totalCoinValueSum.toLocaleString()}枚</Mark>
+        のコインを賭けました！
+      </Group>
       <Tabs defaultValue='card'>
         <Tabs.List position='right'>
           <Tooltip label='カード'>
