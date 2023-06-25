@@ -145,14 +145,14 @@ export function AnimeCard({ work, totalCoin }: animeCardProps) {
           </Group>
 
           <Tooltip label='視聴者数'>
-            <Text align='center'>{work.watchersCount} watchers</Text>
+            <Text align='center'>{work.watchersCount.toLocaleString()} watchers</Text>
           </Tooltip>
         </Flex>
       </Card.Section>
       <Card.Section px='xs'>
         <Flex className='justify-end text-right'>
           <Tooltip label='コイン総数'>
-            <Text color='yellow'>{totalCoinValue.toLocaleString()} coins</Text>
+            <Text>{totalCoinValue.toLocaleString()} coins</Text>
           </Tooltip>
         </Flex>
       </Card.Section>
