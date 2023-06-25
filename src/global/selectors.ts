@@ -47,3 +47,19 @@ export const selectorClearBetAnimeListCurrentSeason = selector({
     })
   },
 })
+
+export const selectorGetBetAnimeListWithCoinValue = selector({
+  key: 'selector/GetBetAnimeListWithCoinValue',
+  get: ({ get }) => {
+    const currentSearchWorks = get(AtomFetchCurrentSeason)
+    const betAnimeList: { annict_id: number; coin_value: number }[] = []
+    // [{"annict_id": 1, "coin_value": 1000}, {"annict_id": 2, "coin_value": 2000}]のような形で返す
+    currentSearchWorks.nodes.map((work) => {
+      const coinValue = get(AtomFamilybetCoinValue(work.annictId))
+      if (coinValue > 0) {
+        betAnimeList.push({ annict_id: work.annictId, coin_value: coinValue })
+      }
+    })
+    return betAnimeList
+  },
+})
