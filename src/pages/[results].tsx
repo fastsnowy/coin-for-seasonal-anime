@@ -117,7 +117,7 @@ export default function Result({
         <Button
           component={TwitterIntentTweet}
           text={shareText}
-          url={`${DEPLOY_URL}/results?id=${resultId}`}
+          url={`https://${DEPLOY_URL}/results?id=${resultId}`}
           color='blue'
           leftIcon={<FaTwitter />}
         >
