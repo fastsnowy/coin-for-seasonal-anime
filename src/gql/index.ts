@@ -27,7 +27,7 @@ export const GET_ANIME_DETAILS_BY_IDS = (annictIds: number[]) => {
   return {
     query: `
     query {
-      searchWorks(annictIds: [${annictIds}]) {
+      searchWorks(orderBy: { field: WATCHERS_COUNT, direction: DESC }, annictIds: [${annictIds}]) {
         nodes {
           __typename
           annictId
