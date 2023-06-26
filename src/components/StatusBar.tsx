@@ -38,7 +38,7 @@ export function CurrentStatus() {
         </ActionIcon>
         {totalValue.toLocaleString()}枚
       </Group>
-      <Tooltip label='結果を表示'>
+      <Tooltip label='確認'>
         <ActionIcon
           variant='light'
           color='cyan'

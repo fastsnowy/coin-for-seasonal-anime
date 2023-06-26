@@ -7,6 +7,11 @@ export const AtomFamilybetCoinValue = atomFamily<number, number>({
   default: 0,
 })
 
+export const AtomFamilyTotalCoinValue = atomFamily<number, number>({
+  key: 'totalCoinValue',
+  default: 0,
+})
+
 export const AtomtotalCoinCount = atom({
   key: 'totalCoin',
   default: 0,

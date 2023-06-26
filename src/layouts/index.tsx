@@ -27,7 +27,6 @@ export const LayoutHeader = () => {
           <ActionIcon size='md' variant='transparent' disabled>
             <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
           </ActionIcon>
-          <Text className='text-2xl font-bold'>毎期のコイン</Text>
         </Group>
       </Link>
       <ActionToggle />

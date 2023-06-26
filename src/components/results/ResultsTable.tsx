@@ -1,27 +1,39 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 
-import {
-  ActionIcon,
-  Card,
-  Group,
-  Image,
-  Progress,
-  Stack,
-  Table,
-  Text,
-  Tooltip,
-} from '@mantine/core'
+import { ActionIcon, Card, Group, Image, Stack, Text, Tooltip } from '@mantine/core'
 
-import {
-  selectorGetBetAnimeListCurrentSeason,
-  selectorTotalCoinCurrentSeason,
-} from '@/global/selectors'
+import { AtomFamilyTotalCoinValue } from '@/global/atoms'
+import { nodes } from '@/types/annict'
+import { betAnimes } from '@/types/coins'
 
-export function ResultsCurrentTable() {
-  const { betAnimeList, coinValueList } = useRecoilValue(selectorGetBetAnimeListCurrentSeason)
-  const totalBet = useRecoilValue(selectorTotalCoinCurrentSeason)
-  const tableItems = betAnimeList.map((work, idx) => (
+type resultTableProps = {
+  work: nodes
+  betAnimes: betAnimes
+  totalCoins: { annict_id: number; total_coin_value: number }[]
+}
+
+export function ResultsTable({ work, betAnimes, totalCoins }: resultTableProps) {
+  // annictIdごとのcoin_valueの合計を取得
+  const [totalCoinValue, setTotalCoinValue] = useRecoilState(
+    AtomFamilyTotalCoinValue(work.annictId),
+  )
+  totalCoins.map((item) => {
+    if (item.annict_id === work.annictId) {
+      setTotalCoinValue(item.total_coin_value)
+    }
+  })
+  // work.annictIdとbetAnimes.annict_idが一致する時のcoin_valueを取得
+  const coinValueList = betAnimes.map((item) => {
+    if (item.annict_id === work.annictId) {
+      return item.coin_value
+    } else {
+      return 0
+    }
+  })
+  const idx = coinValueList.findIndex((item) => item !== 0)
+
+  const tableItems = (
     <tr key={work.annictId}>
       <td>
         <Card
@@ -40,46 +52,33 @@ export function ResultsCurrentTable() {
             color: theme.colorScheme === 'dark' ? theme.white : theme.colors.gray[4],
           })}
         >
-          <Stack align='flex-start'>
+          <Group className='flex justify-between'>
             <Tooltip label='視聴者数'>
               <Text>{work.watchersCount.toLocaleString()} watchers</Text>
             </Tooltip>
+            <Tooltip label='コイン総数'>
+              <Text>{totalCoinValue.toLocaleString()} coins</Text>
+            </Tooltip>
+          </Group>
+          <Stack align='flex-start'>
             <Text align='center' size='lg' weight='bold' className='items-center text-center'>
-              {betAnimeList[idx].title}
+              {work.title}
             </Text>
           </Stack>
         </Card>
       </td>
       <td className='whitespace-nowrap'>
-        <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
-        <Tooltip label={`${((coinValueList[idx] / totalBet) * 100).toPrecision(4)}%`}>
-          <Progress
-            value={(coinValueList[idx] / totalBet) * 100}
-            size='md'
-            px='sm'
-            color='yellow'
-          ></Progress>
-        </Tooltip>
+        <Group position='center'>
+          <ActionIcon size='xs' variant='transparent' disabled>
+            <Image
+              src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png'
+              alt='coin-icon'
+            />
+          </ActionIcon>
+          <Text align='center'>{coinValueList[idx].toLocaleString()}</Text>
+        </Group>
       </td>
     </tr>
-  ))
-  return (
-    <Table fontSize='md' verticalSpacing='md'>
-      <thead>
-        <tr>
-          <th>
-            <Text align='center'>作品名</Text>
-          </th>
-          <th>
-            <Group position='center'>
-              <ActionIcon size='xs' variant='transparent' disabled>
-                <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
-              </ActionIcon>
-            </Group>
-          </th>
-        </tr>
-      </thead>
-      <tbody className='items-center text-center'>{tableItems}</tbody>
-    </Table>
   )
+  return tableItems
 }

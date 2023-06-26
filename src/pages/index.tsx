@@ -44,7 +44,7 @@ export default function Home() {
 
           <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>
             <Text>気になるアニメに「コイン」を賭ける</Text>
-            <Text>結果をスクリーンショットしシェア</Text>
+            <Text>結果をツイートしシェア</Text>
           </Alert>
           <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
             <Text>

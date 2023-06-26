@@ -8,11 +8,13 @@ import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/cor
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
-import { ResultCurrentModal } from '@/components/results/ResultsModal'
+import { ConfirmModal } from '@/components/ConfirmModal'
+import { TOTAL_COIN_VALUE_VIEW } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
 import { GET_ANIME_DETAILS } from '@/gql'
 import { LayoutHeader } from '@/layouts'
 import { headers, ANNICT_URL } from '@/libs/annict'
+import { supabase } from '@/libs/supabaseClient'
 import { getSeasons } from '@/utils/getseason'
 
 const LayoutCurrentSeasonFooter = dynamic(
@@ -22,9 +24,10 @@ const LayoutCurrentSeasonFooter = dynamic(
 type searchWorksProps = {
   searchWorks: annictWorks
   seasonName: string
+  totalCoin: { annict_id: number; total_coin_value: number }[]
 }
 
-export default function Season({ searchWorks, seasonName }: searchWorksProps) {
+export default function Season({ searchWorks, seasonName, totalCoin }: searchWorksProps) {
   const setSearchWorks = useSetRecoilState(AtomFetchCurrentSeason)
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
   setModalOpened(false)
@@ -36,7 +39,8 @@ export default function Season({ searchWorks, seasonName }: searchWorksProps) {
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
         })}
       >
-        <ResultCurrentModal seasonName={seasonName} />
+        {/* <ResultCurrentModal seasonName={seasonName} /> */}
+        <ConfirmModal seasonName={seasonName} />
         <Stack align='center' justify='center'>
           <Title order={2} className=' p-3 px-2'>
             {seasonName
@@ -57,7 +61,7 @@ export default function Season({ searchWorks, seasonName }: searchWorksProps) {
           >
             {searchWorks.nodes.map((work) => (
               <div key={work.annictId}>
-                <AnimeCard work={work} />
+                <AnimeCard work={work} totalCoin={totalCoin} />
               </div>
             ))}
           </SimpleGrid>
@@ -97,8 +101,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
     throw error
   }
   const data = await response.json()
+  // supabaseからデータを取得
+  const { data: totalCoinValue, error } = await supabase
+    .from(TOTAL_COIN_VALUE_VIEW)
+    .select('annict_id, total_coin_value')
+    .eq('season', seasonName)
+  if (error) {
+    console.log(error)
+  }
+
   return {
-    props: { searchWorks: data.data.searchWorks, seasonName: seasonName },
+    props: {
+      searchWorks: data.data.searchWorks,
+      seasonName: seasonName,
+      totalCoin: totalCoinValue,
+    },
     revalidate: 60,
   }
 }

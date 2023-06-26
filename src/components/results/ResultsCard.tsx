@@ -1,27 +1,49 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { FaTwitter } from 'react-icons/fa'
 import { TbLetterA } from 'react-icons/tb'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 
 import {
   ActionIcon,
   AspectRatio,
   Badge,
   Card,
-  Container,
   Flex,
   Group,
   Image,
-  SimpleGrid,
   Text,
   Tooltip,
 } from '@mantine/core'
 
-import { selectorGetBetAnimeListCurrentSeason } from '@/global/selectors'
+import { AtomFamilyTotalCoinValue } from '@/global/atoms'
+import { nodes } from '@/types/annict'
+import { betAnimes } from '@/types/coins'
 
-export function ResultCurrentCard() {
-  const { betAnimeList, coinValueList } = useRecoilValue(selectorGetBetAnimeListCurrentSeason)
-  const cards = betAnimeList.map((work, idx) => (
+type resultCardProps = {
+  work: nodes
+  betAnimes: betAnimes
+  totalCoins: { annict_id: number; total_coin_value: number }[]
+}
+
+export function ResultCard({ work, betAnimes, totalCoins }: resultCardProps) {
+  // annictIdごとのcoin_valueの合計を取得
+  const [totalCoinValue, setTotalCoinValue] = useRecoilState(
+    AtomFamilyTotalCoinValue(work.annictId),
+  )
+  totalCoins.map((item) => {
+    if (item.annict_id === work.annictId) {
+      setTotalCoinValue(item.total_coin_value)
+    }
+  })
+  // work.annictIdとbetAnimes.annict_idが一致する時のcoin_valueを取得
+  const coinValueList = betAnimes.map((item) => {
+    if (item.annict_id === work.annictId) {
+      return item.coin_value
+    }
+  })
+  const idx = coinValueList.findIndex((item) => item !== undefined)
+
+  return (
     <Card shadow='md' radius='md' p='lg' key={work.annictId}>
       <Card.Section component='a' target='_blank' href={work.officialSiteUrl}>
         <AspectRatio ratio={16 / 9}>
@@ -67,9 +89,18 @@ export function ResultCurrentCard() {
             </Tooltip>
           </Group>
           <Tooltip label='視聴者数'>
-            <Text align='center'>{work.watchersCount} watchers</Text>
+            <Text align='center'>{work.watchersCount.toLocaleString()} watchers</Text>
           </Tooltip>
         </Flex>
+      </Card.Section>
+      <Card.Section px='xs'>
+        <Flex className='justify-end text-right'>
+          <Tooltip label='コイン総数'>
+            <Text>{totalCoinValue.toLocaleString()} coins</Text>
+          </Tooltip>
+        </Flex>
+      </Card.Section>
+      <Card.Section px='xs'>
         <Text px='md' className='font-medium text-center justify-center'>
           {work.title}
         </Text>
@@ -80,23 +111,10 @@ export function ResultCurrentCard() {
             <Image src='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1fa99.png' />
           </ActionIcon>
           <Text size='lg' align='center'>
-            {coinValueList[idx].toLocaleString()}
+            {coinValueList[idx]?.toLocaleString()}
           </Text>
         </Group>
       </Card.Section>
     </Card>
-  ))
-  return (
-    <Container size='xl' p='md'>
-      <SimpleGrid
-        cols={3}
-        breakpoints={[
-          { maxWidth: 'md', cols: 2 },
-          { maxWidth: 'xs', cols: 1 },
-        ]}
-      >
-        {cards}
-      </SimpleGrid>
-    </Container>
   )
 }
