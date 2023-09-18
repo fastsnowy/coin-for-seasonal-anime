@@ -40,6 +40,11 @@ export default function Home() {
                 )に賭ける
               </Button>
             </Link>
+            <Link href={`/seasons/`}>
+              <Button variant='light' color='cyan' size='lg'>
+                過去のアニメはこちら
+              </Button>
+            </Link>
           </Group>
 
           <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>

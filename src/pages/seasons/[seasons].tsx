@@ -39,7 +39,6 @@ export default function Season({ searchWorks, seasonName, totalCoin }: searchWor
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
         })}
       >
-        {/* <ResultCurrentModal seasonName={seasonName} /> */}
         <ConfirmModal seasonName={seasonName} />
         <Stack align='center' justify='center'>
           <Title order={2} className=' p-3 px-2'>
