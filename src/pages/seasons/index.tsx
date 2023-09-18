@@ -17,7 +17,7 @@ export default function AllSeasons() {
             color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
           })}
         >
-          過去のアニメ一覧
+          各クール一覧
         </Title>
         <SimpleGrid
           cols={4}

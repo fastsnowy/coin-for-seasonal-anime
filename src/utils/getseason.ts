@@ -67,7 +67,7 @@ export function getSeasons(): { seasons: string }[] {
     }
   }
 
-  for (let year = 2000; year <= currentYear; year++) {
+  for (let year = 2000; year <= currentYear + 1; year++) {
     for (let month = 0; month < 12; month += 3) {
       const season = getMonth2Season(month)
       const seasonString = `${year}-${SEASONS[season]}`
