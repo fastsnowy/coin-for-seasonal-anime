@@ -6,10 +6,10 @@ import { Alert, Button, Container, Group, SimpleGrid, Text } from '@mantine/core
 
 import { TWITTER_URL } from '@/configs'
 import { Layout } from '@/layouts'
-import { getSeasons } from '@/utils/getseason'
+import { getCurrentNextSeasons } from '@/utils/getseason'
 
 export default function Home() {
-  const season = getSeasons()
+  const season = getCurrentNextSeasons()
   return (
     <>
       <Container p='md' size='md'>
@@ -38,6 +38,11 @@ export default function Home() {
                   .replace('summer', '夏')
                   .replace('autumn', '秋')}
                 )に賭ける
+              </Button>
+            </Link>
+            <Link href={`/seasons/`}>
+              <Button variant='light' color='cyan' size='lg'>
+                過去のアニメはこちら
               </Button>
             </Link>
           </Group>
