@@ -40,8 +40,6 @@ export const getCurrentNextSeasons = () => {
   }
 }
 
-type Season = 'winter' | 'spring' | 'summer' | 'autumn'
-
 export function getSeasons(): { seasons: string }[] {
   const SEASONS = {
     winter: 'winter',
@@ -55,7 +53,6 @@ export function getSeasons(): { seasons: string }[] {
   const nextDate = utcToZonedTime(new Date(currentDate), 'Asia/Tokyo')
   nextDate.setMonth(currentDate.getMonth() + 3)
   const currentYear = currentDate.getFullYear()
-  const currentMonth = currentDate.getMonth()
 
   const seasons = []
   const getMonth2Season = (month: number) => {
