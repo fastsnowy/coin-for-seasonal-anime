@@ -80,11 +80,13 @@ Season.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = getSeasons().map((season) => ({
+    params: {
+      seasons: season.seasons,
+    },
+  }))
   return {
-    paths: [
-      { params: { seasons: `${getSeasons().current}` } },
-      { params: { seasons: `${getSeasons().next}` } },
-    ],
+    paths: paths,
     fallback: false,
   }
 }
