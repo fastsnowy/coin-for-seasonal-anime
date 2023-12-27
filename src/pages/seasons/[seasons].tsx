@@ -8,7 +8,7 @@ import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/cor
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
-import SEO from '@/components/BaseHead'
+import { SEO } from '@/components/BaseHead'
 import { ConfirmModal } from '@/components/ConfirmModal'
 import { TOTAL_COIN_VALUE_VIEW } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
