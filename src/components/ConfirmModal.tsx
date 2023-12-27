@@ -11,6 +11,7 @@ import {
   selectorGetBetAnimeListWithCoinValue,
 } from '@/global/selectors'
 import { createBetData } from '@/utils/crud'
+import { generateRandomString } from '@/utils/generate'
 
 type modalProps = {
   seasonName: string
@@ -22,8 +23,9 @@ export function ConfirmModal({ seasonName }: modalProps) {
   const betWithCoinValues = useRecoilValue(selectorGetBetAnimeListWithCoinValue)
   const [visible, { toggle }] = useDisclosure(false)
   const resultId = uuidv4()
+  const deleteId = generateRandomString(8)
   const betWithCoinValuesData = betWithCoinValues.map((item) => {
-    return { ...item, created_id: resultId, season: seasonName }
+    return { ...item, created_id: resultId, season: seasonName, delete_id: deleteId }
   })
   const createBetHandler = () => {
     createBetData(betWithCoinValuesData)
@@ -62,11 +64,12 @@ export function ConfirmModal({ seasonName }: modalProps) {
         <Button variant='default' onClick={() => setModalOpened(false)}>
           戻る
         </Button>
-        <Link href={`/results/?id=${resultId}`}>
+        <Link href={`/results/${deleteId}?id=${resultId}`}>
           <Button color='cyan' onClick={() => createBetHandler()}>
             結果を表示
           </Button>
         </Link>
+        {deleteId}
       </Group>
     </Modal>
   )

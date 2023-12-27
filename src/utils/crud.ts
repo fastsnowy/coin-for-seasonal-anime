@@ -10,12 +10,30 @@ const notificationPostError = () => {
     color: 'red',
   })
 }
+
+const notificationDeleteError = () => {
+  showNotification({
+    title: 'エラー',
+    message: 'データの削除が出来ませんでした',
+    color: 'red',
+  })
+}
+
+const notificationDeleteSuccess = () => {
+  showNotification({
+    title: '成功',
+    message: 'データを削除しました！',
+    color: 'green',
+  })
+}
+
 export const createBetData = async (
   annictIdsWithCoinValues: {
     annict_id: number
     coin_value: number
     season: string
     created_id: string
+    deleted_id?: string
   }[],
 ) => {
   try {
@@ -24,5 +42,19 @@ export const createBetData = async (
   } catch (error) {
     console.error(error)
     notificationPostError()
+  }
+}
+
+export const deleteBetData = async (deletedId: string) => {
+  try {
+    const { error } = await supabase.from(BET_COINS).delete().eq('delete_id', deletedId)
+
+    if (!error) {
+      notificationDeleteSuccess()
+    }
+    if (error) throw error
+  } catch (error) {
+    console.error(error)
+    notificationDeleteError()
   }
 }
