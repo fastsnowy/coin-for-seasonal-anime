@@ -8,6 +8,7 @@ import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/cor
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
+import SEO from '@/components/BaseHead'
 import { ConfirmModal } from '@/components/ConfirmModal'
 import { TOTAL_COIN_VALUE_VIEW } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
@@ -30,10 +31,18 @@ type searchWorksProps = {
 export default function Season({ searchWorks, seasonName, totalCoin }: searchWorksProps) {
   const setSearchWorks = useSetRecoilState(AtomFetchCurrentSeason)
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
+  const replacedSeasonName =
+    seasonName
+      .replace('winter', '冬')
+      .replace('spring', '春')
+      .replace('summer', '夏')
+      .replace('autumn', '秋') + 'アニメ一覧'
+
   setModalOpened(false)
   setSearchWorks(searchWorks)
   return (
     <>
+      <SEO title={replacedSeasonName} />
       <Box
         sx={(theme) => ({
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
