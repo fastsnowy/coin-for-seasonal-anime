@@ -3,7 +3,7 @@ import { ReactElement } from 'react'
 
 import { Container, SimpleGrid, Group, Button, Title } from '@mantine/core'
 
-import SEO from '@/components/BaseHead'
+import { SEO } from '@/components/BaseHead'
 import { Layout } from '@/layouts'
 import { getSeasons } from '@/utils/getseason'
 

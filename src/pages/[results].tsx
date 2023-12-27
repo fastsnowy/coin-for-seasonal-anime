@@ -18,7 +18,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 
-import SEO from '@/components/BaseHead'
+import { DynamicSEO } from '@/components/BaseHead'
 import { TwitterIntentTweet } from '@/components/TwitterShare'
 import { ResultCard } from '@/components/results/ResultsCard'
 import { ResultsTable } from '@/components/results/ResultsTable'
@@ -78,7 +78,7 @@ export default function Result({
   )
   return (
     <Container size='xl' p='md'>
-      <SEO title={`${shareText}`} />
+      <DynamicSEO title={`${shareText}`} />
       <Text align='center' className='text-lg'>
         {seasonsText}アニメに
       </Text>
