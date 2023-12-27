@@ -17,6 +17,7 @@ import { LayoutHeader } from '@/layouts'
 import { headers, ANNICT_URL } from '@/libs/annict'
 import { supabase } from '@/libs/supabaseClient'
 import { getSeasons } from '@/utils/getseason'
+import { getJapaneseSeasonName } from '@/utils/seasons'
 
 const LayoutCurrentSeasonFooter = dynamic(
   () => import('@/layouts/').then((mod) => mod.LayoutCurrentSeasonFooter),
@@ -31,12 +32,7 @@ type searchWorksProps = {
 export default function Season({ searchWorks, seasonName, totalCoin }: searchWorksProps) {
   const setSearchWorks = useSetRecoilState(AtomFetchCurrentSeason)
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
-  const replacedSeasonName =
-    seasonName
-      .replace('winter', '冬')
-      .replace('spring', '春')
-      .replace('summer', '夏')
-      .replace('autumn', '秋') + 'アニメ一覧'
+  const replacedSeasonName = getJapaneseSeasonName(seasonName) + 'アニメ一覧'
 
   setModalOpened(false)
   setSearchWorks(searchWorks)
