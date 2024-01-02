@@ -117,6 +117,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       seasonName: seasonName,
       totalCoin: totalCoinValue,
     },
-    revalidate: 60,
+    revalidate: 60 * 30,
   }
 }
