@@ -138,7 +138,7 @@ export const getServerSideProps = async ({
   query,
   res,
 }: GetServerSidePropsContext<{ results: string }>) => {
-  res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=59')
+  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=59')
   const resultId = query.id
   const { data: betAnimes, error } = await supabase
     .from(BET_COINS)
