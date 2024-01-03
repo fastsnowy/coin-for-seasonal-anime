@@ -3,12 +3,15 @@ import { ReactElement } from 'react'
 
 import { Container, SimpleGrid, Group, Button, Title } from '@mantine/core'
 
+import { SEO } from '@/components/BaseHead'
 import { Layout } from '@/layouts'
 import { getSeasons } from '@/utils/getseason'
+import { replaceSeasonName } from '@/utils/replaceSeason'
 
 export default function AllSeasons() {
   return (
     <>
+      <SEO title='各クール一覧' currentUrl='seasons' />
       <Container p='md' size='md'>
         <Title
           order={2}
@@ -35,11 +38,7 @@ export default function AllSeasons() {
                 <Group position='center' p='md' key={`${season.seasons}`}>
                   <Link href={`/seasons/${season.seasons}`}>
                     <Button variant='subtle' color='cyan' size='xl'>
-                      {season.seasons
-                        .replace('winter', '冬')
-                        .replace('spring', '春')
-                        .replace('summer', '夏')
-                        .replace('autumn', '秋')}
+                      {replaceSeasonName(season.seasons)}
                     </Button>
                   </Link>
                 </Group>
