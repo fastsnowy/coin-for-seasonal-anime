@@ -18,6 +18,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 
+import { SEO } from '@/components/BaseHead'
 import { TwitterIntentTweet } from '@/components/TwitterShare'
 import { ResultCard } from '@/components/results/ResultsCard'
 import { ResultsTable } from '@/components/results/ResultsTable'
@@ -28,6 +29,7 @@ import { ANNICT_URL, headers } from '@/libs/annict'
 import { supabase } from '@/libs/supabaseClient'
 import { annictWorks } from '@/types/annict'
 import { betAnimes } from '@/types/coins'
+import { replaceSeasonName } from '@/utils/replaceSeason'
 
 type resultProps = {
   seasonName: string
@@ -48,11 +50,7 @@ export default function Result({
   const totalCoinValueSum = betAnimes.reduce((sum, current) => {
     return sum + current.coin_value
   }, 0)
-  const seasonsText = seasonName
-    .replace('winter', '冬')
-    .replace('spring', '春')
-    .replace('summer', '夏')
-    .replace('autumn', '秋')
+  const seasonsText = replaceSeasonName(seasonName)
   const shareText = `${seasonsText}アニメに合計${totalCoinValueSum}枚のコインを賭けました！`
   const card = searchWorks.nodes.map((work) => (
     <ResultCard work={work} betAnimes={betAnimes} totalCoins={totalCoins} key={work.annictId} />
@@ -77,6 +75,10 @@ export default function Result({
   )
   return (
     <Container size='xl' p='md'>
+      <SEO
+        title={`${seasonsText}アニメに${totalCoinValueSum.toLocaleString()}枚のコインを賭けました！`}
+        currentUrl={`results?id=${resultId}`}
+      />
       <Text align='center' className='text-lg'>
         {seasonsText}アニメに
       </Text>

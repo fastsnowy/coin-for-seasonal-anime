@@ -8,6 +8,7 @@ import { AppShell, Box, Container, SimpleGrid, Stack, Title } from '@mantine/cor
 import type { annictWorks } from '@/types/annict'
 
 import { AnimeCard } from '@/components/AnimeCard'
+import { SEO } from '@/components/BaseHead'
 import { ConfirmModal } from '@/components/ConfirmModal'
 import { TOTAL_COIN_VALUE_VIEW } from '@/configs'
 import { AtomFetchCurrentSeason, AtomIsCurrentModalOpened } from '@/global/atoms'
@@ -16,6 +17,7 @@ import { LayoutHeader } from '@/layouts'
 import { headers, ANNICT_URL } from '@/libs/annict'
 import { supabase } from '@/libs/supabaseClient'
 import { getSeasons } from '@/utils/getseason'
+import { replaceSeasonName } from '@/utils/replaceSeason'
 
 const LayoutCurrentSeasonFooter = dynamic(
   () => import('@/layouts/').then((mod) => mod.LayoutCurrentSeasonFooter),
@@ -32,8 +34,10 @@ export default function Season({ searchWorks, seasonName, totalCoin }: searchWor
   const setModalOpened = useSetRecoilState(AtomIsCurrentModalOpened)
   setModalOpened(false)
   setSearchWorks(searchWorks)
+  const replacedSeasonName = replaceSeasonName(seasonName)
   return (
     <>
+      <SEO title={`${replacedSeasonName}アニメ一覧`} currentUrl={`seasons/${seasonName}`} />
       <Box
         sx={(theme) => ({
           color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
@@ -42,11 +46,7 @@ export default function Season({ searchWorks, seasonName, totalCoin }: searchWor
         <ConfirmModal seasonName={seasonName} />
         <Stack align='center' justify='center'>
           <Title order={2} className=' p-3 px-2'>
-            {seasonName
-              .replace('winter', '冬')
-              .replace('spring', '春')
-              .replace('summer', '夏')
-              .replace('autumn', '秋')}
+            {replacedSeasonName}
             アニメ一覧
           </Title>
         </Stack>

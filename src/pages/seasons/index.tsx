@@ -3,12 +3,14 @@ import { ReactElement } from 'react'
 
 import { Container, SimpleGrid, Group, Button, Title } from '@mantine/core'
 
+import { SEO } from '@/components/BaseHead'
 import { Layout } from '@/layouts'
 import { getSeasons } from '@/utils/getseason'
 
 export default function AllSeasons() {
   return (
     <>
+      <SEO title='各クール一覧' currentUrl='seasons' />
       <Container p='md' size='md'>
         <Title
           order={2}
