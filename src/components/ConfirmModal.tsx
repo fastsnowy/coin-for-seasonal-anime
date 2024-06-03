@@ -1,34 +1,47 @@
-import Link from 'next/link'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { v4 as uuidv4 } from 'uuid'
+import Link from "next/link";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { v4 as uuidv4 } from "uuid";
 
-import { Button, Group, LoadingOverlay, Modal, Table, Text } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import {
+  Button,
+  Group,
+  LoadingOverlay,
+  Modal,
+  Table,
+  Text,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
-import { AtomIsCurrentModalOpened } from '@/global/atoms'
+import { AtomIsCurrentModalOpened } from "@/global/atoms";
 import {
   selectorGetBetAnimeListCurrentSeason,
   selectorGetBetAnimeListWithCoinValue,
-} from '@/global/selectors'
-import { createBetData } from '@/utils/crud'
+} from "@/global/selectors";
+import { createBetData } from "@/utils/crud";
 
 type modalProps = {
-  seasonName: string
-}
+  seasonName: string;
+};
 
 export function ConfirmModal({ seasonName }: modalProps) {
-  const [modalOpened, setModalOpened] = useRecoilState(AtomIsCurrentModalOpened)
-  const { betAnimeList, coinValueList } = useRecoilValue(selectorGetBetAnimeListCurrentSeason)
-  const betWithCoinValues = useRecoilValue(selectorGetBetAnimeListWithCoinValue)
-  const [visible, { toggle }] = useDisclosure(false)
-  const resultId = uuidv4()
+  const [modalOpened, setModalOpened] = useRecoilState(
+    AtomIsCurrentModalOpened,
+  );
+  const { betAnimeList, coinValueList } = useRecoilValue(
+    selectorGetBetAnimeListCurrentSeason,
+  );
+  const betWithCoinValues = useRecoilValue(
+    selectorGetBetAnimeListWithCoinValue,
+  );
+  const [visible, { toggle }] = useDisclosure(false);
+  const resultId = uuidv4();
   const betWithCoinValuesData = betWithCoinValues.map((item) => {
-    return { ...item, created_id: resultId, season: seasonName }
-  })
+    return { ...item, created_id: resultId, season: seasonName };
+  });
   const createBetHandler = () => {
-    createBetData(betWithCoinValuesData)
-    toggle()
-  }
+    createBetData(betWithCoinValuesData);
+    toggle();
+  };
 
   const confirmList = betAnimeList.map((work, idx) => (
     <tr key={work.annictId}>
@@ -39,14 +52,14 @@ export function ConfirmModal({ seasonName }: modalProps) {
         <Text>{coinValueList[idx].toLocaleString()}</Text>
       </td>
     </tr>
-  ))
+  ));
   return (
     <Modal
       opened={modalOpened}
       onClose={() => setModalOpened(false)}
       centered
       overlayBlur={3}
-      title='以下のアニメに賭けますか？'
+      title="以下のアニメに賭けますか？"
     >
       <LoadingOverlay visible={visible} overlayBlur={2} />
       <Table>
@@ -58,16 +71,16 @@ export function ConfirmModal({ seasonName }: modalProps) {
         </thead>
         <tbody>{confirmList}</tbody>
       </Table>
-      <Group position='center' className='flex justify-center'>
-        <Button variant='default' onClick={() => setModalOpened(false)}>
+      <Group position="center" className="flex justify-center">
+        <Button variant="default" onClick={() => setModalOpened(false)}>
           戻る
         </Button>
         <Link href={`/results/?id=${resultId}`}>
-          <Button color='cyan' onClick={() => createBetHandler()}>
+          <Button color="cyan" onClick={() => createBetHandler()}>
             結果を表示
           </Button>
         </Link>
       </Group>
     </Modal>
-  )
+  );
 }
