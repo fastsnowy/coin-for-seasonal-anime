@@ -20,8 +20,8 @@ export const GET_ANIME_DETAILS = (season: string) => {
       }
     }
   `,
-  }
-}
+  };
+};
 
 export const GET_ANIME_DETAILS_BY_IDS = (annictIds: number[]) => {
   return {
@@ -46,5 +46,5 @@ export const GET_ANIME_DETAILS_BY_IDS = (annictIds: number[]) => {
       }
     }
   `,
-  }
-}
+  };
+};

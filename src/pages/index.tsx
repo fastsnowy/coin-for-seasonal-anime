@@ -1,70 +1,87 @@
-import Link from 'next/link'
-import { ReactElement } from 'react'
-import { TiLightbulb, TiWarningOutline } from 'react-icons/ti'
+import Link from "next/link";
+import type { ReactElement } from "react";
+import { TiLightbulb, TiWarningOutline } from "react-icons/ti";
 
-import { Alert, Button, Container, Group, SimpleGrid, Text } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Container,
+  Group,
+  SimpleGrid,
+  Text,
+} from "@mantine/core";
 
-import { TWITTER_URL } from '@/configs'
-import { Layout } from '@/layouts'
-import { getCurrentNextSeasons } from '@/utils/getseason'
+import { TWITTER_URL } from "@/configs";
+import { Layout } from "@/layouts";
+import { getCurrentNextSeasons } from "@/utils/getseason";
 
 export default function Home() {
-  const season = getCurrentNextSeasons()
+  const season = getCurrentNextSeasons();
   return (
     <>
-      <Container p='md' size='md'>
-        <SimpleGrid cols={1} spacing='xs'>
-          <Text align='center' size='xl'>
+      <Container p="md" size="md">
+        <SimpleGrid cols={1} spacing="xs">
+          <Text align="center" size="xl">
             アニメに対する期待度を「コイン」を賭けて表そう！
           </Text>
-          <Group position='center' p='md'>
+          <Group position="center" p="md">
             <Link href={`/seasons/${season.current}`}>
-              <Button variant='light' color='cyan' size='lg'>
+              <Button variant="light" color="cyan" size="lg">
                 今期(
                 {season.current
-                  .replace('winter', '冬')
-                  .replace('spring', '春')
-                  .replace('summer', '夏')
-                  .replace('autumn', '秋')}
+                  .replace("winter", "冬")
+                  .replace("spring", "春")
+                  .replace("summer", "夏")
+                  .replace("autumn", "秋")}
                 )に賭ける
               </Button>
             </Link>
             <Link href={`/seasons/${season.next}`}>
-              <Button variant='light' color='cyan' size='lg'>
+              <Button variant="light" color="cyan" size="lg">
                 来期(
                 {season.next
-                  .replace('winter', '冬')
-                  .replace('spring', '春')
-                  .replace('summer', '夏')
-                  .replace('autumn', '秋')}
+                  .replace("winter", "冬")
+                  .replace("spring", "春")
+                  .replace("summer", "夏")
+                  .replace("autumn", "秋")}
                 )に賭ける
               </Button>
             </Link>
-            <Link href={`/seasons/`}>
-              <Button variant='light' color='cyan' size='lg'>
+            <Link href={"/seasons/"}>
+              <Button variant="light" color="cyan" size="lg">
                 過去のアニメはこちら
               </Button>
             </Link>
           </Group>
 
-          <Alert title='使い方' color='cyan' icon={<TiLightbulb />}>
+          <Alert title="使い方" color="cyan" icon={<TiLightbulb />}>
             <Text>気になるアニメに「コイン」を賭ける</Text>
             <Text>結果をツイートしシェア</Text>
           </Alert>
-          <Alert title='注意' color='red' icon={<TiWarningOutline />} className='grow-0'>
+          <Alert
+            title="注意"
+            color="red"
+            icon={<TiWarningOutline />}
+            className="grow-0"
+          >
             <Text>
               作った人→
-              <Text component='a' target='_blank' href={TWITTER_URL} className='underline'>
+              <Text
+                component="a"
+                target="_blank"
+                href={TWITTER_URL}
+                className="underline"
+              >
                 Twitter
               </Text>
             </Text>
             <Text>
               このサイトは
               <Text
-                component='a'
-                target='_blank'
-                href='https://developers.annict.com'
-                className='underline'
+                component="a"
+                target="_blank"
+                href="https://developers.annict.com"
+                className="underline"
               >
                 Annict GraphQL API
               </Text>
@@ -78,9 +95,9 @@ export default function Home() {
         </SimpleGrid>
       </Container>
     </>
-  )
+  );
 }
 
 Home.getLayout = function getLayout(pages: ReactElement) {
-  return <Layout>{pages}</Layout>
-}
+  return <Layout>{pages}</Layout>;
+};
