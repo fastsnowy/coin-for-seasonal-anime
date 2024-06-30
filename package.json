@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --apply ./src",
-    "check": "biome check --apply ./src",
+    "check": "biome check --write ./src",
     "check:unsafe": "biome check --apply-unsafe ./src"
   },
   "dependencies": {

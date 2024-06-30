@@ -75,7 +75,7 @@ export function ConfirmModal({ seasonName }: modalProps) {
         <Button variant="default" onClick={() => setModalOpened(false)}>
           戻る
         </Button>
-        <Link href={`/results/?id=${resultId}`}>
+        <Link href={`/results/${resultId}`}>
           <Button color="cyan" onClick={() => createBetHandler()}>
             結果を表示
           </Button>
