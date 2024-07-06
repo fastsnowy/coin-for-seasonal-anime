@@ -14,6 +14,7 @@ import {
 import { TWITTER_URL } from "@/configs";
 import { Layout } from "@/layouts";
 import { getCurrentNextSeasons } from "@/utils/getseason";
+import { replaceSeasonName } from "@/utils/replaceSeason";
 
 export default function Home() {
   const season = getCurrentNextSeasons();
@@ -28,23 +29,14 @@ export default function Home() {
             <Link href={`/seasons/${season.current}`}>
               <Button variant="light" color="cyan" size="lg">
                 今期(
-                {season.current
-                  .replace("winter", "冬")
-                  .replace("spring", "春")
-                  .replace("summer", "夏")
-                  .replace("autumn", "秋")}
+                {replaceSeasonName(season.current)}
                 )に賭ける
               </Button>
             </Link>
             <Link href={`/seasons/${season.next}`}>
               <Button variant="light" color="cyan" size="lg">
                 来期(
-                {season.next
-                  .replace("winter", "冬")
-                  .replace("spring", "春")
-                  .replace("summer", "夏")
-                  .replace("autumn", "秋")}
-                )に賭ける
+                {replaceSeasonName(season.next)})に賭ける
               </Button>
             </Link>
             <Link href={"/seasons/"}>
