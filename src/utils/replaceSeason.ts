@@ -3,5 +3,6 @@ export const replaceSeasonName = (seasonName: string) => {
     .replace("winter", "冬")
     .replace("spring", "春")
     .replace("summer", "夏")
-    .replace("autumn", "秋");
+    .replace("autumn", "秋")
+    .replace("-", "");
 };
