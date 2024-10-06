@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
@@ -60,6 +61,7 @@ export default function App(props: AppPropsWithLayout) {
             <NotificationsProvider autoClose={3000}>
               {getLayout(<Component {...pageProps} />)}
               <Analytics />
+              <SpeedInsights />
             </NotificationsProvider>
           </MantineProvider>
         </ColorSchemeProvider>
