@@ -3,5 +3,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
+  },
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "/home/fasmint/.local/share/mise/shims/node"
   }
 }
