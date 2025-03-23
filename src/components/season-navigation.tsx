@@ -1,40 +1,52 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { getCurrentSeason, getNextSeason, type Season } from "@/lib/seasons"
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type Season, getCurrentSeason, getNextSeason } from "@/lib/seasons";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface SeasonNavigationProps {
-  currentYear: number
-  currentSeason: Season
+  currentYear: number;
+  currentSeason: Season;
 }
 
-export default function SeasonNavigation({ currentYear, currentSeason }: SeasonNavigationProps) {
-  const router = useRouter()
-  const now = new Date()
-  const thisYear = now.getFullYear()
+export default function SeasonNavigation({
+  currentYear,
+  currentSeason,
+}: SeasonNavigationProps) {
+  const router = useRouter();
+  const now = new Date();
+  const thisYear = now.getFullYear();
 
   // 現在の季節と来期の季節を取得
-  const currentSeasonInfo = getCurrentSeason()
-  const nextSeasonInfo = getNextSeason()
+  const currentSeasonInfo = getCurrentSeason();
+  const nextSeasonInfo = getNextSeason();
 
   // 過去の年と季節の選択状態
-  const [selectedYear, setSelectedYear] = useState(thisYear.toString())
-  const [selectedSeason, setSelectedSeason] = useState<Season>("spring")
+  const [selectedYear, setSelectedYear] = useState(thisYear.toString());
+  const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
 
   // タブの初期値を設定
-  let defaultTab = "past"
+  let defaultTab = "past";
   if (currentYear === thisYear && currentSeason === currentSeasonInfo.id) {
-    defaultTab = "current"
-  } else if (currentYear === nextSeasonInfo.year && currentSeason === nextSeasonInfo.id) {
-    defaultTab = "next"
+    defaultTab = "current";
+  } else if (
+    currentYear === nextSeasonInfo.year &&
+    currentSeason === nextSeasonInfo.id
+  ) {
+    defaultTab = "next";
   }
 
   // 年の選択肢を生成（現在から10年前まで）
-  const years = Array.from({ length: 10 }, (_, i) => thisYear - i)
+  const years = Array.from({ length: 10 }, (_, i) => thisYear - i);
 
   // 季節の選択肢
   const seasons = [
@@ -42,25 +54,29 @@ export default function SeasonNavigation({ currentYear, currentSeason }: SeasonN
     { id: "summer", name: "夏" },
     { id: "autumn", name: "秋" },
     { id: "winter", name: "冬" },
-  ]
+  ];
 
   // タブ切り替え時の処理
   const handleTabChange = (value: string) => {
     if (value === "current") {
-      router.push(`/seasons/${thisYear}-${currentSeasonInfo.id}`)
+      router.push(`/seasons/${thisYear}-${currentSeasonInfo.id}`);
     } else if (value === "next") {
-      router.push(`/seasons/${nextSeasonInfo.year}-${nextSeasonInfo.id}`)
+      router.push(`/seasons/${nextSeasonInfo.year}-${nextSeasonInfo.id}`);
     }
-  }
+  };
 
   // 過去のアニメを表示する処理
   const handleShowPastSeason = () => {
-    router.push(`/seasons/${selectedYear}-${selectedSeason}`)
-  }
+    router.push(`/seasons/${selectedYear}-${selectedSeason}`);
+  };
 
   return (
     <div className="mb-8 bg-card rounded-lg p-4 shadow-sm">
-      <Tabs defaultValue={defaultTab} onValueChange={handleTabChange} className="w-full">
+      <Tabs
+        defaultValue={defaultTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="current">今期</TabsTrigger>
           <TabsTrigger value="next">来期</TabsTrigger>
@@ -82,7 +98,10 @@ export default function SeasonNavigation({ currentYear, currentSeason }: SeasonN
         <TabsContent value="past" className="pt-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <div className="w-full sm:w-1/3">
-              <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
+              <Select
+                defaultValue={selectedYear}
+                onValueChange={setSelectedYear}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="年を選択" />
                 </SelectTrigger>
@@ -97,7 +116,10 @@ export default function SeasonNavigation({ currentYear, currentSeason }: SeasonN
             </div>
 
             <div className="w-full sm:w-1/3">
-              <Select defaultValue={selectedSeason} onValueChange={(value) => setSelectedSeason(value as Season)}>
+              <Select
+                defaultValue={selectedSeason}
+                onValueChange={(value) => setSelectedSeason(value as Season)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="季節を選択" />
                 </SelectTrigger>
@@ -118,6 +140,5 @@ export default function SeasonNavigation({ currentYear, currentSeason }: SeasonN
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-

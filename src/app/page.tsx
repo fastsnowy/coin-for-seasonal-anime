@@ -1,14 +1,14 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Coins, Share2, ArrowRight, Info } from "lucide-react"
-import { getCurrentSeason } from "@/lib/seasons"
-import { siteName } from "@/config/constant"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { siteName } from "@/config/constant";
+import { getCurrentSeason } from "@/lib/seasons";
+import { ArrowRight, Coins, Info, Share2 } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   // 現在の季節を取得
-  const current = getCurrentSeason()
-  const currentYear = new Date().getFullYear()
+  const current = getCurrentSeason();
+  const currentYear = new Date().getFullYear();
 
   return (
     <main className="min-h-screen">
@@ -102,10 +102,11 @@ export default function Home() {
       {/* フッター */}
       <footer className="py-8 px-4 border-t">
         <div className="container mx-auto max-w-4xl text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} {siteName} - All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {siteName} - All rights reserved.
+          </p>
         </div>
       </footer>
     </main>
-  )
+  );
 }
-
