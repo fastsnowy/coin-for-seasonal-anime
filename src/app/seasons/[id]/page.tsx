@@ -7,15 +7,17 @@ import type { Season } from "@/lib/seasons";
 import { supabase } from "@/lib/supabaseClient";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 // 動的パラメータの生成（静的生成するパスを指定）
 export async function generateStaticParams() {
   const currentYear = new Date().getFullYear();
   return [
     { id: `${currentYear}-spring` },
-    // { id: `${currentYear}-summer` },
-    // { id: `${currentYear}-autumn` },
-    // { id: `${currentYear}-winter` },
+    { id: `${currentYear}-summer` },
+    { id: `${currentYear}-autumn` },
+    { id: `${currentYear}-winter` },
   ];
 }
 
@@ -57,7 +59,8 @@ export default async function SeasonPage({
   const { data: coins, error } = await supabase
     .from("total_coin_value_view")
     .select("annict_id, total_coin_value")
-    .eq("season", `${year}-${season}`);
+    .eq("season", `${year}-${season}`)
+    .order("total_coin_value", { ascending: false })
   if (error) {
     console.error("Failed to fetch total coin data", error);
   }
@@ -87,6 +90,26 @@ export default async function SeasonPage({
               : `${year}年 ${seasonName}`}
           のアニメ
         </h2>
+      </div>
+
+      <div className="my-6">
+        <h2 className="text-2xl font-semibold text-center">コイン総数トップ3のアニメ
+        </h2>
+        <div className="space-y-4">
+          {coins.slice(0, 3).map((coin, index) => {
+            const anime = animeList.find((anime) => anime.id === coin.annict_id);
+            return (
+              <div key={coin.annict_id} className="flex items-center space-x-4">
+                <Badge>{index + 1}位</Badge>
+                <div>
+                  <p className="text-lg font-semibold">{anime?.title}</p>
+                  <p className="text-sm">{anime?.watchersCount.toLocaleString()} watchers</p>
+                  <p className="text-sm">{coin.total_coin_value?.toLocaleString()} coins</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <Suspense
