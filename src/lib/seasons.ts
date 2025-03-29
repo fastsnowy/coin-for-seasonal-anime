@@ -51,9 +51,9 @@ export function getSeasonType(
 
   if (year === currentYear && season === currentSeason.id) {
     return "current";
-  } else if (year === nextSeason.year && season === nextSeason.id) {
-    return "next";
-  } else {
-    return "past";
   }
+  if (year === nextSeason.year && season === nextSeason.id) {
+    return "next";
+  }
+  return "past";
 }

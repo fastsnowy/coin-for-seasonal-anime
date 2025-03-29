@@ -6,15 +6,12 @@ export const atomBetAnimeWorkId = atomWithReset<number[]>([]);
 
 // { work_id: 1, title: "title", amount: 0 }
 export const atomBetAnimeWork = atomFamily((id: number) =>
-  atomWithReset<
-  { work_id: number; title: string, amount: number }
->({
+  atomWithReset<{ work_id: number; title: string; amount: number }>({
     work_id: id,
     title: "",
     amount: 0,
   }),
 );
-
 
 export const atomSelectWorkCount = atom((get) => {
   const betCoin = get(atomBetAnimeWorkId);
@@ -35,12 +32,12 @@ export const atomBetCoinValue = atom((get) => {
   const betWorks = get(atomBetAnimeWorkId);
   const betCoinValue = betWorks
     .map((id) => {
-      const  { amount, title } = get(atomBetAnimeWork(id))
+      const { amount, title } = get(atomBetAnimeWork(id));
       return amount > 0
         ? {
             annict_id: id,
             title: title,
-            total_coin_value: amount,
+            coin_value: amount,
           }
         : null;
     })
@@ -57,7 +54,6 @@ export const atomResetBetCoins = atom(null, (get, set) => {
       amount: 0,
     }); // Reset each atomBetAnimeWork to initial state
   }
-
 });
 
 const now = new Date();
