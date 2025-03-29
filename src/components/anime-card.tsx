@@ -4,9 +4,7 @@ import { memo } from "react";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
@@ -18,6 +16,7 @@ import type { Anime } from "@/lib/anime-data";
 import { Icon } from "@iconify/react";
 import { Coins, Eye } from "lucide-react";
 import Link from "next/link";
+import { NumberInput } from "./number-input";
 
 type workProps = {
   work: Anime;
@@ -36,40 +35,26 @@ const SliderCoin = ({ work }: workProps) => {
   const [betValue, setBetValue] = useAtom(atomFamilyBetCoin(work.id));
   const setBetWorkId = useSetAtom(atomBetAnimeWorkId);
 
-  const handleIncrement = () => {
-    setBetValue((prev) => Math.min(prev + 10, 100));
-    // setBetWorkId((prev) => [...prev, work.id]); unique add
-    setBetWorkId((prev) => {
-      if (!prev.includes(work.id)) {
-        return [...prev, work.id];
-      }
-      return prev;
-    });
-  };
-
-  const handleDecrement = () => {
-    setBetValue((prev) => Math.max(prev - 10, 0));
-  };
-
   return (
     <div className="flex justify-center items-center space-x-2">
-      <Button variant="outline" size="icon" onClick={handleDecrement}>
-        -
-      </Button>
-      <Input
-        type="number"
+      <NumberInput
+        min={0}
+        max={100}
+        stepper={10}
+        defaultValue={0}
         value={betValue}
-        onChange={(e) => {
-          const val = Number.parseInt(e.target.value);
-          if (!Number.isNaN(val)) {
-            setBetValue(Math.min(Math.max(val, 0), 100));
+        onValueChange={(value) => {
+          if (value !== undefined) {
+            setBetValue(value);
           }
+          setBetWorkId((prev) => {
+            if (!prev.includes(work.id)) {
+              return [...prev, work.id];
+            }
+            return prev;
+          });
         }}
-        className="w-24 text-center"
       />
-      <Button variant="outline" size="icon" onClick={handleIncrement}>
-        +
-      </Button>
     </div>
   );
 };
@@ -89,11 +74,7 @@ export function AnimeCard({ work, coins }: animeCardProps) {
           rel="noopener noreferrer"
         >
           <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-t-xl">
-            <img
-              src={work.image}
-              alt={work.title}
-              className="object-cover w-full h-full"
-            />
+            <img src={work.image} alt={work.title} className="object-cover" />
           </AspectRatio>
         </a>
       </div>
