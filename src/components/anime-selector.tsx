@@ -1,18 +1,27 @@
 "use client";
-import {
-  atomBetAnimeWorkId,
-  atomSelectWorkCount,
-  atomTotalCoinValue,
-} from "@/global/atom";
+import { atomBetCoinValue, atomResetBetCoins } from "@/global/atom";
+import { atomBetAnimeWorkId } from "@/global/atom";
 import { useAtomValue } from "jotai";
+import { useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { Button } from "./ui/button";
 
 export function AnimeSelector() {
-  const selectCount = useAtomValue(atomSelectWorkCount);
-  const totalCoinValue = useAtomValue(atomTotalCoinValue);
-  const betWorkId = useAtomValue(atomBetAnimeWorkId);
+  const currentStatus = useAtomValue(atomBetCoinValue);
+  const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
+  const resetAllBetCoins = useSetAtom(atomResetBetCoins);
 
-  console.log(selectCount);
+  const resetHandler = () => {
+    resetAllBetCoins(); // Reset the bet coins
+    resetBetAnimeWorkId(); // Reset the selected works
+  };
+
+  const selectCount = currentStatus.length;
+  const totalCoinValue = currentStatus.reduce(
+    (acc, item) => acc + (item.total_coin_value || 0),
+    0,
+  );
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-10">
       <div className="container mx-auto flex items-center justify-between">
@@ -26,7 +35,7 @@ export function AnimeSelector() {
         </div>
         <div className="flex space-x-4">
           <Button size="lg">投票する</Button>
-          <Button size="lg" variant="destructive">
+          <Button size="lg" variant="destructive" onClick={resetHandler}>
             リセット
           </Button>
         </div>
