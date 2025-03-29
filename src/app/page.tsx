@@ -51,7 +51,7 @@ export default function Home() {
                   <h3 className="text-xl font-semibold mb-2">コインを賭ける</h3>
                   <p className="text-muted-foreground">
                     気になるアニメにコインを賭けて、あなたの期待度を表現しましょう。
-                    スライダーを動かして0〜100の範囲で設定できます。
+                    0~100までの範囲で自由に設定できます。
                   </p>
                 </div>
               </CardContent>
@@ -65,8 +65,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">結果をシェア</h3>
                   <p className="text-muted-foreground">
-                    投票後、あなたの期待度ランキングをSNSでシェアして友達と共有しましょう。
-                    みんなの期待度を比較するのも楽しいですよ！
+                    投票後、あなたの期待度をSNSでシェアして友達と共有しましょう。
                   </p>
                 </div>
               </CardContent>

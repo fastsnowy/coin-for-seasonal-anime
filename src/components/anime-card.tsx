@@ -1,16 +1,11 @@
-import { useAtom } from "jotai";
+"use client";
+import { useAtom, useSetAtom } from "jotai";
 import { memo } from "react";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Tooltip,
@@ -18,8 +13,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { atomFamilyBetCoin } from "@/global/atom";
+import { atomBetAnimeWorkId, atomFamilyBetCoin } from "@/global/atom";
 import type { Anime } from "@/lib/anime-data";
+import { Icon } from "@iconify/react";
+import { Coins, Eye } from "lucide-react";
+import Link from "next/link";
 
 type workProps = {
   work: Anime;
@@ -30,14 +28,23 @@ type animeCardProps = {
   coins: {
     annict_id: number | null;
     total_coin_value: number | null;
+    uu: number | null;
   }[];
 };
 
 const SliderCoin = ({ work }: workProps) => {
   const [betValue, setBetValue] = useAtom(atomFamilyBetCoin(work.id));
+  const setBetWorkId = useSetAtom(atomBetAnimeWorkId);
 
   const handleIncrement = () => {
     setBetValue((prev) => Math.min(prev + 10, 100));
+    // setBetWorkId((prev) => [...prev, work.id]); unique add
+    setBetWorkId((prev) => {
+      if (!prev.includes(work.id)) {
+        return [...prev, work.id];
+      }
+      return prev;
+    });
   };
 
   const handleDecrement = () => {
@@ -54,7 +61,7 @@ const SliderCoin = ({ work }: workProps) => {
         value={betValue}
         onChange={(e) => {
           const val = Number.parseInt(e.target.value);
-          if (!isNaN(val)) {
+          if (!Number.isNaN(val)) {
             setBetValue(Math.min(Math.max(val, 0), 100));
           }
         }}
@@ -71,6 +78,7 @@ const MemoSliderCoin = memo(SliderCoin);
 export function AnimeCard({ work, coins }: animeCardProps) {
   const coinValue =
     coins.find((coin) => coin.annict_id === work.id)?.total_coin_value || 0;
+  const votersCount = coins.find((coin) => coin.annict_id === work.id)?.uu || 0;
 
   return (
     <Card key={work.id} className="p-0">
@@ -89,44 +97,53 @@ export function AnimeCard({ work, coins }: animeCardProps) {
           </AspectRatio>
         </a>
       </div>
-      <CardContent className="p-2">
+      <CardContent className="px-2">
         <div className="flex justify-between items-center text-center">
           <div className="flex items-center space-x-2">
-            <Badge variant="outline">{work.media}</Badge>
             <TooltipProvider>
               <Tooltip>
+                {/* Official */}
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    asChild
-                    onClick={() =>
-                      window.open(
-                        `https://twitter.com/${work.twitterUrl}`,
-                        "_blank",
-                      )
-                    }
-                  >
-                    Tw{/* <FaTwitter /> */}
-                  </Button>
+                  <Badge variant="outline">{work.media}</Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Twitter</p>
+                  <p>media</p>
                 </TooltipContent>
               </Tooltip>
+            </TooltipProvider>
+            {/* <Badge variant="outline">{work.media}</Badge> */}
+            <TooltipProvider>
               <Tooltip>
+                {/* Twitter */}
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    asChild
-                    onClick={() =>
-                      window.open(
-                        `https://annict.com/works/${work.id}`,
-                        "_blank",
-                      )
-                    }
-                  ></Button>
+                  <Badge variant="outline" className="w-6 h-6 p-1">
+                    <Link
+                      href={`https://twitter.com/${work.twitterUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Icon icon="fa6-brands:x-twitter" />
+                    </Link>
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Twitter / X</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                {/* Annict */}
+                <TooltipTrigger asChild>
+                  <Badge variant="outline" className="w-6 h-6 p-1">
+                    <Link
+                      href={`https://annict.com/works/${work.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Icon icon="uil:letter-english-a" />
+                    </Link>
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Annict</p>
@@ -137,9 +154,10 @@ export function AnimeCard({ work, coins }: animeCardProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <p className="text-sm">
-                  {work.watchersCount.toLocaleString()} watchers
-                </p>
+                <div className="flex items-center text-blue-600 text-sm">
+                  <Eye className="h-4 w-4 mr-1" />
+                  <span> {work.watchersCount.toLocaleString()} watchers</span>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>視聴者数</p>
@@ -151,7 +169,11 @@ export function AnimeCard({ work, coins }: animeCardProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <p className="text-sm">{coinValue.toLocaleString()} coins</p>
+                <div className="flex items-center text-yellow-600 text-sm">
+                  <Coins className="h-4 w-4 mr-1" />
+                  <span>{coinValue.toLocaleString()} coins</span>
+                </div>
+                {/* <p className="text-sm">{coinValue.toLocaleString()} coins</p> */}
               </TooltipTrigger>
               <TooltipContent>
                 <p>コイン総数</p>
@@ -159,9 +181,23 @@ export function AnimeCard({ work, coins }: animeCardProps) {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <CardTitle className="text-center font-medium">{work.title}</CardTitle>
+        <div className="flex justify-end text-right">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center text-blue-600 text-sm">
+                  <span>{votersCount.toLocaleString()} counts</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>投票回数</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <div className="text-center text-md font-medium">{work.title}</div>
       </CardContent>
-      <CardFooter className="p-2 justify-center">
+      <CardFooter className="py-2 justify-center">
         <MemoSliderCoin work={work} />
       </CardFooter>
     </Card>

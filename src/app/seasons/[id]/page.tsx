@@ -1,4 +1,5 @@
 import AnimeGrid from "@/components/anime-grid";
+import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
@@ -7,8 +8,6 @@ import type { Season } from "@/lib/seasons";
 import { supabase } from "@/lib/supabaseClient";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 // 動的パラメータの生成（静的生成するパスを指定）
 export async function generateStaticParams() {
@@ -58,9 +57,9 @@ export default async function SeasonPage({
   // supabaseからデータを取得
   const { data: coins, error } = await supabase
     .from("total_coin_value_view")
-    .select("annict_id, total_coin_value")
+    .select("annict_id, total_coin_value, uu")
     .eq("season", `${year}-${season}`)
-    .order("total_coin_value", { ascending: false })
+    .order("total_coin_value", { ascending: false });
   if (error) {
     console.error("Failed to fetch total coin data", error);
   }
@@ -74,6 +73,15 @@ export default async function SeasonPage({
       </main>
     );
   }
+  const top3Coins = coins.slice(0, 3);
+  const top3Anime = top3Coins.map((coin) => {
+    const anime = animeList.find((anime) => anime.id === coin.annict_id);
+    return {
+      ...anime,
+      total_coin_value: coin.total_coin_value,
+      uu: coin.uu,
+    };
+  });
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -91,9 +99,11 @@ export default async function SeasonPage({
           のアニメ
         </h2>
       </div>
-
+      {/* ranking */}
       <div className="my-6">
-        <h2 className="text-2xl font-semibold text-center">コイン総数トップ3のアニメ
+        <RankingSection animeList={animeList} />
+      </div>
+      {/* <h2 className="text-2xl font-semibold text-center">コイン総数トップ3のアニメ
         </h2>
         <div className="space-y-4">
           {coins.slice(0, 3).map((coin, index) => {
@@ -105,12 +115,12 @@ export default async function SeasonPage({
                   <p className="text-lg font-semibold">{anime?.title}</p>
                   <p className="text-sm">{anime?.watchersCount.toLocaleString()} watchers</p>
                   <p className="text-sm">{coin.total_coin_value?.toLocaleString()} coins</p>
+                  <p className="text-sm">{coin.uu} users</p>
                 </div>
               </div>
             );
           })}
-        </div>
-      </div>
+        </div> */}
 
       <Suspense
         fallback={<div className="text-center py-10">読み込み中...</div>}

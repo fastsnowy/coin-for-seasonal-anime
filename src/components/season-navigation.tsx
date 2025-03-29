@@ -9,9 +9,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { atomSelectSeason, atomSelectYear } from "@/global/atom";
 import { type Season, getCurrentSeason, getNextSeason } from "@/lib/seasons";
+import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 interface SeasonNavigationProps {
   currentYear: number;
@@ -31,8 +32,9 @@ export default function SeasonNavigation({
   const nextSeasonInfo = getNextSeason();
 
   // 過去の年と季節の選択状態
-  const [selectedYear, setSelectedYear] = useState(thisYear.toString());
-  const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
+  const [selectedYear, setSelectedYear] = useAtom(atomSelectYear);
+
+  const [selectedSeason, setSelectedSeason] = useAtom(atomSelectSeason);
 
   // タブの初期値を設定
   let defaultTab = "past";
@@ -45,8 +47,9 @@ export default function SeasonNavigation({
     defaultTab = "next";
   }
 
-  // 年の選択肢を生成（現在から10年前まで）
-  const years = Array.from({ length: 10 }, (_, i) => thisYear - i);
+  // 年の選択肢を生成（2000年から現在まで）
+  const years = Array.from({ length: thisYear - 1999 }, (_, i) => thisYear - i);
+  // const years = Array.from({ length: 10 }, (_, i) => thisYear - i);
 
   // 季節の選択肢
   const seasons = [
@@ -55,15 +58,6 @@ export default function SeasonNavigation({
     { id: "autumn", name: "秋" },
     { id: "winter", name: "冬" },
   ];
-
-  // タブ切り替え時の処理
-  const handleTabChange = (value: string) => {
-    if (value === "current") {
-      router.push(`/seasons/${thisYear}-${currentSeasonInfo.id}`);
-    } else if (value === "next") {
-      router.push(`/seasons/${nextSeasonInfo.year}-${nextSeasonInfo.id}`);
-    }
-  };
 
   // 過去のアニメを表示する処理
   const handleShowPastSeason = () => {
@@ -74,13 +68,11 @@ export default function SeasonNavigation({
     <div className="mb-8 bg-card rounded-lg p-4 shadow-sm">
       <Tabs
         defaultValue={defaultTab}
-        onValueChange={handleTabChange}
+        // onValueChange={handleTabChange}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="current">今期</TabsTrigger>
-          <TabsTrigger value="next">来期</TabsTrigger>
-          <TabsTrigger value="past">過去</TabsTrigger>
+        <TabsList className="w-full">
+          <TabsTrigger value="past">シーズンを選択</TabsTrigger>
         </TabsList>
 
         <TabsContent value="current" className="pt-4">
@@ -103,7 +95,7 @@ export default function SeasonNavigation({
                 onValueChange={setSelectedYear}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="年を選択" />
+                  <SelectValue placeholder="年を選択" className="w-full" />
                 </SelectTrigger>
                 <SelectContent>
                   {years.map((year) => (
