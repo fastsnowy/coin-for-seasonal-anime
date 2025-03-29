@@ -5,12 +5,14 @@ import { useAtomValue } from "jotai";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Button } from "./ui/button";
+import { Icon } from "@iconify/react";
+import { DialogDemo } from "./anime-vote-comfirm";
 
 export function AnimeSelector() {
   const currentStatus = useAtomValue(atomBetCoinValue);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
-
+  console.log("currentStatus", currentStatus);
   const resetHandler = () => {
     resetAllBetCoins(); // Reset the bet coins
     resetBetAnimeWorkId(); // Reset the selected works
@@ -29,12 +31,12 @@ export function AnimeSelector() {
           選択中: <span className="font-bold text-primary">{selectCount}</span>{" "}
           作品
         </div>
-        <div className="text-lg font-medium">
-          合計: <span className="font-bold text-primary">{totalCoinValue}</span>{" "}
-          コイン
+        <div className="flex items-center space-x-1">
+          <Icon icon="twemoji:coin" className="w-5 h-5" />
+          <span className="font-bold text-primary">{totalCoinValue}</span>
         </div>
         <div className="flex space-x-4">
-          <Button size="lg">投票する</Button>
+          <DialogDemo />
           <Button size="lg" variant="destructive" onClick={resetHandler}>
             リセット
           </Button>
@@ -43,17 +45,3 @@ export function AnimeSelector() {
     </div>
   );
 }
-
-const CheckModal = () => {
-  return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-background p-4 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4">投票を確定しますか？</h2>
-        <div className="flex justify-end space-x-4">
-          <Button>キャンセル</Button>
-          <Button variant="destructive">確定</Button>
-        </div>
-      </div>
-    </div>
-  );
-};

@@ -1,5 +1,5 @@
 "use client";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { memo } from "react";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { atomBetAnimeWorkId, atomFamilyBetCoin } from "@/global/atom";
+import { atomBetAnimeWork, atomBetAnimeWorkId } from "@/global/atom";
 import type { Anime } from "@/lib/anime-data";
 import { Icon } from "@iconify/react";
 import { Coins, Eye } from "lucide-react";
@@ -29,12 +29,12 @@ type animeCardProps = {
     total_coin_value: number | null;
     uu: number | null;
   }[];
+  isVoted?: boolean;
 };
 
 const SliderCoin = ({ work }: workProps) => {
-  const [betValue, setBetValue] = useAtom(atomFamilyBetCoin(work.id));
-  const setBetWorkId = useSetAtom(atomBetAnimeWorkId);
-
+  const [betWorkId, setBetWorkId] = useAtom(atomBetAnimeWorkId);
+  const [betWork, setBetWork] = useAtom(atomBetAnimeWork(work.id));
   return (
     <div className="flex justify-center items-center space-x-2">
       <NumberInput
@@ -42,10 +42,17 @@ const SliderCoin = ({ work }: workProps) => {
         max={100}
         stepper={10}
         defaultValue={0}
-        value={betValue}
+        value={betWork.amount}
         onValueChange={(value) => {
           if (value !== undefined) {
-            setBetValue(value);
+            setBetWork((prev) => {
+              return {
+                ...prev,
+                work_id: work.id,
+                title: work.title,
+                amount: value,
+              };
+            });
           }
           setBetWorkId((prev) => {
             if (!prev.includes(work.id)) {
@@ -60,7 +67,7 @@ const SliderCoin = ({ work }: workProps) => {
 };
 const MemoSliderCoin = memo(SliderCoin);
 
-export function AnimeCard({ work, coins }: animeCardProps) {
+export function AnimeCard({ work, coins, isVoted }: animeCardProps) {
   const coinValue =
     coins.find((coin) => coin.annict_id === work.id)?.total_coin_value || 0;
   const votersCount = coins.find((coin) => coin.annict_id === work.id)?.uu || 0;
@@ -178,9 +185,11 @@ export function AnimeCard({ work, coins }: animeCardProps) {
         </div>
         <div className="text-center text-md font-medium">{work.title}</div>
       </CardContent>
-      <CardFooter className="py-2 justify-center">
-        <MemoSliderCoin work={work} />
-      </CardFooter>
+      {isVoted ? null : (
+        <CardFooter className="py-2 justify-center">
+          <MemoSliderCoin work={work} />
+        </CardFooter>
+      )}
     </Card>
   );
 }
