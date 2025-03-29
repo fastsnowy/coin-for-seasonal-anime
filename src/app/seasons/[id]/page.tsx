@@ -103,25 +103,6 @@ export default async function SeasonPage({
       <div className="my-6">
         <RankingSection animeList={animeList} />
       </div>
-      {/* <h2 className="text-2xl font-semibold text-center">コイン総数トップ3のアニメ
-        </h2>
-        <div className="space-y-4">
-          {coins.slice(0, 3).map((coin, index) => {
-            const anime = animeList.find((anime) => anime.id === coin.annict_id);
-            return (
-              <div key={coin.annict_id} className="flex items-center space-x-4">
-                <Badge>{index + 1}位</Badge>
-                <div>
-                  <p className="text-lg font-semibold">{anime?.title}</p>
-                  <p className="text-sm">{anime?.watchersCount.toLocaleString()} watchers</p>
-                  <p className="text-sm">{coin.total_coin_value?.toLocaleString()} coins</p>
-                  <p className="text-sm">{coin.uu} users</p>
-                </div>
-              </div>
-            );
-          })}
-        </div> */}
-
       <Suspense
         fallback={<div className="text-center py-10">読み込み中...</div>}
       >
