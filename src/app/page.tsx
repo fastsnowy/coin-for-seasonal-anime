@@ -30,9 +30,9 @@ export default function Home() {
 
         {/* 装飾的な背景要素 */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-10">
-          <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary"></div>
-          <div className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-primary"></div>
-          <div className="absolute top-1/3 right-1/4 w-16 h-16 rounded-full bg-primary"></div>
+          <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary" />
+          <div className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-primary" />
+          <div className="absolute top-1/3 right-1/4 w-16 h-16 rounded-full bg-primary" />
         </div>
       </section>
 
