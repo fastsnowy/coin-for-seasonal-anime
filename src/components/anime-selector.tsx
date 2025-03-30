@@ -24,7 +24,6 @@ export function AnimeSelector() {
     return `${year}-${season}`;
   };
   const seasonName = currentSeasonName();
-  console.log("currentStatus", currentStatus);
   const resetHandler = () => {
     resetAllBetCoins(); // Reset the bet coins
     resetBetAnimeWorkId(); // Reset the selected works
@@ -38,20 +37,26 @@ export function AnimeSelector() {
   );
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-10">
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="text-lg font-medium">
+      <div className="container mx-auto grid grid-cols-3 items-center justify-center">
+        <div className="text-lg font-medium  hidden md:block">
           選択中: <span className="font-bold text-primary">{selectCount}</span>{" "}
           作品
         </div>
-        <div className="flex items-center space-x-1">
-          <Icon icon="twemoji:coin" className="w-5 h-5" />
-          <span className="font-bold text-primary">{totalCoinValue}</span>
-        </div>
-        <div className="flex space-x-4">
-          <DialogDemo seasonName={seasonName} />
-          <Button size="lg" variant="destructive" onClick={resetHandler}>
-            リセット
+
+        <div className="flex gap-8 justify-center col-span-3 md:col-span-1">
+          <Button
+            size="lg"
+            variant="destructive"
+            onClick={resetHandler}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white"
+          >
+            <Icon icon="ri:reset-right-fill" className="w-5 h-5" />
           </Button>
+          <div className="flex items-center space-x-1 text-lg">
+            <Icon icon="twemoji:coin" className="w-5 h-5" />
+            <span className="font-bold text-primary">{totalCoinValue}</span>
+          </div>
+          <DialogDemo seasonName={seasonName} />
         </div>
       </div>
     </div>

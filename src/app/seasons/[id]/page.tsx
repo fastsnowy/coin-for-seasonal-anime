@@ -13,10 +13,10 @@ import { Suspense } from "react";
 export async function generateStaticParams() {
   const currentYear = new Date().getFullYear();
   return [
+    { id: `${currentYear}-winter` },
     { id: `${currentYear}-spring` },
     { id: `${currentYear}-summer` },
     { id: `${currentYear}-autumn` },
-    { id: `${currentYear}-winter` },
   ];
 }
 
@@ -41,22 +41,12 @@ export default async function SeasonPage({
   const seasonType = getSeasonType(year, season);
 
   // サーバーサイドでアニメデータを取得
-  let animeList;
-  try {
-    animeList = await getAnimeByYearAndSeason(year, season);
-  } catch (error) {
-    console.error("Failed to fetch anime data", error);
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
-        <SeasonNavigation currentYear={year} currentSeason={season} />
-        <div className="text-center py-10">データの取得に失敗しました</div>
-      </main>
-    );
-  }
+
+  const animeList = await getAnimeByYearAndSeason(year, season);
+
   // supabaseからデータを取得
   const { data: coins, error } = await supabase
-    .from("total_coin_value_view")
+    .from("dev_coin_value_view")
     .select("annict_id, total_coin_value, uu")
     .eq("season", `${year}-${season}`)
     .order("total_coin_value", { ascending: false });
@@ -68,7 +58,7 @@ export default async function SeasonPage({
     return (
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
-        <SeasonNavigation currentYear={year} currentSeason={season} />
+        <SeasonNavigation />
         <div className="text-center py-10">データの取得に失敗しました</div>
       </main>
     );
@@ -87,7 +77,7 @@ export default async function SeasonPage({
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
 
-      <SeasonNavigation currentYear={year} currentSeason={season} />
+      <SeasonNavigation />
 
       <div className="my-6">
         <h2 className="text-2xl font-semibold text-center">

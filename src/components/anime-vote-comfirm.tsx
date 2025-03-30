@@ -16,9 +16,11 @@ import {
 } from "@/global/atom";
 import { supabase } from "@/lib/supabaseClient";
 import { useAtomValue } from "jotai";
+import { redirect } from "next/navigation";
+import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-
+import { Icon } from "@iconify/react";
 const currentSeasonName = () => {
   const year = useAtomValue(atomSelectYear);
   const season = useAtomValue(atomSelectSeason);
@@ -61,22 +63,41 @@ const createVoteHandler = async (betanimes: BetAnimes, seasonName: string) => {
     return;
   }
 
-  const { error } = await supabase.from("dev_coins").insert(insertData);
+  const { data, error, status, statusText } = await supabase
+    .from("dev_coins")
+    .insert(insertData);
 
   if (error) {
     console.error("Error creating vote:", error);
     return;
   }
+  console.log("Vote created successfully:", data);
+  console.log("Status:", status);
+  console.log("Status Text:", statusText);
+  return resultId;
 };
 
 export function DialogDemo({ seasonName }: { seasonName: string }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
+  const handleVoteAndRedirect = async (
+    betCoinValue: BetAnimes,
+    seasonName: string,
+  ) => {
+    const resultId = await createVoteHandler(betCoinValue, seasonName);
+    if (resultId) {
+      console.log("Vote created successfully:", resultId);
+      redirect(`/results?id=${resultId}`);
+    } else {
+      console.error("Failed to create vote.");
+      toast.error("投票の作成に失敗しました。");
+    }
+  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="default" size="lg">
-          投票内容を確認
+          <Icon icon="mdi:check" className="w-5 h-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -103,7 +124,7 @@ export function DialogDemo({ seasonName }: { seasonName: string }) {
           <Button
             type="submit"
             onClick={() => {
-              createVoteHandler(betCoinValue, seasonName);
+              handleVoteAndRedirect(betCoinValue, seasonName);
               console.log("投票内容", betCoinValue);
               console.log("投票内容を送信しました");
             }}
