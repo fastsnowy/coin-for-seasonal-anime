@@ -30,6 +30,10 @@ type animeCardProps = {
     uu: number | null;
   }[];
   isVoted?: boolean;
+  votedCoins?: {
+    annict_id: number | null;
+    coin_value: number | null;
+  }[];
 };
 
 const SliderCoin = ({ work }: workProps) => {
@@ -67,13 +71,20 @@ const SliderCoin = ({ work }: workProps) => {
 };
 const MemoSliderCoin = memo(SliderCoin);
 
-export function AnimeCard({ work, coins, isVoted }: animeCardProps) {
+export function AnimeCard({
+  work,
+  coins,
+  isVoted,
+  votedCoins,
+}: animeCardProps) {
   const coinValue =
     coins.find((coin) => coin.annict_id === work.id)?.total_coin_value || 0;
   const votersCount = coins.find((coin) => coin.annict_id === work.id)?.uu || 0;
+  const votedCoinValue =
+    votedCoins?.find((coin) => coin.annict_id === work.id)?.coin_value || 0;
 
   return (
-    <Card key={work.id} className="p-0">
+    <Card key={work.id} className="p-0 gap-2">
       <div className="rounded-t-xl">
         <a
           href={work.officialSiteUrl}
@@ -185,11 +196,16 @@ export function AnimeCard({ work, coins, isVoted }: animeCardProps) {
         </div>
         <div className="text-center text-md font-medium">{work.title}</div>
       </CardContent>
-      {isVoted ? null : (
-        <CardFooter className="py-2 justify-center">
+      <CardFooter className="py-2 justify-center">
+        {isVoted ? (
+          <div className="flex justify-center items-center gap-2">
+            <Icon icon="twemoji:coin" />
+            {votedCoinValue}
+          </div>
+        ) : (
           <MemoSliderCoin work={work} />
-        </CardFooter>
-      )}
+        )}
+      </CardFooter>
     </Card>
   );
 }

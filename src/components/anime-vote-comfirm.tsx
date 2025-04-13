@@ -39,60 +39,65 @@ const insertDataSchema = z.array(
     coin_value: z.number().int().min(1).max(100),
     season: z.string().regex(/^\d{4}-(spring|summer|autumn|winter)$/),
     created_id: z.string().uuid(),
+    delete_id: z.string().length(7),
   }),
 );
 
-const createVoteHandler = async (betanimes: BetAnimes, seasonName: string) => {
+const createVoteHandler = async (
+  betanimes: BetAnimes,
+  seasonName: string,
+): Promise<{ resultId: string; deleteId: string }> => {
   if (betanimes.length === 0) {
-    console.error("No bet animes to create vote for.");
-    return;
+    throw new Error("No anime to vote"); // エラーをスロー
   }
   const resultId = uuidv4();
-
+  const deleteId = Math.random().toString(36).slice(-7);
   const insertData = betanimes.map((item) => ({
     annict_id: item.annict_id,
     coin_value: item.coin_value,
     season: seasonName,
     created_id: resultId,
+    delete_id: deleteId,
   }));
 
   const validationResult = insertDataSchema.safeParse(insertData);
 
   if (!validationResult.success) {
-    console.error("Validation failed:", validationResult.error.errors);
-    return;
+    throw new Error("Failed to create vote data"); // エラーをスロー
   }
 
-  const { data, error, status, statusText } = await supabase
-    .from("dev_coins")
-    .insert(insertData);
+  const { error } = await supabase.from("dev_coins").insert(insertData);
 
   if (error) {
-    console.error("Error creating vote:", error);
-    return;
+    throw new Error("Failed to insert vote data"); // エラーをスロー
   }
-  console.log("Vote created successfully:", data);
-  console.log("Status:", status);
-  console.log("Status Text:", statusText);
-  return resultId;
+
+  return { resultId, deleteId }; // 成功時のみ値を返す
 };
 
-export function DialogDemo({ seasonName }: { seasonName: string }) {
-  const betCoinValue = useAtomValue(atomBetCoinValue);
-  const handleVoteAndRedirect = async (
-    betCoinValue: BetAnimes,
-    seasonName: string,
-  ) => {
-    const resultId = await createVoteHandler(betCoinValue, seasonName);
-    if (resultId) {
-      console.log("Vote created successfully:", resultId);
-      redirect(`/results?id=${resultId}`);
-    } else {
-      console.error("Failed to create vote.");
-      toast.error("投票の作成に失敗しました。");
-    }
-  };
+const handleVoteAndRedirect = async (
+  betCoinValue: BetAnimes,
+  seasonName: string,
+) => {
+  let redirectTo = "";
+  try {
+    const { resultId, deleteId } = await createVoteHandler(
+      betCoinValue,
+      seasonName,
+    );
+    console.log("Vote created successfully:", resultId);
+    redirectTo = `/results?id=${resultId}&did=${deleteId}`;
+  } catch (error) {
+    console.error("Failed to create vote:", error);
+    toast.error("エラーが発生しました");
+  }
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
 
+export function VoteConfirm({ seasonName }: { seasonName: string }) {
+  const betCoinValue = useAtomValue(atomBetCoinValue);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -123,8 +128,8 @@ export function DialogDemo({ seasonName }: { seasonName: string }) {
         <DialogFooter>
           <Button
             type="submit"
-            onClick={() => {
-              handleVoteAndRedirect(betCoinValue, seasonName);
+            onClick={async () => {
+              await handleVoteAndRedirect(betCoinValue, seasonName);
               console.log("投票内容", betCoinValue);
               console.log("投票内容を送信しました");
             }}

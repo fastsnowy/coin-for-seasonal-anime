@@ -11,7 +11,7 @@ import { useAtomValue } from "jotai";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { toast } from "sonner";
-import { DialogDemo } from "./anime-vote-comfirm";
+import { VoteConfirm } from "./anime-vote-comfirm";
 import { Button } from "./ui/button";
 
 export function AnimeSelector() {
@@ -56,7 +56,7 @@ export function AnimeSelector() {
             <Icon icon="twemoji:coin" className="w-5 h-5" />
             <span className="font-bold text-primary">{totalCoinValue}</span>
           </div>
-          <DialogDemo seasonName={seasonName} />
+          <VoteConfirm seasonName={seasonName} />
         </div>
       </div>
     </div>

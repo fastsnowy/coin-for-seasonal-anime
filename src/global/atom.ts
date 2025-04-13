@@ -10,7 +10,7 @@ export const atomBetAnimeWork = atomFamily((id: number) =>
     work_id: id,
     title: "",
     amount: 0,
-  }),
+  })
 );
 
 export const atomSelectWorkCount = atom((get) => {
