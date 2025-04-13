@@ -1,13 +1,14 @@
 import { VoteDeleteButton } from "@/components/vote-delete";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
+import { AnimeCard } from "@/components/anime-card";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const { id = "" } = await searchParams;
+  const { id = "", did = "" } = await searchParams;
   // supabaseから投票内容取得
   const { data, error } = await supabase
     .from("dev_coins") // TODO: dev
@@ -44,41 +45,25 @@ export default async function Page({
     title: anime.title,
     image: anime.image,
     watchersCount: anime.watchersCount,
+    officialSiteUrl: anime.officialSiteUrl,
+    media: anime.media,
+    twitterUrl: anime.twitterUrl,
   }));
+
   return (
-    <div>
-      <h1>Product Listing</h1>
-      <p>reslut id {id}</p>
-      <p>投票内容</p>
-      <div className="grid gap-4 py-4">
-        {/* animeListのanime情報と、supabaseからのannict_idに対応するcoin_valueとtotal_coin_valueを表示 */}
-        {/* 自分の投票結果のcoin数も表示 */}
-        {animeList.map((item) => {
-          const coinValue = data.find(
-            (coin) => coin.annict_id === item.id,
-          )?.coin_value;
-          const totalCoinValue = coins.find(
-            (coin) => coin.annict_id === item.id,
-          )?.total_coin_value;
-          return (
-            <div
-              key={item.id}
-              className="flex justify-between items-center border-b py-2"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="aspect-video w-96"
-              />
-              <span>{`${item.title}`}</span>
-              <span>{`${item.watchersCount} watchers`}</span>
-              <span>{`${coinValue} コイン`}</span>
-              <span>{`${totalCoinValue} コイン`}</span>
-            </div>
-          );
-        })}
-        <VoteDeleteButton id={id} />
+    <main className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-24">
+        {animeList.map((anime) => (
+          <AnimeCard
+            work={anime}
+            key={anime.id}
+            coins={coins}
+            isVoted={true} // 投票済みの状態を示す
+            votedCoins={data} // 投票
+          />
+        ))}
       </div>
-    </div>
+      {did === data[0].delete_id && <VoteDeleteButton id={id} />}
+    </main>
   );
 }
