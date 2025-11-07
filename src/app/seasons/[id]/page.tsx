@@ -110,7 +110,7 @@ export default async function SeasonPage({
         </div>
 
         {/* ranking */}
-        <RankingSection animeList={animeList} />
+        <RankingSection animeList={animeList} coins={coins} />
 
         <Suspense
           fallback={

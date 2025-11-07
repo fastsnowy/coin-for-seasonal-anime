@@ -1,5 +1,5 @@
 import type { Anime } from "@/lib/anime-data";
-import { Coins, Eye } from "lucide-react";
+import { Coins, Eye, Trophy, Medal, Award } from "lucide-react";
 
 interface RankingItemProps {
   rank: number;
@@ -7,21 +7,34 @@ interface RankingItemProps {
 }
 
 function RankingItem({ rank, anime }: RankingItemProps) {
-  // ランクに応じてメダルアイコンを表示
+  // ランクに応じてアイコンを表示
   const getRankBadge = (rank: number) => {
-    const medals = ["🥇", "🥈", "🥉"];
-    if (rank <= 3) {
-      return (
-        <div className="flex items-center justify-center w-8 h-8 text-lg">
-          {medals[rank - 1]}
-        </div>
-      );
+    switch (rank) {
+      case 1:
+        return (
+          <div className="flex items-center justify-center w-8 h-8">
+            <Trophy className="h-5 w-5 text-yellow-500" />
+          </div>
+        );
+      case 2:
+        return (
+          <div className="flex items-center justify-center w-8 h-8">
+            <Medal className="h-5 w-5 text-gray-400" />
+          </div>
+        );
+      case 3:
+        return (
+          <div className="flex items-center justify-center w-8 h-8">
+            <Award className="h-5 w-5 text-amber-600" />
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center w-8 h-8 text-sm font-semibold text-muted-foreground">
+            {rank}
+          </div>
+        );
     }
-    return (
-      <div className="flex items-center justify-center w-8 h-8 text-sm font-semibold text-muted-foreground">
-        {rank}
-      </div>
-    );
   };
 
   return (
@@ -52,14 +65,19 @@ function RankingItem({ rank, anime }: RankingItemProps) {
 
 interface RankingSectionProps {
   animeList: Anime[];
+  coins: {
+    annict_id: number | null;
+    total_coin_value: number | null;
+    uu: number | null;
+  }[];
 }
 
-export default function RankingSection({ animeList }: RankingSectionProps) {
-  // デモ用にランダムな視聴者数とコイン数を割り当て
+export default function RankingSection({ animeList, coins }: RankingSectionProps) {
+  // 実際のコインデータを使用
   const animeWithStats = animeList.map((anime) => ({
     ...anime,
     watchers: anime.watchersCount,
-    coins: Math.floor(Math.random() * 1000),
+    coins: coins.find((c) => c.annict_id === anime.id)?.total_coin_value || 0,
   }));
 
   // コイン数でソート
