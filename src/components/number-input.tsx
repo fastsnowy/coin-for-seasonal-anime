@@ -121,16 +121,16 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     return (
-      <div className="grid grid-cols-12 gap-4 items-center">
+      <div className="grid grid-cols-12 gap-2 items-center w-full">
         <div className="flex flex-col col-span-3">
           <Button
             aria-label="Decrease value"
-            className=""
             variant="outline"
             onClick={handleDecrement}
             disabled={value === min}
+            className="h-10 w-full hover:bg-muted transition-colors"
           >
-            <ChevronDown size={15} />
+            <ChevronDown size={16} />
           </Button>
         </div>
         <NumericFormat
@@ -148,20 +148,20 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           prefix={prefix}
           customInput={Input}
           placeholder={placeholder}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-md relative text-center col-span-6"
-          getInputRef={combinedRef} // Use combined ref
+          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-lg text-center col-span-6 h-10 font-semibold text-base"
+          getInputRef={combinedRef}
           {...props}
         />
 
         <div className="flex flex-col col-span-3">
           <Button
             aria-label="Increase value"
-            className=""
             variant="outline"
             onClick={handleIncrement}
             disabled={value === max}
+            className="h-10 w-full hover:bg-muted transition-colors"
           >
-            <ChevronUp size={15} />
+            <ChevronUp size={16} />
           </Button>
         </div>
       </div>

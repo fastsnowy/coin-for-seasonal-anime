@@ -98,34 +98,67 @@ const handleVoteAndRedirect = async (
 
 export function VoteConfirm({ seasonName }: { seasonName: string }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
+  const totalCoins = betCoinValue.reduce((acc, item) => acc + item.coin_value, 0);
+  
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" size="lg">
-          <Icon icon="mdi:check" className="w-5 h-5" />
+        <Button 
+          variant="default" 
+          size="lg"
+          className="h-12 px-6 gap-2 shadow-lg hover:shadow-xl transition-all font-semibold"
+          disabled={betCoinValue.length === 0}
+        >
+          <Icon icon="mdi:check-circle" className="w-5 h-5" />
+          <span className="hidden sm:inline">投票確定</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>投票内容の確認</DialogTitle>
-          <DialogDescription>以下は現在の投票内容です。</DialogDescription>
+          <DialogTitle className="text-xl">投票内容の確認</DialogTitle>
+          <DialogDescription className="text-base">
+            以下の内容で投票します。よろしいですか？
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        
+        <div className="space-y-3 py-4 max-h-96 overflow-y-auto">
           {betCoinValue.length > 0 ? (
-            betCoinValue.map((item) => (
-              <div
-                key={item.annict_id}
-                className="flex justify-between items-center"
-              >
-                <span>{`${item.title}`}</span>
-                <span>{`${item.coin_value} コイン`}</span>
+            <>
+              {betCoinValue.map((item) => (
+                <div
+                  key={item.annict_id}
+                  className="flex justify-between items-start gap-4 p-3 rounded-lg bg-muted/50 border border-border/50"
+                >
+                  <span className="text-sm flex-1 line-clamp-2">{item.title}</span>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Icon icon="twemoji:coin" className="w-4 h-4" />
+                    <span className="font-semibold text-sm">{item.coin_value}</span>
+                  </div>
+                </div>
+              ))}
+              
+              {/* 合計 */}
+              <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <span className="font-semibold">合計</span>
+                <div className="flex items-center gap-2">
+                  <Icon icon="twemoji:coin" className="w-5 h-5" />
+                  <span className="font-bold text-lg text-primary">{totalCoins}</span>
+                </div>
               </div>
-            ))
+            </>
           ) : (
-            <p>現在、投票内容はありません。</p>
+            <p className="text-center text-muted-foreground py-8">
+              現在、投票内容はありません。
+            </p>
           )}
         </div>
-        <DialogFooter>
+        
+        <DialogFooter className="gap-2">
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              キャンセル
+            </Button>
+          </DialogClose>
           <Button
             type="submit"
             onClick={async () => {
@@ -133,15 +166,10 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
               console.log("投票内容", betCoinValue);
               console.log("投票内容を送信しました");
             }}
+            disabled={betCoinValue.length === 0}
           >
             投票する
           </Button>
-
-          <DialogClose asChild>
-            <Button type="button" variant="outline">
-              閉じる
-            </Button>
-          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

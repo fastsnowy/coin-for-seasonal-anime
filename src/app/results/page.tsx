@@ -2,6 +2,7 @@ import { VoteDeleteButton } from "@/components/vote-delete";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
 import { AnimeCard } from "@/components/anime-card";
+import { Breadcrumb } from "@/components/breadcrumb";
 
 export default async function Page({
   searchParams,
@@ -51,19 +52,47 @@ export default async function Page({
   }));
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-24">
-        {animeList.map((anime) => (
-          <AnimeCard
-            work={anime}
-            key={anime.id}
-            coins={coins}
-            isVoted={true} // 投票済みの状態を示す
-            votedCoins={data} // 投票
-          />
-        ))}
+    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* ヘッダー */}
+      <div className="border-b border-border/50 bg-background/80 backdrop-blur">
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
+            投票結果
+          </h1>
+          <p className="text-center text-muted-foreground text-sm">
+            あなたの期待度が記録されました
+          </p>
+        </div>
       </div>
-      {did === data[0].delete_id && <VoteDeleteButton id={id} />}
+
+      <div className="container mx-auto px-4 py-8">
+        {/* パンくずリスト */}
+        <Breadcrumb
+          items={[
+            {
+              label: "投票結果",
+            },
+          ]}
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-24">
+          {animeList.map((anime) => (
+            <AnimeCard
+              work={anime}
+              key={anime.id}
+              coins={coins}
+              isVoted={true}
+              votedCoins={data}
+            />
+          ))}
+        </div>
+        
+        {did === data[0].delete_id && (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
+            <VoteDeleteButton id={id} />
+          </div>
+        )}
+      </div>
     </main>
   );
 }

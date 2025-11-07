@@ -24,19 +24,28 @@ export const VoteDeleteButton = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive" type="button">
+        <Button 
+          variant="destructive" 
+          type="button"
+          className="shadow-lg hover:shadow-xl transition-all"
+        >
           投票を削除
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>投票を削除しますか？</DialogTitle>
+          <DialogTitle className="text-xl">投票を削除しますか？</DialogTitle>
           <DialogClose />
         </DialogHeader>
-        <DialogDescription>
-          投票を削除すると、元に戻すことはできません。
+        <DialogDescription className="text-base py-4">
+          投票を削除すると、元に戻すことはできません。本当に削除してもよろしいですか？
         </DialogDescription>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              キャンセル
+            </Button>
+          </DialogClose>
           <Button
             variant="destructive"
             disabled={isDeleteButtonPressed}
@@ -47,7 +56,7 @@ export const VoteDeleteButton = ({
             }}
             type="button"
           >
-            投票を削除
+            {isDeleteButtonPressed ? "削除中..." : "削除する"}
           </Button>
         </DialogFooter>
       </DialogContent>

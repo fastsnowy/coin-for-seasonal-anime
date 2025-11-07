@@ -13,58 +13,56 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* ヒーローセクション */}
-      <section className="relative bg-gradient-to-b from-primary/10 to-background py-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">🥇{siteName}</h1>
-          <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
+      <section className="relative bg-gradient-to-br from-primary/5 via-background to-primary/5 py-24 md:py-32 px-4">
+        <div className="container mx-auto max-w-5xl text-center">
+          <div className="inline-flex items-center justify-center p-2 bg-primary/10 rounded-full mb-6">
+            <Coins className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            {siteName}
+          </h1>
+          <p className="text-lg md:text-xl mb-10 text-muted-foreground max-w-2xl mx-auto">
             気になるアニメに「コイン」を賭けて期待度を表そう！
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Link href={`/seasons/${currentYear}-${current.id}`}>
-              <Button size="lg" className="gap-2">
-                今期アニメを見る <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* 装飾的な背景要素 */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-10">
-          <div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-primary" />
-          <div className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-primary" />
-          <div className="absolute top-1/3 right-1/4 w-16 h-16 rounded-full bg-primary" />
+          <Link href={`/seasons/${currentYear}-${current.id}`}>
+            <Button size="lg" className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all">
+              今期アニメを見る <ArrowRight className="h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* 使い方セクション */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-4xl">
-          <h2 className="text-3xl font-bold text-center mb-12">使い方</h2>
+      <section className="py-20 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            使い方
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="bg-background">
-              <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <Card className="border-border/50 hover:border-primary/30 transition-colors">
+              <CardContent className="p-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-primary/10 p-4 rounded-full mb-4">
+                  <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-5 rounded-2xl mb-5">
                     <Coins className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">コインを賭ける</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-semibold mb-3">コインを賭ける</h3>
+                  <p className="text-muted-foreground leading-relaxed">
                     気になるアニメにコインを賭けて、あなたの期待度を表現しましょう。
-                    0~100までの範囲で自由に設定できます。
+                    0〜100までの範囲で自由に設定できます。
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-background">
-              <CardContent className="pt-6">
+            <Card className="border-border/50 hover:border-primary/30 transition-colors">
+              <CardContent className="p-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="bg-primary/10 p-4 rounded-full mb-4">
+                  <div className="bg-gradient-to-br from-primary/20 to-primary/10 p-5 rounded-2xl mb-5">
                     <Share2 className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">結果をシェア</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-xl font-semibold mb-3">結果をシェア</h3>
+                  <p className="text-muted-foreground leading-relaxed">
                     投票後、あなたの期待度をSNSでシェアして友達と共有しましょう。
                   </p>
                 </div>
@@ -72,23 +70,27 @@ export default function Home() {
             </Card>
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="text-center">
             <Link href={`/seasons/${currentYear}-${current.id}`}>
-              <Button size="lg">さっそく投票する</Button>
+              <Button size="lg" variant="outline" className="gap-2">
+                さっそく投票する
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* 注意事項セクション */}
-      <section className="py-10 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="bg-muted/50 border rounded-lg p-6">
+      <section className="py-12 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-3xl">
+          <div className="bg-background/80 backdrop-blur border border-border/50 rounded-2xl p-6 md:p-8">
             <div className="flex items-start gap-4">
-              <Info className="h-6 w-6 text-muted-foreground flex-shrink-0 mt-1" />
+              <div className="bg-muted p-2 rounded-lg flex-shrink-0">
+                <Info className="h-5 w-5 text-muted-foreground" />
+              </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2">注意事項</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   このサイトはネタサイトです。ここで言う「コイン」とは一般名称であり、実際の金融通貨等と一切関係ありません。
                   投票結果はあくまで娯楽目的であり、作品の価値を決めるものではありません。
                 </p>
@@ -99,10 +101,10 @@ export default function Home() {
       </section>
 
       {/* フッター */}
-      <footer className="py-8 px-4 border-t">
+      <footer className="py-8 px-4 border-t border-border/50">
         <div className="container mx-auto max-w-4xl text-center text-sm text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} {siteName} - All rights reserved.
+            © {new Date().getFullYear()} {siteName}
           </p>
         </div>
       </footer>

@@ -61,27 +61,26 @@ export default function SeasonNavigation() {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-8 bg-card shadow p-4 rounded-sm">
-      <div className="col-span-4 flex w-full">
-        <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="年を選択" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end">
+      <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
+        <SelectTrigger className="w-24 md:w-28 h-9 text-sm">
+          <SelectValue placeholder="年" />
+        </SelectTrigger>
+        <SelectContent>
+          {years.map((year) => (
+            <SelectItem key={year} value={year.toString()}>
+              {year}年
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       <Select
         defaultValue={selectedSeason}
         onValueChange={(value) => setSelectedSeason(value as Season)}
       >
-        <SelectTrigger className="w-full col-span-4">
-          <SelectValue placeholder="季節を選択" />
+        <SelectTrigger className="w-20 h-9 text-sm">
+          <SelectValue placeholder="季節" />
         </SelectTrigger>
         <SelectContent>
           {seasons.map((season) => (
@@ -92,7 +91,10 @@ export default function SeasonNavigation() {
         </SelectContent>
       </Select>
 
-      <Button className="w-full sm:w-auto col-span-4" onClick={routeHandler}>
+      <Button 
+        className="h-9 px-3 md:px-4 text-sm" 
+        onClick={routeHandler}
+      >
         表示
       </Button>
     </div>

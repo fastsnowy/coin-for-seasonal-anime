@@ -1,6 +1,7 @@
 import AnimeGrid from "@/components/anime-grid";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
@@ -74,30 +75,54 @@ export default async function SeasonPage({
   });
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
-
-      <SeasonNavigation />
-
-      <div className="my-6">
-        <h2 className="text-2xl font-semibold text-center">
-          {seasonType === "current"
-            ? "今期"
-            : seasonType === "next"
-              ? "来期"
-              : `${year}年 ${seasonName}`}
-          のアニメ
-        </h2>
+    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* ヘッダー */}
+      <div className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-center sm:text-left">
+              {siteName}
+            </h1>
+            <SeasonNavigation />
+          </div>
+        </div>
       </div>
-      {/* ranking */}
-      <div className="my-6">
+
+      <div className="container mx-auto px-4 py-8">
+        {/* パンくずリスト */}
+        <Breadcrumb
+          items={[
+            {
+              label: `${year}年 ${seasonName}`,
+            },
+          ]}
+        />
+
+        <div className="mb-8">
+          <h2 className="text-lg md:text-xl font-semibold text-center text-muted-foreground">
+            {seasonType === "current"
+              ? "今期"
+              : seasonType === "next"
+                ? "来期"
+                : `${year}年 ${seasonName}`}
+            のアニメ
+          </h2>
+        </div>
+
+        {/* ranking */}
         <RankingSection animeList={animeList} />
+
+        <Suspense
+          fallback={
+            <div className="text-center py-20">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
+              <p className="mt-4 text-muted-foreground">読み込み中...</p>
+            </div>
+          }
+        >
+          <AnimeGrid animeList={animeList} coins={coins} />
+        </Suspense>
       </div>
-      <Suspense
-        fallback={<div className="text-center py-10">読み込み中...</div>}
-      >
-        <AnimeGrid animeList={animeList} coins={coins} />
-      </Suspense>
     </main>
   );
 }
