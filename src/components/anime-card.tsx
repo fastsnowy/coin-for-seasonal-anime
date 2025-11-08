@@ -95,44 +95,38 @@ export function AnimeCard({
         </AspectRatio>
       </a>
 
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="p-3 space-y-2">
         {/* タイトル */}
-        <h3 className="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">
+        <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem]">
           {work.title}
         </h3>
 
         {/* 統計情報 */}
-        <div className="flex flex-col gap-2 text-xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-500">
-              <Coins className="h-3.5 w-3.5" />
-              <span className="font-medium">{coinValue.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-1 text-blue-600 dark:text-blue-500">
-              <Eye className="h-3.5 w-3.5" />
-              <span className="font-medium">
-                {work.watchersCount.toLocaleString()}
-              </span>
-            </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500">
+            <Coins className="h-4 w-4 flex-shrink-0" />
+            <span className="font-medium text-sm">
+              {coinValue.toLocaleString()}
+            </span>
           </div>
-          {votersCount > 0 && (
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>投票数</span>
-              <span className="font-medium">{votersCount.toLocaleString()}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-500">
+            <Eye className="h-4 w-4 flex-shrink-0" />
+            <span className="font-medium text-sm">
+              {work.watchersCount.toLocaleString()}
+            </span>
+          </div>
         </div>
 
         {/* リンク */}
-        <div className="flex items-center gap-1.5 pt-1">
-          <Badge variant="secondary" className="text-xs px-2 py-0.5">
+        <div className="flex items-center gap-1.5">
+          <Badge variant="secondary" className="text-xs px-2 py-0.5 h-5">
             {work.media}
           </Badge>
           <Link
             href={`https://twitter.com/${work.twitterUrl}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center h-6 w-6 rounded hover:bg-muted transition-colors"
           >
             <Icon icon="fa6-brands:x-twitter" className="h-3.5 w-3.5" />
           </Link>
@@ -140,18 +134,18 @@ export function AnimeCard({
             href={`https://annict.com/works/${work.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center h-6 w-6 rounded hover:bg-muted transition-colors"
           >
             <Icon icon="uil:letter-english-a" className="h-4 w-4" />
           </Link>
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-3 pt-0">
         {isVoted ? (
-          <div className="flex items-center justify-center gap-2 w-full py-2 px-4 bg-muted rounded-lg">
+          <div className="flex items-center justify-center gap-2 w-full py-2 px-3 bg-muted rounded-lg">
             <Icon icon="twemoji:coin" className="h-5 w-5" />
-            <span className="font-semibold">{votedCoinValue}</span>
+            <span className="font-semibold text-base">{votedCoinValue}</span>
           </div>
         ) : (
           <MemoSliderCoin work={work} />

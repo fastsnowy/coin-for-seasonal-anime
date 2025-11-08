@@ -15,12 +15,12 @@ import {
   atomSelectYear,
 } from "@/global/atom";
 import { supabase } from "@/lib/supabaseClient";
+import { Icon } from "@iconify/react";
 import { useAtomValue } from "jotai";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { Icon } from "@iconify/react";
 const currentSeasonName = () => {
   const year = useAtomValue(atomSelectYear);
   const season = useAtomValue(atomSelectSeason);
@@ -98,13 +98,16 @@ const handleVoteAndRedirect = async (
 
 export function VoteConfirm({ seasonName }: { seasonName: string }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
-  const totalCoins = betCoinValue.reduce((acc, item) => acc + item.coin_value, 0);
-  
+  const totalCoins = betCoinValue.reduce(
+    (acc, item) => acc + item.coin_value,
+    0,
+  );
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           size="lg"
           className="h-12 px-6 gap-2 shadow-lg hover:shadow-xl transition-all font-semibold"
           disabled={betCoinValue.length === 0}
@@ -120,7 +123,7 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
             以下の内容で投票します。よろしいですか？
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-3 py-4 max-h-96 overflow-y-auto">
           {betCoinValue.length > 0 ? (
             <>
@@ -129,20 +132,26 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
                   key={item.annict_id}
                   className="flex justify-between items-start gap-4 p-3 rounded-lg bg-muted/50 border border-border/50"
                 >
-                  <span className="text-sm flex-1 line-clamp-2">{item.title}</span>
+                  <span className="text-sm flex-1 line-clamp-2">
+                    {item.title}
+                  </span>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <Icon icon="twemoji:coin" className="w-4 h-4" />
-                    <span className="font-semibold text-sm">{item.coin_value}</span>
+                    <span className="font-semibold text-sm">
+                      {item.coin_value}
+                    </span>
                   </div>
                 </div>
               ))}
-              
+
               {/* 合計 */}
               <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10 border border-primary/20">
                 <span className="font-semibold">合計</span>
                 <div className="flex items-center gap-2">
                   <Icon icon="twemoji:coin" className="w-5 h-5" />
-                  <span className="font-bold text-lg text-primary">{totalCoins}</span>
+                  <span className="font-bold text-lg text-primary">
+                    {totalCoins}
+                  </span>
                 </div>
               </div>
             </>
@@ -152,7 +161,7 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
             </p>
           )}
         </div>
-        
+
         <DialogFooter className="gap-2">
           <DialogClose asChild>
             <Button type="button" variant="outline">

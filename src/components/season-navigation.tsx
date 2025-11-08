@@ -91,10 +91,7 @@ export default function SeasonNavigation() {
         </SelectContent>
       </Select>
 
-      <Button 
-        className="h-9 px-3 md:px-4 text-sm" 
-        onClick={routeHandler}
-      >
+      <Button className="h-9 px-3 md:px-4 text-sm" onClick={routeHandler}>
         表示
       </Button>
     </div>

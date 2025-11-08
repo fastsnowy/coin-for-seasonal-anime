@@ -25,7 +25,10 @@ export default function Home() {
             気になるアニメに「コイン」を賭けて期待度を表そう！
           </p>
           <Link href={`/seasons/${currentYear}-${current.id}`}>
-            <Button size="lg" className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all">
+            <Button
+              size="lg"
+              className="gap-2 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all"
+            >
               今期アニメを見る <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>

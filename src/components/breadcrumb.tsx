@@ -25,10 +25,10 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
             <span className="hidden sm:inline">ホーム</span>
           </Link>
         </li>
-        {items.map((item, index) => {
-          const isLast = index === items.length - 1;
+        {items.map((item) => {
+          const isLast = items.indexOf(item) === items.length - 1;
           return (
-            <li key={index} className="flex items-center gap-1 flex-shrink-0">
+            <li key={item.label} className="flex items-center gap-1 flex-shrink-0">
               <ChevronRight className="h-3.5 w-3.5 flex-shrink-0" />
               {item.href && !isLast ? (
                 <Link
@@ -49,4 +49,3 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
     </nav>
   );
 }
-

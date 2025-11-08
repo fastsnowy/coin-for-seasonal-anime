@@ -121,14 +121,14 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     };
 
     return (
-      <div className="grid grid-cols-12 gap-2 items-center w-full">
+      <div className="grid grid-cols-12 gap-1.5 items-center w-full">
         <div className="flex flex-col col-span-3">
           <Button
             aria-label="Decrease value"
             variant="outline"
             onClick={handleDecrement}
             disabled={value === min}
-            className="h-10 w-full hover:bg-muted transition-colors"
+            className="h-9 w-full hover:bg-muted transition-colors p-0"
           >
             <ChevronDown size={16} />
           </Button>
@@ -148,7 +148,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           prefix={prefix}
           customInput={Input}
           placeholder={placeholder}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-lg text-center col-span-6 h-10 font-semibold text-base"
+          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-lg text-center col-span-6 h-9 font-semibold text-base px-2"
           getInputRef={combinedRef}
           {...props}
         />
@@ -159,7 +159,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             variant="outline"
             onClick={handleIncrement}
             disabled={value === max}
-            className="h-10 w-full hover:bg-muted transition-colors"
+            className="h-9 w-full hover:bg-muted transition-colors p-0"
           >
             <ChevronUp size={16} />
           </Button>

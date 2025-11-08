@@ -1,5 +1,5 @@
 import type { Anime } from "@/lib/anime-data";
-import { Coins, Eye, Trophy, Medal, Award } from "lucide-react";
+import { Award, Coins, Eye, Medal, Trophy } from "lucide-react";
 
 interface RankingItemProps {
   rank: number;
@@ -41,9 +41,7 @@ function RankingItem({ rank, anime }: RankingItemProps) {
     <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
       {getRankBadge(rank)}
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm line-clamp-1 mb-1">
-          {anime.title}
-        </h3>
+        <h3 className="font-medium text-sm line-clamp-1 mb-1">{anime.title}</h3>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           {anime.coins > 0 && (
             <div className="flex items-center gap-1">
@@ -72,7 +70,10 @@ interface RankingSectionProps {
   }[];
 }
 
-export default function RankingSection({ animeList, coins }: RankingSectionProps) {
+export default function RankingSection({
+  animeList,
+  coins,
+}: RankingSectionProps) {
   // 実際のコインデータを使用
   const animeWithStats = animeList.map((anime) => ({
     ...anime,

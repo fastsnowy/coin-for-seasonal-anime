@@ -1,6 +1,14 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -9,15 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Filter, SlidersHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 export type MediaType = "all" | "TV" | "OVA" | "MOVIE" | "WEB" | "OTHER";
 export type SortType = "coins" | "watchers" | "title";
@@ -104,7 +104,11 @@ export function AnimeFilter({
       {/* モバイル表示 */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="sm" className="md:hidden relative h-9">
+          <Button
+            variant="outline"
+            size="sm"
+            className="md:hidden relative h-9"
+          >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             フィルター
             {activeFilterCount > 0 && (
@@ -120,15 +124,11 @@ export function AnimeFilter({
         <SheetContent side="bottom" className="h-[400px]">
           <SheetHeader>
             <SheetTitle>フィルター</SheetTitle>
-            <SheetDescription>
-              アニメの表示条件を設定できます
-            </SheetDescription>
+            <SheetDescription>アニメの表示条件を設定できます</SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-6">
             <div>
-              <label className="text-sm font-medium mb-2 block">
-                メディアタイプ
-              </label>
+              <div className="text-sm font-medium mb-2">メディアタイプ</div>
               <div className="grid grid-cols-3 gap-2">
                 {mediaTypes.map((type) => (
                   <Button
@@ -145,7 +145,7 @@ export function AnimeFilter({
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">並び順</label>
+              <div className="text-sm font-medium mb-2">並び順</div>
               <Select value={sortBy} onValueChange={onSortChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="並び順を選択" />
@@ -175,4 +175,3 @@ export function AnimeFilter({
     </div>
   );
 }
-

@@ -43,7 +43,9 @@ export function AnimeSelector() {
           <div className="hidden md:flex items-center gap-3">
             <div className="text-sm text-muted-foreground">選択中</div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 rounded-full">
-              <span className="font-bold text-primary text-lg">{selectCount}</span>
+              <span className="font-bold text-primary text-lg">
+                {selectCount}
+              </span>
               <span className="text-xs text-muted-foreground">作品</span>
             </div>
           </div>
@@ -57,7 +59,10 @@ export function AnimeSelector() {
               onClick={resetHandler}
               className="h-12 w-12 p-0 hover:bg-yellow-50 hover:border-yellow-300 dark:hover:bg-yellow-950/20"
             >
-              <Icon icon="ri:reset-right-fill" className="w-5 h-5 text-yellow-600" />
+              <Icon
+                icon="ri:reset-right-fill"
+                className="w-5 h-5 text-yellow-600"
+              />
             </Button>
 
             {/* コイン総数 */}

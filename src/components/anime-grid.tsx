@@ -1,11 +1,11 @@
 "use client";
 
 import type { Anime } from "@/lib/anime-data";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { AnimeCard } from "./anime-card";
-import { AnimeSelector } from "./anime-selector";
 import { AnimeFilter, type MediaType, type SortType } from "./anime-filter";
+import { AnimeSelector } from "./anime-selector";
 
 interface AnimeGridProps {
   animeList: Anime[];
@@ -51,7 +51,8 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
     return sorted;
   }, [animeList, coins, mediaType, sortBy]);
 
-  const activeFilterCount = (mediaType !== "all" ? 1 : 0) + (sortBy !== "coins" ? 1 : 0);
+  const activeFilterCount =
+    (mediaType !== "all" ? 1 : 0) + (sortBy !== "coins" ? 1 : 0);
 
   return (
     <>
@@ -69,7 +70,7 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-32">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-32">
         {filteredAndSortedAnimeList.length > 0 ? (
           filteredAndSortedAnimeList.map((anime) => (
             <AnimeCard work={anime} key={anime.id} coins={coins} />

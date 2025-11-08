@@ -1,8 +1,8 @@
+import { AnimeCard } from "@/components/anime-card";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { VoteDeleteButton } from "@/components/vote-delete";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
-import { AnimeCard } from "@/components/anime-card";
-import { Breadcrumb } from "@/components/breadcrumb";
 
 export default async function Page({
   searchParams,
@@ -75,7 +75,7 @@ export default async function Page({
           ]}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-24">
           {animeList.map((anime) => (
             <AnimeCard
               work={anime}
@@ -86,7 +86,7 @@ export default async function Page({
             />
           ))}
         </div>
-        
+
         {did === data[0].delete_id && (
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
             <VoteDeleteButton id={id} />

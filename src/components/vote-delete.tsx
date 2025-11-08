@@ -1,6 +1,7 @@
 "use client";
 
 import { handleDeleteVote } from "@/lib/vote-delete-action";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import {
@@ -13,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useState } from "react";
 
 export const VoteDeleteButton = ({
   id,
@@ -24,8 +24,8 @@ export const VoteDeleteButton = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
-          variant="destructive" 
+        <Button
+          variant="destructive"
           type="button"
           className="shadow-lg hover:shadow-xl transition-all"
         >

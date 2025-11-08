@@ -1,7 +1,7 @@
 import AnimeGrid from "@/components/anime-grid";
+import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
-import { Breadcrumb } from "@/components/breadcrumb";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
