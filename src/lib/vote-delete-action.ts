@@ -1,10 +1,11 @@
 "use server";
+import { DB_TABLES } from "@/config/database";
 import { supabase } from "./supabaseClient";
 
 export const handleDeleteVote = async (id: string) => {
   // すでに削除済みかどうか、または存在するかを確認する
   const { data: existingVote, error: fetchError } = await supabase
-    .from("dev_coins")
+    .from(DB_TABLES.COINS)
     .select("deleted_at")
     .eq("created_id", id)
     .single();
@@ -20,7 +21,7 @@ export const handleDeleteVote = async (id: string) => {
   }
 
   const { error } = await supabase
-    .from("dev_coins")
+    .from(DB_TABLES.COINS)
     .update({
       deleted_at: new Date().toISOString(), // UTCタイムゾーンでの論理削除
     })

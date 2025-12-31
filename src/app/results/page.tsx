@@ -3,6 +3,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
+import { DB_TABLES, DB_VIEWS } from "@/config/database";
 
 export default async function Page({
   searchParams,
@@ -13,7 +14,7 @@ export default async function Page({
 
   // supabaseから投票内容取得
   const { data, error } = await supabase
-    .from("dev_coins")
+    .from(DB_TABLES.COINS)
     .select("*")
     .eq("created_id", id);
 
@@ -36,7 +37,7 @@ export default async function Page({
   }
 
   const { data: coins, error: coinError } = await supabase
-    .from("dev_coin_value_view")
+    .from(DB_VIEWS.COIN_VALUE)
     .select("annict_id, total_coin_value, uu")
     .eq("season", data[0].season as string)
     .order("total_coin_value", { ascending: false });
@@ -105,7 +106,10 @@ export default async function Page({
         </div>
 
         {/* クライアントコンポーネントで削除ボタンの表示を判定 */}
-        <VoteDeleteWrapper voteId={id} deleteId={data[0].delete_id as string} />
+        <VoteDeleteWrapper
+          voteId={id}
+          deleteId={(data[0] as { delete_id?: string }).delete_id || ""}
+        />
       </div>
     </main>
   );

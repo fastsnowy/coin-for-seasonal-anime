@@ -14,6 +14,7 @@ import {
   atomSelectSeason,
   atomSelectYear,
 } from "@/global/atom";
+import { DB_TABLES } from "@/config/database";
 import { supabase } from "@/lib/supabaseClient";
 import { Icon } from "@iconify/react";
 import { useAtomValue } from "jotai";
@@ -67,7 +68,7 @@ const createVoteHandler = async (
     throw new Error("Failed to create vote data"); // エラーをスロー
   }
 
-  const { error } = await supabase.from("dev_coins").insert(insertData);
+  const { error } = await supabase.from(DB_TABLES.COINS).insert(insertData);
 
   if (error) {
     throw new Error("Failed to insert vote data"); // エラーをスロー

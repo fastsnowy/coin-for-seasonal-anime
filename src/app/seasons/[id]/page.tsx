@@ -7,6 +7,7 @@ import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
 import type { Season } from "@/lib/seasons";
 import { supabase } from "@/lib/supabaseClient";
+import { DB_VIEWS } from "@/config/database";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -47,7 +48,7 @@ export default async function SeasonPage({
 
   // supabaseからデータを取得
   const { data: coins, error } = await supabase
-    .from("dev_coin_value_view")
+    .from(DB_VIEWS.COIN_VALUE)
     .select("annict_id, total_coin_value, uu")
     .eq("season", `${year}-${season}`)
     .order("total_coin_value", { ascending: false });
