@@ -19,6 +19,7 @@ interface AnimeGridProps {
 export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
   const [mediaType, setMediaType] = useState<MediaType>("all");
   const [sortBy, setSortBy] = useState<SortType>("coins");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // フィルタリングとソート
   const filteredAndSortedAnimeList = useMemo(() => {
@@ -31,28 +32,33 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
 
     // ソート
     const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0;
       switch (sortBy) {
         case "coins": {
           const aCoins =
             coins.find((c) => c.annict_id === a.id)?.total_coin_value || 0;
           const bCoins =
             coins.find((c) => c.annict_id === b.id)?.total_coin_value || 0;
-          return bCoins - aCoins;
+          comparison = bCoins - aCoins;
+          break;
         }
         case "watchers":
-          return b.watchersCount - a.watchersCount;
+          comparison = b.watchersCount - a.watchersCount;
+          break;
         case "title":
-          return a.title.localeCompare(b.title, "ja");
-        default:
-          return 0;
+          comparison = a.title.localeCompare(b.title, "ja");
+          break;
       }
+      return sortOrder === "desc" ? comparison : -comparison;
     });
 
     return sorted;
-  }, [animeList, coins, mediaType, sortBy]);
+  }, [animeList, coins, mediaType, sortBy, sortOrder]);
 
   const activeFilterCount =
-    (mediaType !== "all" ? 1 : 0) + (sortBy !== "coins" ? 1 : 0);
+    (mediaType !== "all" ? 1 : 0) +
+    (sortBy !== "coins" ? 1 : 0) +
+    (sortOrder !== "desc" ? 1 : 0);
 
   return (
     <>
@@ -64,8 +70,10 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
         <AnimeFilter
           mediaType={mediaType}
           sortBy={sortBy}
+          sortOrder={sortOrder}
           onMediaTypeChange={setMediaType}
           onSortChange={setSortBy}
+          onSortOrderChange={setSortOrder}
           activeFilterCount={activeFilterCount}
         />
       </div>

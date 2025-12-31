@@ -23,7 +23,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Filter, RotateCcw, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Filter,
+  RotateCcw,
+  SlidersHorizontal,
+} from "lucide-react";
 
 export type MediaType = "all" | "TV" | "OVA" | "MOVIE" | "WEB" | "OTHER";
 export type SortType = "coins" | "watchers" | "title";
@@ -31,16 +37,20 @@ export type SortType = "coins" | "watchers" | "title";
 interface AnimeFilterProps {
   mediaType: MediaType;
   sortBy: SortType;
+  sortOrder: "asc" | "desc";
   onMediaTypeChange: (value: MediaType) => void;
   onSortChange: (value: SortType) => void;
+  onSortOrderChange: (value: "asc" | "desc") => void;
   activeFilterCount: number;
 }
 
 export function AnimeFilter({
   mediaType,
   sortBy,
+  sortOrder,
   onMediaTypeChange,
   onSortChange,
+  onSortOrderChange,
   activeFilterCount,
 }: AnimeFilterProps) {
   const mediaTypes = [
@@ -61,6 +71,7 @@ export function AnimeFilter({
   const resetFilters = () => {
     onMediaTypeChange("all");
     onSortChange("coins");
+    onSortOrderChange("desc");
   };
 
   return (
@@ -96,6 +107,31 @@ export function AnimeFilter({
         </Select>
 
         <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() =>
+                  onSortOrderChange(sortOrder === "desc" ? "asc" : "desc")
+                }
+                className="h-9 w-9"
+              >
+                {sortOrder === "desc" ? (
+                  <ArrowDown className="h-4 w-4" />
+                ) : (
+                  <ArrowUp className="h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {sortOrder === "desc" ? "降順" : "昇順"}
+                </span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{sortOrder === "desc" ? "降順" : "昇順"}</p>
+            </TooltipContent>
+          </Tooltip>
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -173,6 +209,30 @@ export function AnimeFilter({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <div className="text-sm font-medium mb-2">表示順</div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant={sortOrder === "desc" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onSortOrderChange("desc")}
+                  className="w-full gap-2"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                  降順
+                </Button>
+                <Button
+                  variant={sortOrder === "asc" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onSortOrderChange("asc")}
+                  className="w-full gap-2"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                  昇順
+                </Button>
+              </div>
             </div>
 
             {activeFilterCount > 0 ? (
