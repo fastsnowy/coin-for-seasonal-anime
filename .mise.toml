@@ -1,6 +1,7 @@
 [tools]
 node = "20"
 pnpm = "latest"
+supabase = "latest"
 
 [tasks.gen-schema]
 run = "pnpm dlx supabase gen types typescript --linked > ./src/lib/schema.ts"
