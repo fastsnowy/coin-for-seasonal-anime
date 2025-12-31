@@ -10,6 +10,26 @@ import { supabase } from "@/lib/supabaseClient";
 import { DB_VIEWS } from "@/config/database";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const match = id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
+
+  if (!match) return { title: siteName };
+
+  const year = match[1];
+  const season = match[2] as Season;
+  const seasonName = getSeasonName(season);
+
+  return {
+    title: `${year} ${seasonName}アニメ一覧 | ${siteName}`,
+  };
+}
 
 // 動的パラメータの生成（静的生成するパスを指定）
 export async function generateStaticParams() {

@@ -4,6 +4,34 @@ import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
 import { DB_TABLES, DB_VIEWS } from "@/config/database";
+import type { Metadata } from "next";
+import { siteName } from "@/config/constant";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}): Promise<Metadata> {
+  const { id = "" } = await searchParams;
+
+  const { data } = await supabase
+    .from(DB_TABLES.COINS)
+    .select("coin_value")
+    .eq("created_id", id);
+
+  if (!data || data.length === 0) {
+    return { title: `投票結果 | ${siteName}` };
+  }
+
+  const totalCoins = data.reduce(
+    (acc, item) => acc + (item.coin_value as number),
+    0,
+  );
+
+  return {
+    title: `あなたは${totalCoins}枚のコインを投票しました！ | ${siteName}`,
+  };
+}
 
 export default async function Page({
   searchParams,
