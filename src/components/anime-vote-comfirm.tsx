@@ -17,7 +17,8 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import { Icon } from "@iconify/react";
 import { useAtomValue } from "jotai";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -75,33 +76,72 @@ const createVoteHandler = async (
   return { resultId, deleteId }; // 成功時のみ値を返す
 };
 
-const handleVoteAndRedirect = async (
+const createVoteAndGetUrl = async (
   betCoinValue: BetAnimes,
   seasonName: string,
-) => {
-  let redirectTo = "";
+): Promise<string | null> => {
   try {
     const { resultId, deleteId } = await createVoteHandler(
       betCoinValue,
       seasonName,
     );
     console.log("Vote created successfully:", resultId);
-    redirectTo = `/results?id=${resultId}&did=${deleteId}`;
+    return `/results?id=${resultId}&did=${deleteId}`;
   } catch (error) {
     console.error("Failed to create vote:", error);
     toast.error("エラーが発生しました");
-  }
-  if (redirectTo) {
-    redirect(redirectTo);
+    return null;
   }
 };
 
 export function VoteConfirm({ seasonName }: { seasonName: string }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
+  const router = useRouter();
   const totalCoins = betCoinValue.reduce(
     (acc, item) => acc + item.coin_value,
     0,
   );
+
+  const handleSubmit = async () => {
+    if (isSubmitting || isSubmittingRef.current) return; // 既に送信中の場合は何もしない
+
+    setIsSubmitting(true); // すぐにdisabledにする
+    isSubmittingRef.current = true;
+
+    try {
+      const redirectUrl = await createVoteAndGetUrl(betCoinValue, seasonName);
+      console.log("投票内容", betCoinValue);
+      console.log("投票内容を送信しました");
+
+      if (redirectUrl) {
+        // URLから投票IDを抽出
+        const urlParams = new URLSearchParams(redirectUrl.split("?")[1]);
+        const voteId = urlParams.get("id");
+        const deleteId = urlParams.get("did");
+
+        // localStorageに投票情報を保存（投票者のみ削除可能にする）
+        if (voteId && deleteId) {
+          const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
+          myVotes[voteId] = {
+            deleteId,
+            timestamp: new Date().toISOString(),
+          };
+          localStorage.setItem("myVotes", JSON.stringify(myVotes));
+        }
+
+        router.push(redirectUrl); // クライアント側でページ遷移
+      } else {
+        setIsSubmitting(false); // エラー時は再度有効にする
+        isSubmittingRef.current = false;
+      }
+    } catch (error) {
+      console.error("投票エラー:", error);
+      setIsSubmitting(false); // エラー時は再度有効にする
+      isSubmittingRef.current = false;
+    }
+  };
 
   return (
     <Dialog>
@@ -164,20 +204,16 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
 
         <DialogFooter className="gap-2">
           <DialogClose asChild>
-            <Button type="button" variant="outline">
+            <Button type="button" variant="outline" disabled={isSubmitting}>
               キャンセル
             </Button>
           </DialogClose>
           <Button
             type="submit"
-            onClick={async () => {
-              await handleVoteAndRedirect(betCoinValue, seasonName);
-              console.log("投票内容", betCoinValue);
-              console.log("投票内容を送信しました");
-            }}
-            disabled={betCoinValue.length === 0}
+            onClick={handleSubmit}
+            disabled={betCoinValue.length === 0 || isSubmitting}
           >
-            投票する
+            {isSubmitting ? "送信中..." : "投票する"}
           </Button>
         </DialogFooter>
       </DialogContent>

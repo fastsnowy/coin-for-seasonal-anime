@@ -1,6 +1,6 @@
 import { AnimeCard } from "@/components/anime-card";
 import { Breadcrumb } from "@/components/breadcrumb";
-import { VoteDeleteButton } from "@/components/vote-delete";
+import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -9,27 +9,42 @@ export default async function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const { id = "", did = "" } = await searchParams;
+  const { id = "" } = await searchParams;
+
   // supabaseから投票内容取得
   const { data, error } = await supabase
-    .from("dev_coins") // TODO: dev
+    .from("dev_coins")
     .select("*")
     .eq("created_id", id);
 
   // annictからanime情報取得
-  if (!data) {
-    return <div className="text-center py-10">データの取得に失敗しました</div>;
+  if (!data || error) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+        <div className="border-b border-border/50 bg-background/80 backdrop-blur">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
+              投票結果
+            </h1>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-10">データの取得に失敗しました</div>
+        </div>
+      </main>
+    );
   }
+
   const { data: coins, error: coinError } = await supabase
-    .from("dev_coin_value_view") // TODO: dev
+    .from("dev_coin_value_view")
     .select("annict_id, total_coin_value, uu")
     .eq("season", data[0].season as string)
     .order("total_coin_value", { ascending: false });
-  const res = await getAnimeByIds(data.map((item) => item.annict_id as number));
 
   if (coinError) {
     console.error("Failed to fetch total coin data", coinError);
   }
+
   if (!coins) {
     return (
       <main className="container mx-auto px-4 py-8">
@@ -40,6 +55,8 @@ export default async function Page({
       </main>
     );
   }
+
+  const res = await getAnimeByIds(data.map((item) => item.annict_id as number));
 
   const animeList = res.map((anime) => ({
     id: anime.id,
@@ -87,11 +104,8 @@ export default async function Page({
           ))}
         </div>
 
-        {did === data[0].delete_id && (
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2">
-            <VoteDeleteButton id={id} />
-          </div>
-        )}
+        {/* クライアントコンポーネントで削除ボタンの表示を判定 */}
+        <VoteDeleteWrapper voteId={id} deleteId={data[0].delete_id as string} />
       </div>
     </main>
   );
