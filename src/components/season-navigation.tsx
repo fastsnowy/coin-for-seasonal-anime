@@ -17,7 +17,8 @@ import {
 import type { Season } from "@/lib/seasons";
 import { useAtom, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface SeasonNavigationProps {
   currentYear: number;
@@ -26,6 +27,7 @@ interface SeasonNavigationProps {
 
 export default function SeasonNavigation() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
   const now = new Date();
   const thisYear = now.getFullYear();
 
@@ -34,6 +36,17 @@ export default function SeasonNavigation() {
   const [selectedSeason, setSelectedSeason] = useAtom(atomSelectSeason);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
+
+  // URLパラメータから現在の年と季節を同期
+  useEffect(() => {
+    if (params?.id) {
+      const match = params.id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
+      if (match) {
+        setSelectedYear(match[1]);
+        setSelectedSeason(match[2] as Season);
+      }
+    }
+  }, [params?.id, setSelectedYear, setSelectedSeason]);
 
   const resetHandler = () => {
     resetAllBetCoins(); // Reset the bet coins

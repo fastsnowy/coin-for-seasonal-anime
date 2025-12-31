@@ -100,23 +100,6 @@ export function AnimeCard({
         <h3 className="font-semibold text-sm leading-tight line-clamp-2 min-h-[2.5rem]">
           {work.title}
         </h3>
-
-        {/* 統計情報 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500">
-            <Coins className="h-4 w-4 flex-shrink-0" />
-            <span className="font-medium text-sm">
-              {coinValue.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-500">
-            <Eye className="h-4 w-4 flex-shrink-0" />
-            <span className="font-medium text-sm">
-              {work.watchersCount.toLocaleString()}
-            </span>
-          </div>
-        </div>
-
         {/* リンク */}
         <div className="flex items-center gap-1.5">
           <Badge variant="secondary" className="text-xs px-2 py-0.5 h-5">
@@ -138,6 +121,22 @@ export function AnimeCard({
           >
             <Icon icon="uil:letter-english-a" className="h-4 w-4" />
           </Link>
+        </div>
+
+        {/* 統計情報 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-500">
+            <Coins className="h-4 w-4 flex-shrink-0" />
+            <span className="font-medium text-sm">
+              {coinValue.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-500">
+            <Eye className="h-4 w-4 flex-shrink-0" />
+            <span className="font-medium text-sm">
+              {work.watchersCount.toLocaleString()}
+            </span>
+          </div>
         </div>
       </CardContent>
 

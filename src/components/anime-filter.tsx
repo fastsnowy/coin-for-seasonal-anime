@@ -17,7 +17,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Filter, SlidersHorizontal } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Filter, RotateCcw, SlidersHorizontal } from "lucide-react";
 
 export type MediaType = "all" | "TV" | "OVA" | "MOVIE" | "WEB" | "OTHER";
 export type SortType = "coins" | "watchers" | "title";
@@ -89,16 +95,25 @@ export function AnimeFilter({
           </SelectContent>
         </Select>
 
-        {activeFilterCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={resetFilters}
-            className="h-9 text-sm"
-          >
-            リセット
-          </Button>
-        )}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={resetFilters}
+                className="h-9 w-9"
+                disabled={activeFilterCount === 0}
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span className="sr-only">リセット</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>リセット</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
       {/* モバイル表示 */}
@@ -160,12 +175,16 @@ export function AnimeFilter({
               </Select>
             </div>
 
-            {activeFilterCount > 0 && (
+            {activeFilterCount > 0 ? (
               <Button
                 variant="outline"
                 onClick={resetFilters}
                 className="w-full"
               >
+                フィルターをリセット
+              </Button>
+            ) : (
+              <Button variant="outline" className="w-full" disabled>
                 フィルターをリセット
               </Button>
             )}
