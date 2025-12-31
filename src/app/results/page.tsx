@@ -1,4 +1,4 @@
-import { AnimeCard } from "@/components/anime-card";
+import { ResultsClient } from "@/components/results-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
 import { getAnimeByIds } from "@/lib/anime-data";
@@ -93,17 +93,12 @@ export default async function Page({
           ]}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-24">
-          {animeList.map((anime) => (
-            <AnimeCard
-              work={anime}
-              key={anime.id}
-              coins={coins}
-              isVoted={true}
-              votedCoins={data}
-            />
-          ))}
-        </div>
+        <ResultsClient
+          animeList={animeList}
+          coins={coins}
+          id={id}
+          votedCoins={data}
+        />
 
         {/* クライアントコンポーネントで削除ボタンの表示を判定 */}
         <VoteDeleteWrapper
