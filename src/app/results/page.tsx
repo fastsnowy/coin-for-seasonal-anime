@@ -7,8 +7,9 @@ import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Coins } from "lucide-react";
 import Link from "next/link";
+import { getSeasonName, type Season } from "@/lib/seasons";
+import { ShareButtons } from "@/components/share-buttons";
 
 export async function generateMetadata({
   searchParams,
@@ -20,7 +21,7 @@ export async function generateMetadata({
 
   const { data } = await supabase
     .from(DB_TABLES.COINS)
-    .select("coin_value")
+    .select("coin_value, season")
     .eq("created_id", id);
 
   if (!data || data.length === 0) {
@@ -32,8 +33,18 @@ export async function generateMetadata({
     0,
   );
 
+  const firstVote = data[0];
+  const seasonMatch = firstVote?.season?.match(
+    /^(\d{4})-(spring|summer|autumn|winter)$/,
+  );
+  const year = seasonMatch ? seasonMatch[1] : "";
+  const season = seasonMatch ? (seasonMatch[2] as Season) : "spring";
+  const seasonNameText = seasonMatch ? getSeasonName(season) : "";
+  const seasonText = seasonMatch ? `${year}年${seasonNameText}アニメ` : "アニメ";
+  const titleText = `${seasonText}に合計${totalCoins}枚のコインを賭けました！`;
+
   return {
-    title: `${totalCoins}枚のコインを投票しました | ${siteName}`,
+    title: `${titleText} | ${siteName}`,
   };
 }
 
@@ -109,6 +120,15 @@ export default async function Page({
     0,
   );
 
+  const seasonMatch = firstVote.season.match(
+    /^(\d{4})-(spring|summer|autumn|winter)$/,
+  );
+  const year = seasonMatch ? seasonMatch[1] : "";
+  const season = seasonMatch ? (seasonMatch[2] as Season) : "spring";
+  const seasonNameText = seasonMatch ? getSeasonName(season) : "";
+  const seasonText = seasonMatch ? `${year}年${seasonNameText}アニメ` : "アニメ";
+  const shareText = `${seasonText}に合計${totalCoins}枚のコインを賭けました！\n\n#季節アニメコイン\n`;
+
   return (
     <main className="min-h-dvh bg-background">
       {/* Header */}
@@ -122,20 +142,19 @@ export default async function Page({
           </Link>
           <ThemeToggle />
         </div>
-        <div className="container mx-auto max-w-4xl px-4 pb-5 text-center space-y-3">
-          <h1 className="text-xl font-bold">投票結果</h1>
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-coin-muted border border-coin/15">
-            <Coins className="w-5 h-5 text-coin" />
-            <span className="font-bold text-2xl text-coin tabular-nums">
-              {totalCoins}
-            </span>
-            <span className="text-sm text-muted-foreground">コイン</span>
-          </div>
-        </div>
       </header>
 
-      <div className="container mx-auto max-w-4xl px-4 py-6">
+      <div className="container mx-auto max-w-4xl px-4 py-6 pb-20">
         <Breadcrumb items={[{ label: "投票結果" }]} />
+
+        <div className="mt-8 mb-10 text-center space-y-2">
+          <p className="text-xs font-bold text-muted-foreground tracking-widest uppercase opacity-70">
+            {seasonText}
+          </p>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+            <span className="text-coin px-1">{totalCoins}枚</span>のコインを賭けました！
+          </h1>
+        </div>
 
         <ResultsClient
           animeList={animeList}
@@ -144,7 +163,17 @@ export default async function Page({
           votedCoins={data}
         />
 
-        <VoteDeleteWrapper voteId={id} deleteId={deleteId} />
+        <div className="mt-16 pt-10 border-t border-border/50">
+          <div className="flex flex-col items-center gap-8">
+            <div className="flex flex-col items-center gap-4 w-full">
+              <p className="text-sm font-bold text-muted-foreground">この結果をシェアする</p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <ShareButtons shareText={shareText} />
+                <VoteDeleteWrapper voteId={id} deleteId={deleteId} />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
