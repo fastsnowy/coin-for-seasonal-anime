@@ -36,5 +36,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     ...data,
     sub: String(data.id), // GoTrue は `sub` を一意識別子として使用
+    email_verified: true, // メール確認フローをスキップ
   });
 }
