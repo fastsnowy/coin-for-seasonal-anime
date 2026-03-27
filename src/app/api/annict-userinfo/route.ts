@@ -36,6 +36,5 @@ export async function GET(request: Request) {
   return NextResponse.json({
     ...data,
     sub: String(data.id), // GoTrue は `sub` を一意識別子として使用
-    email: `${data.username}@annict.local`, // Annict は email を公開しないためダミー値
   });
 }
