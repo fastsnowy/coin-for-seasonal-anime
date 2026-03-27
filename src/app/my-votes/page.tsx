@@ -1,5 +1,6 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { VoteCardActions } from "@/components/vote-card-actions";
 import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
@@ -187,7 +188,10 @@ function PageShell({ children }: { children: React.ReactNode }) {
           >
             {siteName}
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <UserMenu />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <div className="container mx-auto max-w-2xl px-4 py-6">

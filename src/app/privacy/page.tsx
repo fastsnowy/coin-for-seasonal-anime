@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { siteName } from "@/config/constant";
 import Link from "next/link";
@@ -19,7 +20,10 @@ export default function PrivacyPage() {
           >
             {siteName}
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <UserMenu />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
