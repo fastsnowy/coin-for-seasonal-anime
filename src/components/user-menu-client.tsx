@@ -17,18 +17,28 @@ interface UserMenuClientProps {
   isLoggedIn: boolean;
   isAnonymous: boolean;
   displayName?: string;
+  avatarUrl?: string;
 }
 
 export function UserMenuClient({
   isLoggedIn,
   isAnonymous,
   displayName,
+  avatarUrl,
 }: UserMenuClientProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <User className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="h-8 w-8 overflow-hidden">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName ?? "ユーザー"}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          ) : (
+            <User className="h-4 w-4" />
+          )}
           <span className="sr-only">ユーザーメニュー</span>
         </Button>
       </DropdownMenuTrigger>
@@ -36,9 +46,18 @@ export function UserMenuClient({
         {isLoggedIn && !isAnonymous ? (
           <>
             <DropdownMenuLabel className="font-normal">
-              <p className="text-xs text-muted-foreground truncate">
-                {displayName}
-              </p>
+              <div className="flex items-center gap-2">
+                {avatarUrl && (
+                  <img
+                    src={avatarUrl}
+                    alt={displayName ?? "ユーザー"}
+                    className="h-6 w-6 rounded-full object-cover shrink-0"
+                  />
+                )}
+                <p className="text-xs text-muted-foreground truncate">
+                  {displayName}
+                </p>
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
           </>
