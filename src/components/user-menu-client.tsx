@@ -60,7 +60,7 @@ export function UserMenuClient({
           <DropdownMenuItem asChild>
             <Link href="/login" className="cursor-pointer">
               <LogIn className="mr-2 h-4 w-4" />
-              ログイン / アカウント連携
+              アカウント連携（開発中）
             </Link>
           </DropdownMenuItem>
         ) : (

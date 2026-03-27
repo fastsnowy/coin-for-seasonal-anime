@@ -42,20 +42,12 @@ export default function PrivacyPage() {
                 本サービスにアクセスした際、匿名ユーザーとして自動的にセッションが作成されます。この際、一意の匿名ユーザーIDが生成されますが、個人を特定する情報は収集しません。
               </p>
             </SubSection>
-            <SubSection title="アカウント連携（任意）">
+            <SubSection title="アカウント連携（任意・開発中）">
               <p>
-                ユーザーが任意で外部アカウントを連携する場合、OAuthプロバイダから以下の情報を取得する場合があります。本サービスではパスワードの管理は一切行いません。
+                本サービスでは、今後外部アカウント（OAuth）との連携機能を提供する予定です。この機能は現在開発中であり、提供開始時にはOAuthプロバイダから基本的なプロフィール情報（ユーザーID、ユーザー名、メールアドレス等）を取得する場合があります。本サービスではパスワードの管理は一切行いません。
               </p>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                <li>
-                  Discordアカウント情報（ユーザーID、ユーザー名等、Discordが提供する基本プロフィール情報）
-                </li>
-                <li>
-                  Googleアカウント情報（ユーザーID、メールアドレス等、Googleが提供する基本プロフィール情報）
-                </li>
-              </ul>
               <p className="text-muted-foreground mt-2">
-                なお、メールアドレスはOAuthプロバイダ（Google等）が認証フローの一環として自動的に送信する場合がありますが、本サービスではメールアドレスを用いた連絡やマーケティング等は行いません。
+                なお、メールアドレスはOAuthプロバイダ（Google等）が認証フローの一環として自動的に送信する場合がありますが、本サービスではメールアドレスを用いた連絡やマーケティング等は行いません。アカウント連携を行うと、匿名ユーザーの投票履歴を連携先アカウントに引き継ぐことができます。
               </p>
             </SubSection>
             <SubSection title="投票データ">
@@ -74,17 +66,13 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="3. Cookie・ローカルストレージの使用">
+          <Section title="3. Cookieの使用">
             <p>本サービスでは、以下の技術を使用しています。</p>
             <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
               <li>
                 <strong>Cookie</strong>
                 ：認証セッションの管理に使用します（Supabase
                 Authが発行するセッショントークン）。
-              </li>
-              <li>
-                <strong>ローカルストレージ</strong>
-                ：投票のメタ情報（削除キー等）の一時保存に使用します。
               </li>
             </ul>
           </Section>
@@ -136,7 +124,7 @@ export default function PrivacyPage() {
               本サービスでは、以下の対策によりユーザーデータの保護に努めています。
             </p>
             <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li>OAuth認証のみを採用し、パスワードの保存・管理を行わない設計</li>
+              <li>匿名認証およびOAuth認証を採用し、パスワードの保存・管理を行わない設計</li>
               <li>データベースへのアクセス制御（Row Level Security）</li>
               <li>通信の暗号化（HTTPS）</li>
               <li>認証トークンの適切な管理</li>

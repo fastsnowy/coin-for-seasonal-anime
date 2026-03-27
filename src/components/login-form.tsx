@@ -1,78 +1,51 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { signInWithDiscord, signInWithGoogle } from "@/lib/auth-actions";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
-import { toast } from "sonner";
-
-type OAuthProvider = "discord" | "google";
+import { Construction } from "lucide-react";
 
 const providers = [
   {
-    id: "discord" as OAuthProvider,
+    id: "discord",
     label: "Discord",
-    linkLabel: "Discordアカウントを連携",
     icon: "simple-icons:discord",
-    action: signInWithDiscord,
   },
   {
-    id: "google" as OAuthProvider,
+    id: "google",
     label: "Google",
-    linkLabel: "Googleアカウントを連携",
     icon: "simple-icons:google",
-    action: signInWithGoogle,
   },
 ] as const;
 
-export function LoginForm({ isAnonymous }: { isAnonymous: boolean }) {
-  const [loadingProvider, setLoadingProvider] = useState<OAuthProvider | null>(
-    null,
-  );
-
-  const handleOAuth = async (provider: (typeof providers)[number]) => {
-    setLoadingProvider(provider.id);
-    try {
-      const result = await provider.action();
-      if (result?.error) {
-        toast.error(result.error);
-      }
-    } catch {
-      // redirect throws NEXT_REDIRECT
-    } finally {
-      setLoadingProvider(null);
-    }
-  };
-
+export function LoginForm() {
   return (
-    <div className="space-y-3">
-      {providers.map((provider) => (
-        <Button
-          key={provider.id}
-          type="button"
-          variant="outline"
-          className="w-full h-11 gap-2.5 font-semibold"
-          onClick={() => handleOAuth(provider)}
-          disabled={loadingProvider !== null}
-        >
-          {loadingProvider === provider.id ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
-          ) : (
-            <Icon icon={provider.icon} className="h-4.5 w-4.5" />
-          )}
-          {isAnonymous
-            ? provider.linkLabel
-            : `${provider.label}でログイン`}
-        </Button>
-      ))}
-
-      {isAnonymous && (
-        <div className="mt-6 rounded-lg border border-border bg-muted/50 p-4">
+    <div className="space-y-4">
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 flex items-start gap-3">
+        <Construction className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+            開発中
+          </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            現在、匿名ユーザーとしてご利用中です。アカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
+            アカウント連携機能は現在開発中です。現時点では匿名ユーザーとして投票・履歴の確認が可能です。
           </p>
         </div>
-      )}
+      </div>
+
+      <div className="space-y-3">
+        {providers.map((provider) => (
+          <Button
+            key={provider.id}
+            type="button"
+            variant="outline"
+            className="w-full h-11 gap-2.5 font-semibold opacity-50 cursor-not-allowed"
+            disabled
+          >
+            <Icon icon={provider.icon} className="h-4.5 w-4.5" />
+            {provider.label}で連携（準備中）
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }

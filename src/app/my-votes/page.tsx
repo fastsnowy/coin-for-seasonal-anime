@@ -162,12 +162,12 @@ export default async function MyVotesPage() {
       {user.is_anonymous && (
         <div className="mt-8 rounded-lg border border-border bg-muted/50 p-4">
           <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-            現在、匿名ユーザーとしてご利用中です。アカウントを連携すると、別のデバイスからも投票履歴を確認できます。
+            現在、匿名ユーザーとしてご利用中です。アカウント連携機能（開発中）を利用すると、別のデバイスからも投票履歴を確認できるようになります。
           </p>
           <Link href="/login">
             <Button variant="outline" size="sm" className="gap-1.5">
               <LogIn className="w-3.5 h-3.5" />
-              アカウントを連携
+              アカウント連携について
             </Button>
           </Link>
         </div>

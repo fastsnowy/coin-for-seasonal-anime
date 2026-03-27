@@ -43,10 +43,10 @@ export default async function LoginPage({
       <div className="container mx-auto max-w-md px-4 py-16">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-extrabold tracking-tight mb-2">
-            ログイン
+            アカウント連携
           </h1>
           <p className="text-sm text-muted-foreground">
-            アカウントを連携すると投票履歴を確認できます
+            外部アカウントを連携すると、別のデバイスからも投票履歴を確認できます
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export default async function LoginPage({
           </div>
         )}
 
-        <LoginForm isAnonymous={user?.is_anonymous ?? false} />
+        <LoginForm />
       </div>
     </main>
   );
