@@ -25,19 +25,18 @@ type BetAnimes = {
   coin_value: number;
 }[];
 
-const createVoteAndGetUrl = async (
+const createVote = async (
   betCoinValue: BetAnimes,
   seasonName: string,
-): Promise<string | null> => {
+): Promise<{ resultId: string; deleteId: string } | null> => {
   try {
-    const { resultId, deleteId } = await createVoteAction({
+    return await createVoteAction({
       seasonName,
       betAnimes: betCoinValue.map((item) => ({
         annict_id: item.annict_id,
         coin_value: item.coin_value,
       })),
     });
-    return `/results?id=${resultId}&did=${deleteId}`;
   } catch (error) {
     console.error("Failed to create vote:", error);
     toast.error("エラーが発生しました");
@@ -62,21 +61,17 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
     isSubmittingRef.current = true;
 
     try {
-      const redirectUrl = await createVoteAndGetUrl(betCoinValue, seasonName);
+      const result = await createVote(betCoinValue, seasonName);
 
-      if (redirectUrl) {
-        const urlParams = new URLSearchParams(redirectUrl.split("?")[1]);
-        const voteId = urlParams.get("id");
-        const deleteId = urlParams.get("did");
+      if (result) {
+        const { resultId, deleteId } = result;
 
-        if (voteId && deleteId) {
-          const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
-          myVotes[voteId] = {
-            deleteId,
-            timestamp: new Date().toISOString(),
-          };
-          localStorage.setItem("myVotes", JSON.stringify(myVotes));
-        }
+        const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
+        myVotes[resultId] = {
+          deleteId,
+          timestamp: new Date().toISOString(),
+        };
+        localStorage.setItem("myVotes", JSON.stringify(myVotes));
 
         import("canvas-confetti").then(({ default: confetti }) => {
           confetti({
@@ -93,7 +88,7 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
           });
         });
 
-        router.push(redirectUrl);
+        router.push(`/results?id=${resultId}`);
       } else {
         setIsSubmitting(false);
         isSubmittingRef.current = false;

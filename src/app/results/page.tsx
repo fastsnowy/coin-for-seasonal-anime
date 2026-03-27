@@ -10,6 +10,43 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { getSeasonName, type Season } from "@/lib/seasons";
 import { ShareButtons } from "@/components/share-buttons";
+import { CircleAlert } from "lucide-react";
+
+function ErrorPage({ message }: { message: string }) {
+  return (
+    <main className="min-h-dvh bg-background">
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-sm font-bold hover:text-foreground transition-colors"
+          >
+            {siteName}
+          </Link>
+          <ThemeToggle />
+        </div>
+      </header>
+      <div className="container mx-auto max-w-4xl px-4 py-6">
+        <Breadcrumb items={[{ label: "投票結果" }]} />
+        <div className="flex flex-col items-center justify-center gap-6 py-24">
+          <CircleAlert className="w-12 h-12 text-muted-foreground/50" />
+          <div className="text-center space-y-2">
+            <h1 className="text-xl font-bold">{message}</h1>
+            <p className="text-sm text-muted-foreground">
+              投票が削除されたか、URLが正しくない可能性があります。
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+          >
+            トップページに戻る
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
 
 export async function generateMetadata({
   searchParams,
@@ -22,7 +59,8 @@ export async function generateMetadata({
   const { data } = await supabase
     .from(DB_TABLES.COINS)
     .select("coin_value, season")
-    .eq("created_id", id);
+    .eq("created_id", id)
+    .is("deleted_at", null);
 
   if (!data || data.length === 0) {
     return { title: `投票結果 | ${siteName}` };
@@ -40,7 +78,9 @@ export async function generateMetadata({
   const year = seasonMatch ? seasonMatch[1] : "";
   const season = seasonMatch ? (seasonMatch[2] as Season) : "spring";
   const seasonNameText = seasonMatch ? getSeasonName(season) : "";
-  const seasonText = seasonMatch ? `${year}年${seasonNameText}アニメ` : "アニメ";
+  const seasonText = seasonMatch
+    ? `${year}年${seasonNameText}アニメ`
+    : "アニメ";
   const titleText = `${seasonText}に合計${totalCoins}枚のコインを賭けました！`;
 
   return {
@@ -59,25 +99,15 @@ export default async function Page({
   const { data, error } = await supabase
     .from(DB_TABLES.COINS)
     .select("*")
-    .eq("created_id", id);
+    .eq("created_id", id)
+    .is("deleted_at", null);
 
-  if (!data || error) {
-    return (
-      <main className="min-h-dvh bg-background flex flex-col items-center justify-center px-4">
-        <p className="text-muted-foreground">データの取得に失敗しました</p>
-      </main>
-    );
+  if (!data || error || data.length === 0) {
+    return <ErrorPage message="投票データが見つかりませんでした" />;
   }
   const [firstVote] = data;
   if (!firstVote?.season) {
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          データの取得に失敗しました
-        </h1>
-        <div className="text-center py-10">データの取得に失敗しました</div>
-      </main>
-    );
+    return <ErrorPage message="投票データが見つかりませんでした" />;
   }
 
   const { data: coins, error: coinError } = await supabase
@@ -89,11 +119,7 @@ export default async function Page({
   if (coinError) console.error("Failed to fetch total coin data", coinError);
 
   if (!coins) {
-    return (
-      <main className="min-h-dvh bg-background flex flex-col items-center justify-center px-4">
-        <p className="text-muted-foreground">データの取得に失敗しました</p>
-      </main>
-    );
+    return <ErrorPage message="データの取得に失敗しました" />;
   }
 
   const votedAnnictIds = data
@@ -126,8 +152,10 @@ export default async function Page({
   const year = seasonMatch ? seasonMatch[1] : "";
   const season = seasonMatch ? (seasonMatch[2] as Season) : "spring";
   const seasonNameText = seasonMatch ? getSeasonName(season) : "";
-  const seasonText = seasonMatch ? `${year}年${seasonNameText}アニメ` : "アニメ";
-  const shareText = `${seasonText}に合計${totalCoins}枚のコインを賭けました！\n\n#季節アニメコイン\n`;
+  const seasonText = seasonMatch
+    ? `${year}年${seasonNameText}アニメ`
+    : "アニメ";
+  const shareText = `${seasonText}に合計${totalCoins}枚のコインを賭けました！\n\n#anicoy\n`;
 
   return (
     <main className="min-h-dvh bg-background">
@@ -152,7 +180,8 @@ export default async function Page({
             {seasonText}
           </p>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-            <span className="text-coin px-1">{totalCoins}枚</span>のコインを賭けました！
+            <span className="text-coin px-1">{totalCoins}枚</span>
+            のコインを賭けました！
           </h1>
         </div>
 
@@ -166,7 +195,9 @@ export default async function Page({
         <div className="mt-16 pt-10 border-t border-border/50">
           <div className="flex flex-col items-center gap-8">
             <div className="flex flex-col items-center gap-4 w-full">
-              <p className="text-sm font-bold text-muted-foreground">この結果をシェアする</p>
+              <p className="text-sm font-bold text-muted-foreground">
+                この結果をシェアする
+              </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <ShareButtons shareText={shareText} />
                 <VoteDeleteWrapper voteId={id} deleteId={deleteId} />

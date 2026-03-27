@@ -1,4 +1,4 @@
-export const siteName = "coin-for-seasonal-anime";
+export const siteName = "Anicoy";
 export const siteDescription =
   "気になるアニメに「コイン」を賭けて期待度を表そう！";
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
