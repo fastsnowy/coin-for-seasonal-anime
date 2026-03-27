@@ -18,8 +18,10 @@ import {
 
 export const VoteDeleteButton = ({
   id,
+  deleteId,
 }: {
   id: string;
+  deleteId: string;
 }) => {
   const [isDeleteButtonPressed, setIsDeleteButtonPressed] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -87,15 +89,14 @@ export const VoteDeleteButton = ({
                   isDeletingRef.current = true;
 
                   try {
-                    // localStorageから投票情報を削除
-                    const myVotes = JSON.parse(
-                      localStorage.getItem("myVotes") || "{}",
-                    );
-                    delete myVotes[id];
-                    localStorage.setItem("myVotes", JSON.stringify(myVotes));
-
-                    const success = await handleDeleteVote(id);
+                    const success = await handleDeleteVote(id, deleteId);
                     if (success) {
+                      // サーバー側で削除成功した場合のみ localStorage から削除
+                      const myVotes = JSON.parse(
+                        localStorage.getItem("myVotes") || "{}",
+                      );
+                      delete myVotes[id];
+                      localStorage.setItem("myVotes", JSON.stringify(myVotes));
                       setIsDeleted(true);
                     } else {
                       toast.error("削除に失敗しました");

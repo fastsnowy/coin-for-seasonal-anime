@@ -36,64 +36,67 @@ export type Database = {
     Tables: {
       bet_coins: {
         Row: {
-          annict_id: number | null;
-          coin_value: number | null;
-          created_at: string | null;
-          created_id: string | null;
+          annict_id: number;
+          coin_value: number;
+          created_at: string;
+          created_id: string;
+          delete_id: string;
           deleted_at: string | null;
           id: string;
-          season: string | null;
+          season: string;
         };
         Insert: {
-          annict_id?: number | null;
-          coin_value?: number | null;
-          created_at?: string | null;
-          created_id?: string | null;
+          annict_id: number;
+          coin_value: number;
+          created_at?: string;
+          created_id: string;
+          delete_id: string;
           deleted_at?: string | null;
           id?: string;
-          season?: string | null;
+          season: string;
         };
         Update: {
-          annict_id?: number | null;
-          coin_value?: number | null;
-          created_at?: string | null;
-          created_id?: string | null;
+          annict_id?: number;
+          coin_value?: number;
+          created_at?: string;
+          created_id?: string;
+          delete_id?: string;
           deleted_at?: string | null;
           id?: string;
-          season?: string | null;
+          season?: string;
         };
         Relationships: [];
       };
       dev_coins: {
         Row: {
-          annict_id: number | null;
-          coin_value: number | null;
-          created_at: string | null;
-          created_id: string | null;
-          delete_id: string | null;
+          annict_id: number;
+          coin_value: number;
+          created_at: string;
+          created_id: string;
+          delete_id: string;
           deleted_at: string | null;
           id: string;
-          season: string | null;
+          season: string;
         };
         Insert: {
-          annict_id?: number | null;
-          coin_value?: number | null;
-          created_at?: string | null;
-          created_id?: string | null;
-          delete_id?: string | null;
+          annict_id: number;
+          coin_value: number;
+          created_at?: string;
+          created_id: string;
+          delete_id: string;
           deleted_at?: string | null;
           id?: string;
-          season?: string | null;
+          season: string;
         };
         Update: {
-          annict_id?: number | null;
-          coin_value?: number | null;
-          created_at?: string | null;
-          created_id?: string | null;
-          delete_id?: string | null;
+          annict_id?: number;
+          coin_value?: number;
+          created_at?: string;
+          created_id?: string;
+          delete_id?: string;
           deleted_at?: string | null;
           id?: string;
-          season?: string | null;
+          season?: string;
         };
         Relationships: [];
       };

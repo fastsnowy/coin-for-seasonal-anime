@@ -6,3 +6,7 @@ supabase = "latest"
 [tasks.gen-schema]
 run = "pnpm dlx supabase gen types typescript --linked > ./src/lib/schema.ts"
 description = "Generate Supabase schema types"
+
+[tasks.gen-schema-local]
+run = "pnpm dlx supabase gen types typescript --local > ./src/lib/schema.ts"
+description = "Generate Supabase schema types from local DB"

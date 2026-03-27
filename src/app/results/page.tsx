@@ -1,9 +1,9 @@
 import { ResultsClient } from "@/components/results-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
-import { getAnimeByIds } from "@/lib/anime-data";
-import { supabase } from "@/lib/supabaseClient";
 import { DB_TABLES, DB_VIEWS } from "@/config/database";
+import { getAnimeByIds } from "@/lib/anime-data";
+import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -16,6 +16,7 @@ export async function generateMetadata({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }): Promise<Metadata> {
   const { id = "" } = await searchParams;
+  const supabase = createSupabaseServerClient();
 
   const { data } = await supabase
     .from(DB_TABLES.COINS)
@@ -27,7 +28,7 @@ export async function generateMetadata({
   }
 
   const totalCoins = data.reduce(
-    (acc, item) => acc + (item.coin_value as number),
+    (acc, item) => acc + (item.coin_value ?? 0),
     0,
   );
 
@@ -42,6 +43,7 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const { id = "" } = await searchParams;
+  const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from(DB_TABLES.COINS)
@@ -55,11 +57,22 @@ export default async function Page({
       </main>
     );
   }
+  const [firstVote] = data;
+  if (!firstVote?.season) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          データの取得に失敗しました
+        </h1>
+        <div className="text-center py-10">データの取得に失敗しました</div>
+      </main>
+    );
+  }
 
   const { data: coins, error: coinError } = await supabase
     .from(DB_VIEWS.COIN_VALUE)
     .select("annict_id, total_coin_value, uu")
-    .eq("season", data[0].season as string)
+    .eq("season", firstVote.season)
     .order("total_coin_value", { ascending: false });
 
   if (coinError) console.error("Failed to fetch total coin data", coinError);
@@ -72,7 +85,15 @@ export default async function Page({
     );
   }
 
-  const res = await getAnimeByIds(data.map((item) => item.annict_id as number));
+  const votedAnnictIds = data
+    .map((item) => item.annict_id)
+    .filter((annictId): annictId is number => annictId !== null);
+  const res = await getAnimeByIds(votedAnnictIds);
+  const deleteId =
+    "delete_id" in firstVote && typeof firstVote.delete_id === "string"
+      ? firstVote.delete_id
+      : "";
+
   const animeList = res.map((anime) => ({
     id: anime.id,
     title: anime.title,
@@ -96,7 +117,10 @@ export default async function Page({
           <ThemeToggle />
         </div>
         <div className="container mx-auto max-w-4xl px-4 py-6 text-center space-y-3">
-          <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
             {siteName}
           </Link>
           <h1 className="text-xl font-bold">投票結果</h1>
@@ -120,10 +144,7 @@ export default async function Page({
           votedCoins={data}
         />
 
-        <VoteDeleteWrapper
-          voteId={id}
-          deleteId={(data[0] as { delete_id?: string }).delete_id || ""}
-        />
+        <VoteDeleteWrapper voteId={id} deleteId={deleteId} />
       </div>
     </main>
   );
