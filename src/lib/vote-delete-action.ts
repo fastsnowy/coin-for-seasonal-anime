@@ -6,19 +6,19 @@ export const handleDeleteVote = async (id: string, deleteId: string) => {
   const supabase = createSupabaseServerClient();
 
   // すでに削除済みかどうか、または存在するかを確認する
-  const { data: existingVote, error: fetchError } = await supabase
+  const { data: existingVotes, error: fetchError } = await supabase
     .from(DB_TABLES.COINS)
     .select("deleted_at")
     .eq("created_id", id)
     .eq("delete_id", deleteId)
-    .single();
+    .limit(1);
 
-  if (fetchError) {
+  if (fetchError || !existingVotes || existingVotes.length === 0) {
     console.error("Failed to fetch vote for deletion:", fetchError);
     return false;
   }
 
-  if (existingVote?.deleted_at) {
+  if (existingVotes[0].deleted_at) {
     console.log("Vote already deleted");
     return true; // すでに削除済みの場合は成功とみなす
   }
