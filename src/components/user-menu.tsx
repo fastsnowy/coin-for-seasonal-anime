@@ -8,7 +8,11 @@ export async function UserMenu() {
   } = await supabase.auth.getUser();
 
   const displayName =
-    (user?.user_metadata?.username as string) ?? user?.email ?? undefined;
+    (user?.user_metadata?.name as string) ??
+    (user?.user_metadata?.username as string) ??
+    (user?.user_metadata?.full_name as string) ??
+    user?.email ??
+    undefined;
   const avatarUrl = (user?.user_metadata?.avatar_url as string) ?? undefined;
 
   return (

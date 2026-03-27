@@ -29,16 +29,8 @@ export function UserMenuClient({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 overflow-hidden">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={displayName ?? "ユーザー"}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          ) : (
-            <User className="h-4 w-4" />
-          )}
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <User className="h-4 w-4" />
           <span className="sr-only">ユーザーメニュー</span>
         </Button>
       </DropdownMenuTrigger>
