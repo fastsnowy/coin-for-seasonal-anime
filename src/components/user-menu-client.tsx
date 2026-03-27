@@ -10,19 +10,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-actions";
-import { History, LogIn, LogOut, Shield, User } from "lucide-react";
+import { History, Link2, LogIn, LogOut, Shield, User } from "lucide-react";
 import Link from "next/link";
 
 interface UserMenuClientProps {
   isLoggedIn: boolean;
   isAnonymous: boolean;
-  email?: string;
+  displayName?: string;
 }
 
 export function UserMenuClient({
   isLoggedIn,
   isAnonymous,
-  email,
+  displayName,
 }: UserMenuClientProps) {
   return (
     <DropdownMenu>
@@ -36,7 +36,9 @@ export function UserMenuClient({
         {isLoggedIn && !isAnonymous ? (
           <>
             <DropdownMenuLabel className="font-normal">
-              <p className="text-xs text-muted-foreground truncate">{email}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {displayName}
+              </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
           </>
@@ -57,12 +59,20 @@ export function UserMenuClient({
         </DropdownMenuItem>
 
         {isAnonymous || !isLoggedIn ? (
-          <DropdownMenuItem asChild>
-            <Link href="/login" className="cursor-pointer">
-              <LogIn className="mr-2 h-4 w-4" />
-              アカウント連携（開発中）
-            </Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/link" className="cursor-pointer">
+                <Link2 className="mr-2 h-4 w-4" />
+                Annictアカウント連携
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/login" className="cursor-pointer">
+                <LogIn className="mr-2 h-4 w-4" />
+                ログイン
+              </Link>
+            </DropdownMenuItem>
+          </>
         ) : (
           <DropdownMenuItem
             onClick={async () => {

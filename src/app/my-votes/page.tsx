@@ -110,7 +110,7 @@ export default async function MyVotesPage() {
         <p className="text-sm text-muted-foreground">
           {user.is_anonymous
             ? "匿名ユーザーとしての投票履歴です"
-            : `${user.email ?? "アカウント"} の投票履歴`}
+            : `${(user.user_metadata?.name as string) ?? (user.user_metadata?.user_name as string) ?? "アカウント"} の投票履歴`}
         </p>
       </div>
 
@@ -162,12 +162,12 @@ export default async function MyVotesPage() {
       {user.is_anonymous && (
         <div className="mt-8 rounded-lg border border-border bg-muted/50 p-4">
           <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-            現在、匿名ユーザーとしてご利用中です。アカウント連携機能（開発中）を利用すると、別のデバイスからも投票履歴を確認できるようになります。
+            現在、匿名ユーザーとしてご利用中です。Annictアカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
           </p>
-          <Link href="/login">
+          <Link href="/link">
             <Button variant="outline" size="sm" className="gap-1.5">
               <LogIn className="w-3.5 h-3.5" />
-              アカウント連携について
+              Annictアカウントを連携
             </Button>
           </Link>
         </div>

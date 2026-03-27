@@ -3,7 +3,6 @@
 import { createSupabaseServerClient } from "./supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import type { Provider } from "@supabase/supabase-js";
 
 async function getBaseUrl() {
   const headersList = await headers();
@@ -13,43 +12,38 @@ async function getBaseUrl() {
   return origin.startsWith("http") ? origin : `${protocol}://${origin}`;
 }
 
-async function signInWithOAuthProvider(provider: Provider) {
+const ANNICT_PROVIDER = "custom:annict" as const;
+
+export async function loginWithAnnict() {
   const supabase = await createSupabaseServerClient();
   const baseUrl = await getBaseUrl();
 
-  const {
-    data: { user: currentUser },
-  } = await supabase.auth.getUser();
-
-  if (currentUser?.is_anonymous) {
-    const { data, error } = await supabase.auth.linkIdentity({
-      provider,
-      options: { redirectTo: `${baseUrl}/auth/callback` },
-    });
-    if (error || !data.url) {
-      return { error: `${provider}連携に失敗しました` };
-    }
-    redirect(data.url);
-  }
-
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
+    provider: ANNICT_PROVIDER,
     options: { redirectTo: `${baseUrl}/auth/callback` },
   });
 
   if (error || !data.url) {
-    return { error: `${provider}ログインに失敗しました` };
+    return { error: "ログインに失敗しました" };
   }
 
   redirect(data.url);
 }
 
-export async function signInWithDiscord() {
-  return signInWithOAuthProvider("discord");
-}
+export async function linkAnnict() {
+  const supabase = await createSupabaseServerClient();
+  const baseUrl = await getBaseUrl();
 
-export async function signInWithGoogle() {
-  return signInWithOAuthProvider("google");
+  const { data, error } = await supabase.auth.linkIdentity({
+    provider: ANNICT_PROVIDER,
+    options: { redirectTo: `${baseUrl}/auth/callback` },
+  });
+
+  if (error || !data.url) {
+    return { error: error?.message ?? "アカウント連携に失敗しました" };
+  }
+
+  redirect(data.url);
 }
 
 export async function signOut() {
