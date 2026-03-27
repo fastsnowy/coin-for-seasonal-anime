@@ -20,24 +20,23 @@ import { useResetAtom } from "jotai/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-interface SeasonNavigationProps {
-  currentYear: number;
-  currentSeason: Season;
-}
+const seasons = [
+  { id: "winter", name: "冬" },
+  { id: "spring", name: "春" },
+  { id: "summer", name: "夏" },
+  { id: "autumn", name: "秋" },
+];
 
 export default function SeasonNavigation() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const now = new Date();
-  const thisYear = now.getFullYear();
+  const thisYear = new Date().getFullYear();
 
   const [selectedYear, setSelectedYear] = useAtom(atomSelectYear);
-
   const [selectedSeason, setSelectedSeason] = useAtom(atomSelectSeason);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
 
-  // URLパラメータから現在の年と季節を同期
   useEffect(() => {
     if (params?.id) {
       const match = params.id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
@@ -48,63 +47,49 @@ export default function SeasonNavigation() {
     }
   }, [params?.id, setSelectedYear, setSelectedSeason]);
 
-  const resetHandler = () => {
-    resetAllBetCoins(); // Reset the bet coins
-    resetBetAnimeWorkId(); // Reset the selected works
-  };
-
-  // 年の選択肢を生成（2000年から現在まで）
   const years = Array.from(
     { length: thisYear - 1999 },
     (_, i) => thisYear + 1 - i,
   );
-  // const years = Array.from({ length: 10 }, (_, i) => thisYear - i);
 
-  // 季節の選択肢
-  const seasons = [
-    { id: "winter", name: "冬" },
-    { id: "spring", name: "春" },
-    { id: "summer", name: "夏" },
-    { id: "autumn", name: "秋" },
-  ];
-
-  const routeHandler = () => {
-    resetHandler();
+  const handleNavigate = () => {
+    resetAllBetCoins();
+    resetBetAnimeWorkId();
     router.push(`/seasons/${selectedYear}-${selectedSeason}`);
   };
 
   return (
-    <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end">
+    <div className="flex items-center gap-1.5 shrink-0">
       <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
-        <SelectTrigger className="w-24 md:w-28 h-9 text-sm">
+        <SelectTrigger className="w-20 h-8 text-xs">
           <SelectValue placeholder="年" />
         </SelectTrigger>
         <SelectContent>
-          {years.map((year) => (
-            <SelectItem key={year} value={year.toString()}>
-              {year}年
-            </SelectItem>
+          {years.map((y) => (
+            <SelectItem key={y} value={y.toString()}>{y}年</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       <Select
         defaultValue={selectedSeason}
-        onValueChange={(value) => setSelectedSeason(value as Season)}
+        onValueChange={(v) => setSelectedSeason(v as Season)}
       >
-        <SelectTrigger className="w-20 h-9 text-sm">
-          <SelectValue placeholder="季節" />
+        <SelectTrigger className="w-16 h-8 text-xs">
+          <SelectValue placeholder="季" />
         </SelectTrigger>
         <SelectContent>
-          {seasons.map((season) => (
-            <SelectItem key={season.id} value={season.id}>
-              {season.name}
-            </SelectItem>
+          {seasons.map((s) => (
+            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Button className="h-9 px-3 md:px-4 text-sm" onClick={routeHandler}>
+      <Button
+        size="sm"
+        className="h-8 px-3 text-xs"
+        onClick={handleNavigate}
+      >
         表示
       </Button>
     </div>

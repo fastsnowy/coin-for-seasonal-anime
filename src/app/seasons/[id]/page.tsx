@@ -2,6 +2,7 @@ import AnimeGrid from "@/components/anime-grid";
 import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
@@ -19,7 +20,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const match = id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
-
   if (!match) return { title: siteName };
 
   const year = match[1];
@@ -27,11 +27,10 @@ export async function generateMetadata({
   const seasonName = getSeasonName(season);
 
   return {
-    title: `${year} ${seasonName}アニメ一覧 | ${siteName}`,
+    title: `${year} ${seasonName}アニメ | ${siteName}`,
   };
 }
 
-// 動的パラメータの生成（静的生成するパスを指定）
 export async function generateStaticParams() {
   const currentYear = new Date().getFullYear();
   return [
@@ -43,101 +42,72 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = true;
-
 export const revalidate = 360;
 
 export default async function SeasonPage({
   params,
 }: { params: Promise<{ id: string }> }) {
-  // URLパラメータから年と季節を取得
   const { id } = await params;
   const match = id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
-
-  if (!match) {
-    notFound();
-  }
+  if (!match) notFound();
 
   const year = Number.parseInt(match[1]);
   const season = match[2] as Season;
   const seasonName = getSeasonName(season);
   const seasonType = getSeasonType(year, season);
 
-  // サーバーサイドでアニメデータを取得
-
   const animeList = await getAnimeByYearAndSeason(year, season);
 
-  // supabaseからデータを取得
   const { data: coins, error } = await supabase
     .from(DB_VIEWS.COIN_VALUE)
     .select("annict_id, total_coin_value, uu")
     .eq("season", `${year}-${season}`)
     .order("total_coin_value", { ascending: false });
-  if (error) {
-    console.error("Failed to fetch total coin data", error);
-  }
+
+  if (error) console.error("Failed to fetch total coin data", error);
 
   if (!coins) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
-        <SeasonNavigation />
-        <div className="text-center py-10">データの取得に失敗しました</div>
+      <main className="min-h-dvh flex flex-col items-center justify-center px-4">
+        <p className="text-muted-foreground">データの取得に失敗しました</p>
       </main>
     );
   }
-  const top3Coins = coins.slice(0, 3);
-  const top3Anime = top3Coins.map((coin) => {
-    const anime = animeList.find((anime) => anime.id === coin.annict_id);
-    return {
-      ...anime,
-      total_coin_value: coin.total_coin_value,
-      uu: coin.uu,
-    };
-  });
+
+  const seasonLabel =
+    seasonType === "current"
+      ? "今期"
+      : seasonType === "next"
+        ? "来期"
+        : `${year}年 ${seasonName}`;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* ヘッダー */}
-      <div className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-center sm:text-left">
-              {siteName}
-            </h1>
+    <main className="min-h-dvh bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto max-w-5xl px-4 h-12 flex items-center justify-between gap-3">
+          <h1 className="text-sm font-bold truncate">{siteName}</h1>
+          <div className="flex items-center gap-1.5">
             <SeasonNavigation />
+            <ThemeToggle />
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* パンくずリスト */}
-        <Breadcrumb
-          items={[
-            {
-              label: `${year}年 ${seasonName}`,
-            },
-          ]}
-        />
+      <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
+        <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
-        <div className="mb-8">
-          <h2 className="text-lg md:text-xl font-semibold text-center text-muted-foreground">
-            {seasonType === "current"
-              ? "今期"
-              : seasonType === "next"
-                ? "来期"
-                : `${year}年 ${seasonName}`}
-            のアニメ
-          </h2>
-        </div>
+        <h2 className="text-center text-sm text-muted-foreground mb-5">
+          {seasonLabel}のアニメ
+        </h2>
 
-        {/* ranking */}
         <RankingSection animeList={animeList} coins={coins} />
 
         <Suspense
           fallback={
-            <div className="text-center py-20">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
-              <p className="mt-4 text-muted-foreground">読み込み中...</p>
+            <div className="flex flex-col items-center py-20 gap-3">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+              <p className="text-xs text-muted-foreground">読み込み中...</p>
             </div>
           }
         >

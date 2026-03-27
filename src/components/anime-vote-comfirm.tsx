@@ -1,33 +1,27 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  atomBetCoinValue,
-  atomSelectSeason,
-  atomSelectYear,
-} from "@/global/atom";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { DB_TABLES } from "@/config/database";
+import { atomBetCoinValue } from "@/global/atom";
 import { supabase } from "@/lib/supabaseClient";
-import { Icon } from "@iconify/react";
+import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
+import { ChevronRight, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-const currentSeasonName = () => {
-  const year = useAtomValue(atomSelectYear);
-  const season = useAtomValue(atomSelectSeason);
-  return `${year}-${season}`;
-};
 
 type BetAnimes = {
   annict_id: number;
@@ -49,9 +43,8 @@ const createVoteHandler = async (
   betanimes: BetAnimes,
   seasonName: string,
 ): Promise<{ resultId: string; deleteId: string }> => {
-  if (betanimes.length === 0) {
-    throw new Error("No anime to vote"); // エラーをスロー
-  }
+  if (betanimes.length === 0) throw new Error("No anime to vote");
+
   const resultId = uuidv4();
   const deleteId = Math.random().toString(36).slice(-7);
   const insertData = betanimes.map((item) => ({
@@ -63,36 +56,33 @@ const createVoteHandler = async (
   }));
 
   const validationResult = insertDataSchema.safeParse(insertData);
-
-  if (!validationResult.success) {
-    throw new Error("Failed to create vote data"); // エラーをスロー
-  }
+  if (!validationResult.success) throw new Error("Failed to create vote data");
 
   const { error } = await supabase.from(DB_TABLES.COINS).insert(insertData);
+  if (error) throw new Error("Failed to insert vote data");
 
-  if (error) {
-    throw new Error("Failed to insert vote data"); // エラーをスロー
-  }
-
-  return { resultId, deleteId }; // 成功時のみ値を返す
+  return { resultId, deleteId };
 };
 
-const createVoteAndGetUrl = async (
-  betCoinValue: BetAnimes,
-  seasonName: string,
-): Promise<string | null> => {
-  try {
-    const { resultId, deleteId } = await createVoteHandler(
-      betCoinValue,
-      seasonName,
-    );
-    console.log("Vote created successfully:", resultId);
-    return `/results?id=${resultId}&did=${deleteId}`;
-  } catch (error) {
-    console.error("Failed to create vote:", error);
-    toast.error("エラーが発生しました");
-    return null;
+const fireConfetti = () => {
+  const count = 180;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 80, zIndex: 200 };
+
+  function fire(ratio: number, opts: confetti.Options) {
+    confetti({
+      ...defaults,
+      particleCount: Math.floor(count * ratio),
+      origin: { x: Math.random() * 0.4 + 0.3, y: Math.random() * 0.3 + 0.3 },
+      colors: ["#fbbf24", "#f59e0b", "#d97706", "#ffffff", "#fef3c7"],
+      ...opts,
+    });
   }
+
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1, { spread: 120, startVelocity: 45 });
 };
 
 export function VoteConfirm({ seasonName }: { seasonName: string }) {
@@ -106,118 +96,111 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
   );
 
   const handleSubmit = async () => {
-    if (isSubmitting || isSubmittingRef.current) return; // 既に送信中の場合は何もしない
-
-    setIsSubmitting(true); // すぐにdisabledにする
+    if (isSubmitting || isSubmittingRef.current) return;
+    setIsSubmitting(true);
     isSubmittingRef.current = true;
 
     try {
-      const redirectUrl = await createVoteAndGetUrl(betCoinValue, seasonName);
-      console.log("投票内容", betCoinValue);
-      console.log("投票内容を送信しました");
+      const { resultId, deleteId } = await createVoteHandler(
+        betCoinValue,
+        seasonName,
+      );
 
-      if (redirectUrl) {
-        // URLから投票IDを抽出
-        const urlParams = new URLSearchParams(redirectUrl.split("?")[1]);
-        const voteId = urlParams.get("id");
-        const deleteId = urlParams.get("did");
+      const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
+      myVotes[resultId] = { deleteId, timestamp: new Date().toISOString() };
+      localStorage.setItem("myVotes", JSON.stringify(myVotes));
 
-        // localStorageに投票情報を保存（投票者のみ削除可能にする）
-        if (voteId && deleteId) {
-          const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
-          myVotes[voteId] = {
-            deleteId,
-            timestamp: new Date().toISOString(),
-          };
-          localStorage.setItem("myVotes", JSON.stringify(myVotes));
-        }
-
-        router.push(redirectUrl); // クライアント側でページ遷移
-      } else {
-        setIsSubmitting(false); // エラー時は再度有効にする
-        isSubmittingRef.current = false;
-      }
+      fireConfetti();
+      setTimeout(() => {
+        router.push(`/results?id=${resultId}&did=${deleteId}`);
+      }, 900);
     } catch (error) {
       console.error("投票エラー:", error);
-      setIsSubmitting(false); // エラー時は再度有効にする
+      toast.error("エラーが発生しました");
+      setIsSubmitting(false);
       isSubmittingRef.current = false;
     }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Sheet>
+      <SheetTrigger asChild>
         <Button
-          variant="default"
           size="lg"
-          className="h-12 px-6 gap-2 shadow-lg hover:shadow-xl transition-all font-semibold"
           disabled={betCoinValue.length === 0}
+          className="h-10 px-5 gap-1.5 font-semibold rounded-lg active:scale-[0.97] transition-all"
         >
-          <Icon icon="mdi:check-circle" className="w-5 h-5" />
-          <span className="hidden sm:inline">投票確定</span>
+          投票確定
+          <ChevronRight className="w-4 h-4" />
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl">投票内容の確認</DialogTitle>
-          <DialogDescription className="text-base">
-            以下の内容で投票します。よろしいですか？
-          </DialogDescription>
-        </DialogHeader>
+      </SheetTrigger>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl max-h-[80dvh] flex flex-col"
+      >
+        <SheetHeader className="text-center pb-0">
+          <div className="mx-auto w-10 h-1 bg-muted-foreground/20 rounded-full mb-3" />
+          <SheetTitle className="text-lg">投票内容の確認</SheetTitle>
+          <SheetDescription>以下の内容で投票します</SheetDescription>
+        </SheetHeader>
 
-        <div className="space-y-3 py-4 max-h-96 overflow-y-auto">
-          {betCoinValue.length > 0 ? (
-            <>
-              {betCoinValue.map((item) => (
-                <div
-                  key={item.annict_id}
-                  className="flex justify-between items-start gap-4 p-3 rounded-lg bg-muted/50 border border-border/50"
-                >
-                  <span className="text-sm flex-1 line-clamp-2">
-                    {item.title}
-                  </span>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <Icon icon="twemoji:coin" className="w-4 h-4" />
-                    <span className="font-semibold text-sm">
-                      {item.coin_value}
-                    </span>
-                  </div>
-                </div>
-              ))}
-
-              {/* 合計 */}
-              <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10 border border-primary/20">
-                <span className="font-semibold">合計</span>
-                <div className="flex items-center gap-2">
-                  <Icon icon="twemoji:coin" className="w-5 h-5" />
-                  <span className="font-bold text-lg text-primary">
-                    {totalCoins}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="text-center text-muted-foreground py-8">
-              現在、投票内容はありません。
-            </p>
-          )}
+        {/* Total */}
+        <div className="flex items-center justify-center gap-3 py-5 mx-4 rounded-xl bg-coin-muted border border-coin/15">
+          <Coins className="w-6 h-6 text-coin" />
+          <span className="font-bold text-3xl text-coin tabular-nums">
+            {totalCoins}
+          </span>
+          <span className="text-sm text-muted-foreground">コイン</span>
         </div>
 
-        <DialogFooter className="gap-2">
-          <DialogClose asChild>
-            <Button type="button" variant="outline" disabled={isSubmitting}>
+        {/* List */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-1.5 min-h-0">
+          {betCoinValue.map((item) => (
+            <div
+              key={item.annict_id}
+              className="flex justify-between items-center gap-3 px-3 py-2.5 rounded-lg bg-muted/40"
+            >
+              <span className="text-sm flex-1 line-clamp-1">{item.title}</span>
+              <div className="flex items-center gap-1.5 shrink-0 text-coin">
+                <Coins className="w-3.5 h-3.5" />
+                <span className="font-semibold text-sm tabular-nums">
+                  {item.coin_value}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <SheetFooter className="flex-row gap-3 pt-3 border-t border-border/50 pb-safe">
+          <SheetClose asChild>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              className="flex-1 h-12 rounded-xl"
+            >
               キャンセル
             </Button>
-          </DialogClose>
+          </SheetClose>
           <Button
-            type="submit"
             onClick={handleSubmit}
             disabled={betCoinValue.length === 0 || isSubmitting}
+            className="flex-1 h-12 rounded-xl font-semibold active:scale-[0.98] transition-all"
           >
-            {isSubmitting ? "送信中..." : "投票する"}
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                送信中...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Coins className="w-4 h-4" />
+                投票する
+              </span>
+            )}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

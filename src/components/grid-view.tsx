@@ -18,7 +18,7 @@ type GridViewProps = {
 
 export function GridView({ animeList, coins, votedCoins }: GridViewProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-24">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 pb-20">
       {animeList.map((anime) => (
         <AnimeCard
           work={anime}

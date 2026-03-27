@@ -1,65 +1,6 @@
 import type { Anime } from "@/lib/anime-data";
-import { Award, Coins, Eye, Medal, Trophy } from "lucide-react";
-
-interface RankingItemProps {
-  rank: number;
-  anime: Anime & { watchers: number; coins: number };
-}
-
-function RankingItem({ rank, anime }: RankingItemProps) {
-  // ランクに応じてアイコンを表示
-  const getRankBadge = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return (
-          <div className="flex items-center justify-center w-8 h-8">
-            <Trophy className="h-5 w-5 text-yellow-500" />
-          </div>
-        );
-      case 2:
-        return (
-          <div className="flex items-center justify-center w-8 h-8">
-            <Medal className="h-5 w-5 text-gray-400" />
-          </div>
-        );
-      case 3:
-        return (
-          <div className="flex items-center justify-center w-8 h-8">
-            <Award className="h-5 w-5 text-amber-600" />
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center justify-center w-8 h-8 text-sm font-semibold text-muted-foreground">
-            {rank}
-          </div>
-        );
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-      {getRankBadge(rank)}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-sm line-clamp-1 mb-1">{anime.title}</h3>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          {anime.coins > 0 && (
-            <div className="flex items-center gap-1">
-              <Coins className="h-3 w-3" />
-              <span>{anime.coins.toLocaleString()}</span>
-            </div>
-          )}
-          {anime.watchers > 0 && (
-            <div className="flex items-center gap-1">
-              <Eye className="h-3 w-3" />
-              <span>{anime.watchers.toLocaleString()}</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+import { cn } from "@/lib/utils";
+import { Coins, Eye, Trophy } from "lucide-react";
 
 interface RankingSectionProps {
   animeList: Anime[];
@@ -74,51 +15,54 @@ export default function RankingSection({
   animeList,
   coins,
 }: RankingSectionProps) {
-  // 実際のコインデータを使用
-  const animeWithStats = animeList.map((anime) => ({
-    ...anime,
-    watchers: anime.watchersCount,
-    coins: coins.find((c) => c.annict_id === anime.id)?.total_coin_value || 0,
-  }));
-
-  // コイン数でソート
-  const coinRanking = [...animeWithStats]
-    .sort((a, b) => b.coins - a.coins)
+  const ranked = [...animeList]
+    .map((anime) => ({
+      ...anime,
+      totalCoins:
+        coins.find((c) => c.annict_id === anime.id)?.total_coin_value || 0,
+    }))
+    .sort((a, b) => b.totalCoins - a.totalCoins)
     .slice(0, 3);
 
-  // 視聴者数でソート
-  const watcherRanking = [...animeWithStats]
-    .sort((a, b) => b.watchers - a.watchers)
-    .slice(0, 3);
+  if (ranked.length === 0 || ranked[0].totalCoins === 0) return null;
+
+  const medals = ["🥇", "🥈", "🥉"];
 
   return (
-    <div className="mb-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* コイン総数ランキング */}
-        <div className="border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Coins className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-sm">コイン総数 TOP3</h3>
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-3 px-0.5">
+        <Trophy className="h-4 w-4 text-coin" />
+        <h3 className="font-semibold text-sm">コインランキング</h3>
+      </div>
+      <div className="flex gap-2.5 overflow-x-auto scroll-snap-x hide-scrollbar pb-1 -mx-1 px-1">
+        {ranked.map((anime, i) => (
+          <div
+            key={anime.id}
+            className={cn(
+              "shrink-0 scroll-snap-start rounded-xl border border-border bg-card p-3 w-[220px] sm:w-[240px]",
+              i === 0 && "border-coin/20 bg-coin-muted",
+            )}
+          >
+            <div className="flex items-start gap-2.5">
+              <span className="text-lg leading-none">{medals[i]}</span>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-sm line-clamp-1 mb-1">
+                  {anime.title}
+                </h4>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1 text-coin font-medium">
+                    <Coins className="h-3 w-3" />
+                    {anime.totalCoins.toLocaleString()}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {anime.watchersCount.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            {coinRanking.map((anime, index) => (
-              <RankingItem key={anime.id} rank={index + 1} anime={anime} />
-            ))}
-          </div>
-        </div>
-
-        {/* 視聴者数ランキング */}
-        <div className="border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Eye className="h-4 w-4 text-muted-foreground" />
-            <h3 className="font-semibold text-sm">視聴者数 TOP3</h3>
-          </div>
-          <div className="space-y-1">
-            {watcherRanking.map((anime, index) => (
-              <RankingItem key={anime.id} rank={index + 1} anime={anime} />
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -1,170 +1,104 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import { NumericFormat, type NumericFormatProps } from "react-number-format";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+"use client";
 
-export interface NumberInputProps
-  extends Omit<NumericFormatProps, "value" | "onValueChange"> {
+import { cn } from "@/lib/utils";
+import { Coins, Minus, Plus } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+export interface NumberInputProps {
   stepper?: number;
-  thousandSeparator?: string;
-  placeholder?: string;
   defaultValue?: number;
   min?: number;
   max?: number;
-  value?: number; // Controlled value
-  suffix?: string;
-  prefix?: string;
+  value?: number;
   onValueChange?: (value: number | undefined) => void;
-  fixedDecimalScale?: boolean;
-  decimalScale?: number;
-  handlersRef?: React.RefObject<{
-    increment: () => void;
-    decrement: () => void;
-  }>;
 }
 
-export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  (
-    {
-      stepper,
-      thousandSeparator,
-      placeholder,
-      defaultValue,
-      min = Number.NEGATIVE_INFINITY,
-      max = Number.POSITIVE_INFINITY,
-      onValueChange,
-      fixedDecimalScale = false,
-      decimalScale = 0,
-      suffix,
-      prefix,
-      value: controlledValue,
-      handlersRef,
-      ...props
+export const NumberInput = ({
+  stepper = 10,
+  defaultValue = 0,
+  min = 0,
+  max = 100,
+  value: controlledValue,
+  onValueChange,
+}: NumberInputProps) => {
+  const [value, setValue] = useState<number>(controlledValue ?? defaultValue);
+  const coinRef = useRef<HTMLDivElement>(null);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    if (controlledValue !== undefined) {
+      setValue(controlledValue);
+    }
+  }, [controlledValue]);
+
+  const update = useCallback(
+    (next: number) => {
+      const clamped = Math.max(min, Math.min(max, next));
+      setValue(clamped);
+      onValueChange?.(clamped);
     },
-    ref,
-  ) => {
-    const internalRef = useRef<HTMLInputElement>(null); // Create an internal ref
-    const combinedRef = ref || internalRef; // Use provided ref or internal ref
-    const [value, setValue] = useState<number | undefined>(
-      controlledValue ?? defaultValue,
-    );
+    [min, max, onValueChange],
+  );
 
-    const handleIncrement = useCallback(() => {
-      setValue((prev) =>
-        prev === undefined
-          ? (stepper ?? 1)
-          : Math.min(prev + (stepper ?? 1), max),
-      );
-    }, [stepper, max]);
+  useEffect(() => {
+    if (value !== prevRef.current && value > 0 && coinRef.current) {
+      coinRef.current.classList.remove("animate-coin-bounce");
+      void coinRef.current.offsetWidth;
+      coinRef.current.classList.add("animate-coin-bounce");
+    }
+    prevRef.current = value;
+  }, [value]);
 
-    const handleDecrement = useCallback(() => {
-      setValue((prev) =>
-        prev === undefined
-          ? -(stepper ?? 1)
-          : Math.max(prev - (stepper ?? 1), min),
-      );
-    }, [stepper, min]);
+  const isActive = value > 0;
 
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (
-          document.activeElement ===
-          (combinedRef as React.RefObject<HTMLInputElement>).current
-        ) {
-          if (e.key === "ArrowUp") {
-            handleIncrement();
-          } else if (e.key === "ArrowDown") {
-            handleDecrement();
-          }
-        }
-      };
+  return (
+    <div className="flex items-center justify-between gap-2 w-full">
+      <button
+        type="button"
+        onClick={() => update(value - stepper)}
+        disabled={value <= min}
+        className={cn(
+          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
+          "border border-border bg-secondary text-secondary-foreground",
+          "disabled:opacity-30 disabled:pointer-events-none",
+          "hover:bg-muted",
+        )}
+      >
+        <Minus className="h-4 w-4" />
+      </button>
 
-      window.addEventListener("keydown", handleKeyDown);
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [handleIncrement, handleDecrement, combinedRef]);
-
-    useEffect(() => {
-      if (controlledValue !== undefined) {
-        setValue(controlledValue);
-      }
-    }, [controlledValue]);
-
-    const handleChange = (values: {
-      value: string;
-      floatValue: number | undefined;
-    }) => {
-      const newValue =
-        values.floatValue === undefined ? undefined : values.floatValue;
-      setValue(newValue);
-      if (onValueChange) {
-        onValueChange(newValue);
-      }
-    };
-
-    const handleBlur = () => {
-      if (value !== undefined) {
-        if (value < min) {
-          setValue(min);
-          // biome-ignore lint/style/noNonNullAssertion: <explanation>
-          (ref as React.RefObject<HTMLInputElement>).current!.value =
-            String(min);
-        } else if (value > max) {
-          setValue(max);
-          // biome-ignore lint/style/noNonNullAssertion: <explanation>
-          (ref as React.RefObject<HTMLInputElement>).current!.value =
-            String(max);
-        }
-      }
-    };
-
-    return (
-      <div className="grid grid-cols-12 gap-1.5 items-center w-full">
-        <div className="flex flex-col col-span-3">
-          <Button
-            aria-label="Decrease value"
-            variant="outline"
-            onClick={handleDecrement}
-            disabled={value === min}
-            className="h-9 w-full hover:bg-muted transition-colors p-0"
-          >
-            <ChevronDown size={16} />
-          </Button>
-        </div>
-        <NumericFormat
-          value={value}
-          onValueChange={handleChange}
-          thousandSeparator={thousandSeparator}
-          decimalScale={decimalScale}
-          fixedDecimalScale={fixedDecimalScale}
-          allowNegative={min < 0}
-          valueIsNumericString
-          onBlur={handleBlur}
-          max={max}
-          min={min}
-          suffix={suffix}
-          prefix={prefix}
-          customInput={Input}
-          placeholder={placeholder}
-          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-lg text-center col-span-6 h-9 font-semibold text-base px-2"
-          getInputRef={combinedRef}
-          {...props}
-        />
-
-        <div className="flex flex-col col-span-3">
-          <Button
-            aria-label="Increase value"
-            variant="outline"
-            onClick={handleIncrement}
-            disabled={value === max}
-            className="h-9 w-full hover:bg-muted transition-colors p-0"
-          >
-            <ChevronUp size={16} />
-          </Button>
-        </div>
+      <div
+        ref={coinRef}
+        className={cn(
+          "flex items-center justify-center gap-1.5 min-w-18 transition-opacity duration-200",
+          isActive ? "opacity-100" : "opacity-35",
+        )}
+      >
+        <Coins className="h-4 w-4 shrink-0" />
+        <span
+          className={cn(
+            "font-bold text-lg tabular-nums transition-colors duration-200",
+            isActive ? "text-coin" : "text-muted-foreground",
+          )}
+        >
+          {value}
+        </span>
       </div>
-    );
-  },
-);
+
+      <button
+        type="button"
+        onClick={() => update(value + stepper)}
+        disabled={value >= max}
+        className={cn(
+          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
+          "border border-border bg-secondary text-secondary-foreground",
+          "disabled:opacity-30 disabled:pointer-events-none",
+          "hover:bg-muted",
+          isActive && "border-coin/30 bg-coin-muted text-coin hover:bg-coin-muted",
+        )}
+      >
+        <Plus className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};

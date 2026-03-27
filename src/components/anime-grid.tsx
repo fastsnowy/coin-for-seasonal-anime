@@ -21,16 +21,12 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
   const [sortBy, setSortBy] = useState<SortType>("coins");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // フィルタリングとソート
   const filteredAndSortedAnimeList = useMemo(() => {
     let filtered = animeList;
-
-    // メディアタイプでフィルタリング
     if (mediaType !== "all") {
       filtered = filtered.filter((anime) => anime.media === mediaType);
     }
 
-    // ソート
     const sorted = [...filtered].sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -62,11 +58,10 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
 
   return (
     <>
-      {/* フィルター */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="text-sm text-muted-foreground">
-          {filteredAndSortedAnimeList.length}件のアニメ
-        </div>
+      <div className="flex items-center justify-between mb-4 gap-3">
+        <p className="text-xs text-muted-foreground tabular-nums">
+          {filteredAndSortedAnimeList.length} 作品
+        </p>
         <AnimeFilter
           mediaType={mediaType}
           sortBy={sortBy}
@@ -78,21 +73,20 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-32">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 pb-28">
         {filteredAndSortedAnimeList.length > 0 ? (
           filteredAndSortedAnimeList.map((anime) => (
             <AnimeCard work={anime} key={anime.id} coins={coins} />
           ))
         ) : (
-          <div className="col-span-full text-center py-20">
-            <p className="text-muted-foreground text-lg">
-              条件に一致するアニメが見つかりません
+          <div className="col-span-full text-center py-16">
+            <p className="text-muted-foreground">
+              条件に一致するアニメがありません
             </p>
           </div>
         )}
       </div>
 
-      {/* 固定フッター - 選択数と投票ボタン */}
       {animeList.length > 0 && <AnimeSelector />}
     </>
   );

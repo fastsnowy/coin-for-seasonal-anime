@@ -6,6 +6,9 @@ import { supabase } from "@/lib/supabaseClient";
 import { DB_TABLES, DB_VIEWS } from "@/config/database";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Coins } from "lucide-react";
+import Link from "next/link";
 
 export async function generateMetadata({
   searchParams,
@@ -29,7 +32,7 @@ export async function generateMetadata({
   );
 
   return {
-    title: `あなたは${totalCoins}枚のコインを投票しました！ | ${siteName}`,
+    title: `${totalCoins}枚のコインを投票しました | ${siteName}`,
   };
 }
 
@@ -40,26 +43,15 @@ export default async function Page({
 }) {
   const { id = "" } = await searchParams;
 
-  // supabaseから投票内容取得
   const { data, error } = await supabase
     .from(DB_TABLES.COINS)
     .select("*")
     .eq("created_id", id);
 
-  // annictからanime情報取得
   if (!data || error) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-        <div className="border-b border-border/50 bg-background/80 backdrop-blur">
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
-              投票結果
-            </h1>
-          </div>
-        </div>
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-10">データの取得に失敗しました</div>
-        </div>
+      <main className="min-h-dvh bg-background flex flex-col items-center justify-center px-4">
+        <p className="text-muted-foreground">データの取得に失敗しました</p>
       </main>
     );
   }
@@ -70,23 +62,17 @@ export default async function Page({
     .eq("season", data[0].season as string)
     .order("total_coin_value", { ascending: false });
 
-  if (coinError) {
-    console.error("Failed to fetch total coin data", coinError);
-  }
+  if (coinError) console.error("Failed to fetch total coin data", coinError);
 
   if (!coins) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          データの取得に失敗しました
-        </h1>
-        <div className="text-center py-10">データの取得に失敗しました</div>
+      <main className="min-h-dvh bg-background flex flex-col items-center justify-center px-4">
+        <p className="text-muted-foreground">データの取得に失敗しました</p>
       </main>
     );
   }
 
   const res = await getAnimeByIds(data.map((item) => item.annict_id as number));
-
   const animeList = res.map((anime) => ({
     id: anime.id,
     title: anime.title,
@@ -97,29 +83,35 @@ export default async function Page({
     twitterUrl: anime.twitterUrl,
   }));
 
-  return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* ヘッダー */}
-      <div className="border-b border-border/50 bg-background/80 backdrop-blur">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
-            投票結果
-          </h1>
-          <p className="text-center text-muted-foreground text-sm">
-            あなたの期待度が記録されました
-          </p>
-        </div>
-      </div>
+  const totalCoins = data.reduce(
+    (acc, item) => acc + ((item.coin_value as number) || 0),
+    0,
+  );
 
-      <div className="container mx-auto px-4 py-8">
-        {/* パンくずリスト */}
-        <Breadcrumb
-          items={[
-            {
-              label: "投票結果",
-            },
-          ]}
-        />
+  return (
+    <main className="min-h-dvh bg-background">
+      {/* Header */}
+      <header className="relative border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="absolute top-3 right-4 z-10">
+          <ThemeToggle />
+        </div>
+        <div className="container mx-auto max-w-4xl px-4 py-6 text-center space-y-3">
+          <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            {siteName}
+          </Link>
+          <h1 className="text-xl font-bold">投票結果</h1>
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-coin-muted border border-coin/15">
+            <Coins className="w-5 h-5 text-coin" />
+            <span className="font-bold text-2xl text-coin tabular-nums">
+              {totalCoins}
+            </span>
+            <span className="text-sm text-muted-foreground">コイン</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto max-w-4xl px-4 py-6">
+        <Breadcrumb items={[{ label: "投票結果" }]} />
 
         <ResultsClient
           animeList={animeList}
@@ -128,7 +120,6 @@ export default async function Page({
           votedCoins={data}
         />
 
-        {/* クライアントコンポーネントで削除ボタンの表示を判定 */}
         <VoteDeleteWrapper
           voteId={id}
           deleteId={(data[0] as { delete_id?: string }).delete_id || ""}

@@ -8,43 +8,31 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-interface BreadcrumbProps {
-  items: BreadcrumbItem[];
-}
-
-export function Breadcrumb({ items }: BreadcrumbProps) {
+export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav aria-label="パンくずリスト" className="mb-4">
-      <ol className="flex items-center gap-1 text-sm text-muted-foreground overflow-x-auto pb-2 scrollbar-thin">
-        <li className="flex items-center gap-1 flex-shrink-0">
+    <nav aria-label="パンくずリスト" className="mb-3">
+      <ol className="flex items-center gap-1 text-xs text-muted-foreground">
+        <li>
           <Link
             href="/"
             className="hover:text-foreground transition-colors flex items-center gap-1"
           >
-            <Home className="h-3.5 w-3.5" />
+            <Home className="h-3 w-3" />
             <span className="hidden sm:inline">ホーム</span>
           </Link>
         </li>
-        {items.map((item) => {
-          const isLast = items.indexOf(item) === items.length - 1;
-          return (
-            <li key={item.label} className="flex items-center gap-1 flex-shrink-0">
-              <ChevronRight className="h-3.5 w-3.5 flex-shrink-0" />
-              {item.href && !isLast ? (
-                <Link
-                  href={item.href}
-                  className="hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-none"
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-none">
-                  {item.label}
-                </span>
-              )}
-            </li>
-          );
-        })}
+        {items.map((item, i) => (
+          <li key={item.label} className="flex items-center gap-1">
+            <ChevronRight className="h-3 w-3 shrink-0" />
+            {item.href && i < items.length - 1 ? (
+              <Link href={item.href} className="hover:text-foreground transition-colors">
+                {item.label}
+              </Link>
+            ) : (
+              <span className="text-foreground font-medium">{item.label}</span>
+            )}
+          </li>
+        ))}
       </ol>
     </nav>
   );

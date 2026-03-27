@@ -17,16 +17,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import {
   ArrowDown,
   ArrowUp,
-  Filter,
   RotateCcw,
   SlidersHorizontal,
 } from "lucide-react";
@@ -44,6 +38,21 @@ interface AnimeFilterProps {
   activeFilterCount: number;
 }
 
+const mediaTypes = [
+  { value: "all", label: "すべて" },
+  { value: "TV", label: "TV" },
+  { value: "OVA", label: "OVA" },
+  { value: "MOVIE", label: "映画" },
+  { value: "WEB", label: "WEB" },
+  { value: "OTHER", label: "他" },
+];
+
+const sortOptions = [
+  { value: "coins", label: "コイン数" },
+  { value: "watchers", label: "視聴者数" },
+  { value: "title", label: "タイトル" },
+];
+
 export function AnimeFilter({
   mediaType,
   sortBy,
@@ -53,21 +62,6 @@ export function AnimeFilter({
   onSortOrderChange,
   activeFilterCount,
 }: AnimeFilterProps) {
-  const mediaTypes = [
-    { value: "all", label: "すべて" },
-    { value: "TV", label: "TV" },
-    { value: "OVA", label: "OVA" },
-    { value: "MOVIE", label: "映画" },
-    { value: "WEB", label: "WEB" },
-    { value: "OTHER", label: "その他" },
-  ];
-
-  const sortOptions = [
-    { value: "coins", label: "コイン数順" },
-    { value: "watchers", label: "視聴者数順" },
-    { value: "title", label: "タイトル順" },
-  ];
-
   const resetFilters = () => {
     onMediaTypeChange("all");
     onSortChange("coins");
@@ -75,177 +69,138 @@ export function AnimeFilter({
   };
 
   return (
-    <div className="flex items-center gap-2">
-      {/* デスクトップ表示 */}
-      <div className="hidden md:flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
+      {/* Desktop */}
+      <div className="hidden md:flex items-center gap-1.5">
         <Select value={mediaType} onValueChange={onMediaTypeChange}>
-          <SelectTrigger className="w-32 h-9 text-sm">
-            <Filter className="h-3.5 w-3.5 mr-1" />
+          <SelectTrigger className="w-28 h-8 text-xs">
             <SelectValue placeholder="メディア" />
           </SelectTrigger>
           <SelectContent>
-            {mediaTypes.map((type) => (
-              <SelectItem key={type.value} value={type.value}>
-                {type.label}
-              </SelectItem>
+            {mediaTypes.map((t) => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-36 h-9 text-sm">
-            <SlidersHorizontal className="h-3.5 w-3.5 mr-1" />
+          <SelectTrigger className="w-28 h-8 text-xs">
             <SelectValue placeholder="並び順" />
           </SelectTrigger>
           <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
+            {sortOptions.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  onSortOrderChange(sortOrder === "desc" ? "asc" : "desc")
-                }
-                className="h-9 w-9"
-              >
-                {sortOrder === "desc" ? (
-                  <ArrowDown className="h-4 w-4" />
-                ) : (
-                  <ArrowUp className="h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {sortOrder === "desc" ? "降順" : "昇順"}
-                </span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{sortOrder === "desc" ? "降順" : "昇順"}</p>
-            </TooltipContent>
-          </Tooltip>
+        <button
+          type="button"
+          onClick={() => onSortOrderChange(sortOrder === "desc" ? "asc" : "desc")}
+          className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        >
+          {sortOrder === "desc" ? (
+            <ArrowDown className="h-3.5 w-3.5" />
+          ) : (
+            <ArrowUp className="h-3.5 w-3.5" />
+          )}
+        </button>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={resetFilters}
-                className="h-9 w-9"
-                disabled={activeFilterCount === 0}
-              >
-                <RotateCcw className="h-4 w-4" />
-                <span className="sr-only">リセット</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>リセット</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {activeFilterCount > 0 && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
-      {/* モバイル表示 */}
+      {/* Mobile */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="md:hidden relative h-9"
+          <button
+            type="button"
+            className="md:hidden h-8 px-3 rounded-lg border border-border text-xs flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            <SlidersHorizontal className="h-3.5 w-3.5" />
             フィルター
             {activeFilterCount > 0 && (
               <Badge
                 variant="default"
-                className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                className="ml-0.5 h-4 min-w-4 rounded-full p-0 flex items-center justify-center text-[10px]"
               >
                 {activeFilterCount}
               </Badge>
             )}
-          </Button>
+          </button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-[400px]">
-          <SheetHeader>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetHeader className="text-center">
+            <div className="mx-auto w-10 h-1 bg-muted-foreground/20 rounded-full mb-3" />
             <SheetTitle>フィルター</SheetTitle>
-            <SheetDescription>アニメの表示条件を設定できます</SheetDescription>
+            <SheetDescription>表示条件を変更</SheetDescription>
           </SheetHeader>
-          <div className="mt-6 space-y-6">
+          <div className="mt-4 space-y-5 px-1">
             <div>
-              <div className="text-sm font-medium mb-2">メディアタイプ</div>
-              <div className="grid grid-cols-3 gap-2">
-                {mediaTypes.map((type) => (
-                  <Button
-                    key={type.value}
-                    variant={mediaType === type.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onMediaTypeChange(type.value as MediaType)}
-                    className="w-full"
+              <p className="text-xs font-medium text-muted-foreground mb-2">メディア</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {mediaTypes.map((t) => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => onMediaTypeChange(t.value as MediaType)}
+                    className={cn(
+                      "h-9 rounded-lg text-sm font-medium transition-colors",
+                      mediaType === t.value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:text-foreground",
+                    )}
                   >
-                    {type.label}
-                  </Button>
+                    {t.label}
+                  </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <div className="text-sm font-medium mb-2">並び順</div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">並び順</p>
               <Select value={sortBy} onValueChange={onSortChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="並び順を選択" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {sortOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
+                  {sortOptions.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <div className="text-sm font-medium mb-2">表示順</div>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant={sortOrder === "desc" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onSortOrderChange("desc")}
-                  className="w-full gap-2"
-                >
-                  <ArrowDown className="h-4 w-4" />
-                  降順
-                </Button>
-                <Button
-                  variant={sortOrder === "asc" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onSortOrderChange("asc")}
-                  className="w-full gap-2"
-                >
-                  <ArrowUp className="h-4 w-4" />
-                  昇順
-                </Button>
+              <p className="text-xs font-medium text-muted-foreground mb-2">順序</p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {(["desc", "asc"] as const).map((order) => (
+                  <button
+                    key={order}
+                    type="button"
+                    onClick={() => onSortOrderChange(order)}
+                    className={cn(
+                      "h-9 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
+                      sortOrder === order
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {order === "desc" ? <ArrowDown className="h-3.5 w-3.5" /> : <ArrowUp className="h-3.5 w-3.5" />}
+                    {order === "desc" ? "降順" : "昇順"}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {activeFilterCount > 0 ? (
-              <Button
-                variant="outline"
-                onClick={resetFilters}
-                className="w-full"
-              >
-                フィルターをリセット
-              </Button>
-            ) : (
-              <Button variant="outline" className="w-full" disabled>
-                フィルターをリセット
+            {activeFilterCount > 0 && (
+              <Button variant="outline" onClick={resetFilters} className="w-full">
+                リセット
               </Button>
             )}
           </div>
