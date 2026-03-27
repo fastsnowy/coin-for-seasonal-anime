@@ -3,7 +3,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { siteName } from "@/config/constant";
 import { getCurrentSeason, getNextSeason } from "@/lib/seasons";
-import { ArrowRight, Coins, Info, Share2 } from "lucide-react";
+import { ArrowRight, Coins, Github, Info, Share2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -25,9 +25,12 @@ export default function Home() {
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-coin-muted mb-6">
             <Coins className="h-8 w-8 text-coin" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-2">
             {siteName}
           </h1>
+          <p className="text-xs text-muted-foreground mb-4 opacity-70">
+            (旧 coin-for-seasonal-anime)
+          </p>
           <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-md mx-auto leading-relaxed">
             気になるアニメに「コイン」を賭けて
             <br className="hidden sm:block" />
@@ -115,14 +118,25 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-6 px-4 border-t border-border/50">
-        <div className="flex flex-col items-center gap-2">
-          <Link
-            href="/privacy"
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-          >
-            プライバシーポリシー
-          </Link>
+      <footer className="py-8 px-4 border-t border-border/50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/privacy"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+            >
+              プライバシーポリシー
+            </Link>
+            <a
+              href="https://github.com/fastsnowy/coin-for-seasonal-anime"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Github className="h-4 w-4" />
+              <span className="sr-only">GitHub</span>
+            </a>
+          </div>
           <p className="text-center text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {siteName}
           </p>

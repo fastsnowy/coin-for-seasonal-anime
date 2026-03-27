@@ -1,7 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { siteName } from "@/config/constant";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
+import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -30,20 +29,7 @@ export default async function LinkPage({
 
   return (
     <main className="min-h-dvh bg-background">
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm font-bold hover:text-foreground transition-colors"
-          >
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1">
-            <UserMenu />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <SiteHeader maxWidth="max-w-4xl" />
 
       <div className="container mx-auto max-w-md px-4 py-16">
         <div className="text-center mb-8">

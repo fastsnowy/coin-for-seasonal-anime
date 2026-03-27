@@ -1,6 +1,4 @@
 import { Breadcrumb } from "@/components/breadcrumb";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
 import { VoteCardActions } from "@/components/vote-card-actions";
 import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
@@ -10,6 +8,7 @@ import { Coins, LogIn, History } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: `投票履歴 | ${siteName}`,
@@ -180,20 +179,7 @@ export default async function MyVotesPage() {
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-dvh bg-background">
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm font-bold hover:text-foreground transition-colors"
-          >
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1">
-            <UserMenu />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <SiteHeader maxWidth="max-w-4xl" />
       <div className="container mx-auto max-w-2xl px-4 py-6">
         <Breadcrumb items={[{ label: "投票履歴" }]} />
         {children}

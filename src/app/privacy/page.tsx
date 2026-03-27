@@ -1,8 +1,6 @@
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
+import { SiteHeader } from "@/components/site-header";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { siteName } from "@/config/constant";
-import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,20 +10,8 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main className="min-h-dvh bg-background">
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm font-bold hover:text-foreground transition-colors"
-          >
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1">
-            <UserMenu />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <SiteHeader maxWidth="max-w-4xl" />
+
 
       <div className="container mx-auto max-w-2xl px-4 py-6">
         <Breadcrumb items={[{ label: "プライバシーポリシー" }]} />
@@ -37,7 +23,7 @@ export default function PrivacyPage() {
 
           <p className="text-muted-foreground">
             {siteName}
-            （以下「本サービス」）は、ユーザーのプライバシーを尊重し、個人情報の保護に努めます。本プライバシーポリシーでは、本サービスにおける情報の収集・利用・管理について説明します。
+            （旧 coin-for-seasonal-anime、以下「本サービス」）は、ユーザーのプライバシーを尊重し、個人情報の保護に努めます。本プライバシーポリシーでは、本サービスにおける情報の収集・利用・管理について説明します。
           </p>
 
           <Section title="1. 収集する情報">

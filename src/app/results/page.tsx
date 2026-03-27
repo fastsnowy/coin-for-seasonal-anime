@@ -5,30 +5,16 @@ import { getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
+import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
+import { CircleAlert } from "lucide-react";
 import { getSeasonName, type Season } from "@/lib/seasons";
 import { ShareButtons } from "@/components/share-buttons";
-import { CircleAlert } from "lucide-react";
 
 function ErrorPage({ message }: { message: string }) {
   return (
     <main className="min-h-dvh bg-background">
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm font-bold hover:text-foreground transition-colors"
-          >
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1">
-            <UserMenu />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <SiteHeader maxWidth="max-w-4xl" />
       <div className="container mx-auto max-w-4xl px-4 py-6">
         <Breadcrumb items={[{ label: "投票結果" }]} />
         <div className="flex flex-col items-center justify-center gap-6 py-24">
@@ -159,20 +145,7 @@ export default async function Page({
   return (
     <main className="min-h-dvh bg-background">
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm font-bold hover:text-foreground transition-colors"
-          >
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1">
-            <UserMenu />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <SiteHeader maxWidth="max-w-4xl" />
 
       <div className="container mx-auto max-w-4xl px-4 py-6 pb-20">
         <Breadcrumb items={[{ label: "投票結果" }]} />
