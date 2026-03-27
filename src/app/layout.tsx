@@ -18,8 +18,36 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000",
+  ),
   title: siteName,
   description: siteDescription,
+  openGraph: {
+    title: siteName,
+    description: siteDescription,
+    type: "website",
+    images: [
+      {
+        url: "/api/og",
+        width: 1200,
+        height: 630,
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+    images: ["/api/og"],
+  },
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
 };
 
 export default function RootLayout({
