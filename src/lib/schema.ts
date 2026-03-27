@@ -67,6 +67,78 @@ export type Database = {
         };
         Relationships: [];
       };
+      coins_prod: {
+        Row: {
+          annict_id: number;
+          coin_value: number;
+          created_at: string;
+          created_id: string;
+          delete_id: string;
+          deleted_at: string | null;
+          id: string;
+          season: string;
+          user_id: string | null;
+        };
+        Insert: {
+          annict_id: number;
+          coin_value: number;
+          created_at?: string;
+          created_id: string;
+          delete_id: string;
+          deleted_at?: string | null;
+          id?: string;
+          season: string;
+          user_id?: string | null;
+        };
+        Update: {
+          annict_id?: number;
+          coin_value?: number;
+          created_at?: string;
+          created_id?: string;
+          delete_id?: string;
+          deleted_at?: string | null;
+          id?: string;
+          season?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
+      coins_dev: {
+        Row: {
+          annict_id: number;
+          coin_value: number;
+          created_at: string;
+          created_id: string;
+          delete_id: string;
+          deleted_at: string | null;
+          id: string;
+          season: string;
+          user_id: string | null;
+        };
+        Insert: {
+          annict_id: number;
+          coin_value: number;
+          created_at?: string;
+          created_id: string;
+          delete_id: string;
+          deleted_at?: string | null;
+          id?: string;
+          season: string;
+          user_id?: string | null;
+        };
+        Update: {
+          annict_id?: number;
+          coin_value?: number;
+          created_at?: string;
+          created_id?: string;
+          delete_id?: string;
+          deleted_at?: string | null;
+          id?: string;
+          season?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       dev_coins: {
         Row: {
           annict_id: number;
@@ -139,6 +211,24 @@ export type Database = {
         Row: {
           annict_id: number | null;
           total_coin_value: number | null;
+        };
+        Relationships: [];
+      };
+      coin_value_view_prod: {
+        Row: {
+          annict_id: number | null;
+          season: string | null;
+          total_coin_value: number | null;
+          uu: number | null;
+        };
+        Relationships: [];
+      };
+      coin_value_view_dev: {
+        Row: {
+          annict_id: number | null;
+          season: string | null;
+          total_coin_value: number | null;
+          uu: number | null;
         };
         Relationships: [];
       };

@@ -31,6 +31,12 @@ export async function createVoteAction(input: unknown) {
     throw new Error("Failed to create vote data");
   }
 
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const resultId = crypto.randomUUID();
   const deleteId = generateDeleteId();
   const { seasonName, betAnimes } = parsedInput.data;
@@ -42,10 +48,10 @@ export async function createVoteAction(input: unknown) {
       season: seasonName,
       created_id: resultId,
       delete_id: deleteId,
+      user_id: user?.id ?? null,
     }),
   );
 
-  const supabase = createSupabaseServerClient();
   const { error } = await supabase.from(DB_TABLES.COINS).insert(insertData);
 
   if (error) {

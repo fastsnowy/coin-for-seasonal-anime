@@ -3,6 +3,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
@@ -51,7 +52,7 @@ export const revalidate = 360;
 export default async function SeasonPage({
   params,
 }: { params: Promise<{ id: string }> }) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   // URLパラメータから年と季節を取得
   const { id } = await params;
   const match = id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
@@ -97,6 +98,7 @@ export default async function SeasonPage({
           </Link>
           <div className="flex items-center gap-1.5">
             <SeasonNavigation />
+            <UserMenu />
             <ThemeToggle />
           </div>
         </div>

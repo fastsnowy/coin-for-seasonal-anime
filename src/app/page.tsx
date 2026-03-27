@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { siteName } from "@/config/constant";
 import { getCurrentSeason, getNextSeason } from "@/lib/seasons";
 import { ArrowRight, Coins, Info, Share2 } from "lucide-react";
@@ -12,7 +13,8 @@ export default function Home() {
 
   return (
     <main className="relative min-h-dvh bg-background">
-      <div className="absolute top-3 right-4 z-10">
+      <div className="absolute top-3 right-4 z-10 flex items-center gap-1">
+        <UserMenu />
         <ThemeToggle />
       </div>
 
@@ -114,9 +116,17 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-6 px-4 border-t border-border/50">
-        <p className="text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} {siteName}
-        </p>
+        <div className="flex flex-col items-center gap-2">
+          <Link
+            href="/privacy"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+          >
+            プライバシーポリシー
+          </Link>
+          <p className="text-center text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} {siteName}
+          </p>
+        </div>
       </footer>
     </main>
   );

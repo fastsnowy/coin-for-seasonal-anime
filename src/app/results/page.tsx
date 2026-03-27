@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import Link from "next/link";
 import { getSeasonName, type Season } from "@/lib/seasons";
 import { ShareButtons } from "@/components/share-buttons";
@@ -23,7 +24,10 @@ function ErrorPage({ message }: { message: string }) {
           >
             {siteName}
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <UserMenu />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <div className="container mx-auto max-w-4xl px-4 py-6">
@@ -54,7 +58,7 @@ export async function generateMetadata({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }): Promise<Metadata> {
   const { id = "" } = await searchParams;
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   const { data } = await supabase
     .from(DB_TABLES.COINS)
@@ -94,7 +98,7 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const { id = "" } = await searchParams;
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from(DB_TABLES.COINS)
@@ -168,7 +172,10 @@ export default async function Page({
           >
             {siteName}
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <UserMenu />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

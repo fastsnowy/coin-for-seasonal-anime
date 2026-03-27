@@ -3,9 +3,8 @@ import { DB_TABLES } from "@/config/database";
 import { createSupabaseServerClient } from "./supabaseClient";
 
 export const handleDeleteVote = async (id: string, deleteId: string) => {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
-  // すでに削除済みかどうか、または存在するかを確認する
   const { data: existingVotes, error: fetchError } = await supabase
     .from(DB_TABLES.COINS)
     .select("deleted_at")
@@ -20,22 +19,22 @@ export const handleDeleteVote = async (id: string, deleteId: string) => {
 
   if (existingVotes[0].deleted_at) {
     console.log("Vote already deleted");
-    return true; // すでに削除済みの場合は成功とみなす
+    return true;
   }
 
   const { error } = await supabase
     .from(DB_TABLES.COINS)
     .update({
-      deleted_at: new Date().toISOString(), // UTCタイムゾーンでの論理削除
+      deleted_at: new Date().toISOString(),
     })
     .eq("created_id", id)
-    .eq("delete_id", deleteId); // 条件: created_id と delete_id が一致するレコード
+    .eq("delete_id", deleteId);
 
   if (error) {
-    console.error("Failed to delete vote:", error); // エラーをログに出力
-    return false; // エラーが発生した場合は失敗
+    console.error("Failed to delete vote:", error);
+    return false;
   }
 
   console.log("Vote deleted successfully");
-  return true; // 成功
+  return true;
 };
