@@ -58,26 +58,26 @@ export const NumberInput = ({
         onClick={() => update(value - stepper)}
         disabled={value <= min}
         className={cn(
-          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
+          "h-7 w-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
           "border border-border bg-secondary text-secondary-foreground",
           "disabled:opacity-30 disabled:pointer-events-none",
           "hover:bg-muted",
         )}
       >
-        <Minus className="h-4 w-4" />
+        <Minus className="h-3 w-3" />
       </button>
 
       <div
         ref={coinRef}
         className={cn(
-          "flex items-center justify-center gap-1.5 min-w-18 transition-opacity duration-200",
+          "flex items-center justify-center gap-1.5 min-w-14 transition-opacity duration-200",
           isActive ? "opacity-100" : "opacity-35",
         )}
       >
-        <Coins className="h-4 w-4 shrink-0" />
+        <Coins className="h-3.5 w-3.5 shrink-0" />
         <span
           className={cn(
-            "font-bold text-lg tabular-nums transition-colors duration-200",
+            "font-bold text-base tabular-nums transition-colors duration-200",
             isActive ? "text-coin" : "text-muted-foreground",
           )}
         >
@@ -90,14 +90,14 @@ export const NumberInput = ({
         onClick={() => update(value + stepper)}
         disabled={value >= max}
         className={cn(
-          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
+          "h-7 w-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 active:scale-90",
           "border border-border bg-secondary text-secondary-foreground",
           "disabled:opacity-30 disabled:pointer-events-none",
           "hover:bg-muted",
           isActive && "border-coin/30 bg-coin-muted text-coin hover:bg-coin-muted",
         )}
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-3 w-3" />
       </button>
     </div>
   );

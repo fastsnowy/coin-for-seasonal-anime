@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteName } from "@/config/constant";
-import { getCurrentSeason } from "@/lib/seasons";
+import { getCurrentSeason, getNextSeason } from "@/lib/seasons";
 import { ArrowRight, Coins, Info, Share2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   const current = getCurrentSeason();
+  const next = getNextSeason();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -30,15 +31,27 @@ export default function Home() {
             <br className="hidden sm:block" />
             期待度を表そう
           </p>
-          <Link href={`/seasons/${currentYear}-${current.id}`}>
-            <Button
-              size="lg"
-              className="h-12 px-8 text-base gap-2 font-semibold active:scale-[0.97] transition-all"
-            >
-              今期アニメを見る
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <Link href={`/seasons/${currentYear}-${current.id}`}>
+              <Button
+                size="lg"
+                className="h-12 px-8 text-base gap-2 font-semibold active:scale-[0.97] transition-all"
+              >
+                今期（{current.name}）に賭ける
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href={`/seasons/${next.year}-${next.id}`}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-12 px-8 text-base gap-2 font-semibold active:scale-[0.97] transition-all"
+              >
+                来期（{next.name}）に賭ける
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

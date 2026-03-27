@@ -112,17 +112,17 @@ export default async function Page({
   return (
     <main className="min-h-dvh bg-background">
       {/* Header */}
-      <header className="relative border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="absolute top-3 right-4 z-10">
-          <ThemeToggle />
-        </div>
-        <div className="container mx-auto max-w-4xl px-4 py-6 text-center space-y-3">
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto max-w-4xl px-4 h-12 flex items-center justify-between">
           <Link
             href="/"
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-bold hover:text-foreground transition-colors"
           >
             {siteName}
           </Link>
+          <ThemeToggle />
+        </div>
+        <div className="container mx-auto max-w-4xl px-4 pb-5 text-center space-y-3">
           <h1 className="text-xl font-bold">投票結果</h1>
           <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-coin-muted border border-coin/15">
             <Coins className="w-5 h-5 text-coin" />

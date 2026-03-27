@@ -73,7 +73,7 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
         />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 pb-28">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-28">
         {filteredAndSortedAnimeList.length > 0 ? (
           filteredAndSortedAnimeList.map((anime) => (
             <AnimeCard work={anime} key={anime.id} coins={coins} />

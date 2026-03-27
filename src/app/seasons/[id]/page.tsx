@@ -2,12 +2,14 @@ import AnimeGrid from "@/components/anime-grid";
 import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
 import type { Season } from "@/lib/seasons";
 import { DB_VIEWS } from "@/config/database";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
@@ -87,48 +89,38 @@ export default async function SeasonPage({
     );
   }
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* ヘッダー */}
-      <div className="border-b border-border/50 bg-background/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-center sm:text-left">
-              {siteName}
-            </h1>
+    <main className="min-h-dvh bg-background">
+      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto max-w-5xl px-4 h-12 flex items-center justify-between gap-3">
+          <Link href="/" className="text-sm font-bold truncate hover:text-foreground/80 transition-colors">
+            {siteName}
+          </Link>
+          <div className="flex items-center gap-1.5">
             <SeasonNavigation />
+            <ThemeToggle />
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* パンくずリスト */}
-        <Breadcrumb
-          items={[
-            {
-              label: `${year}年 ${seasonName}`,
-            },
-          ]}
-        />
+      <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
+        <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
-        <div className="mb-8">
-          <h2 className="text-lg md:text-xl font-semibold text-center text-muted-foreground">
-            {seasonType === "current"
-              ? "今期"
-              : seasonType === "next"
-                ? "来期"
-                : `${year}年 ${seasonName}`}
-            のアニメ
-          </h2>
-        </div>
+        <h2 className="text-center text-sm text-muted-foreground mb-5">
+          {seasonType === "current"
+            ? "今期"
+            : seasonType === "next"
+              ? "来期"
+              : `${year}年 ${seasonName}`}
+          のアニメ
+        </h2>
 
-        {/* ranking */}
         <RankingSection animeList={animeList} coins={coins} />
 
         <Suspense
           fallback={
-            <div className="text-center py-20">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" />
-              <p className="mt-4 text-muted-foreground">読み込み中...</p>
+            <div className="flex flex-col items-center py-20 gap-3">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-r-transparent" />
+              <p className="text-xs text-muted-foreground">読み込み中...</p>
             </div>
           }
         >
