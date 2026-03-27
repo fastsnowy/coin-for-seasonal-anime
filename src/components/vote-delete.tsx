@@ -13,33 +13,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "./ui/dialog";
 
-export const VoteDeleteButton = ({
+export function VoteDeleteDialog({
   id,
-  deleteId,
+  open,
+  onOpenChange,
 }: {
   id: string;
-  deleteId: string;
-}) => {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const [isDeleteButtonPressed, setIsDeleteButtonPressed] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const isDeletingRef = useRef(false);
   const router = useRouter();
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="destructive"
-          type="button"
-          className="shadow-lg hover:shadow-xl transition-all"
-          disabled={isDeleted || isDeleteButtonPressed}
-        >
-          {isDeleted ? "削除済み" : "投票を削除"}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         {isDeleted ? (
           <>
@@ -55,7 +46,7 @@ export const VoteDeleteButton = ({
                   variant="outline"
                   type="button"
                   onClick={() => {
-                    router.push("/");
+                    router.push("/my-votes");
                   }}
                 >
                   閉じる
@@ -69,7 +60,6 @@ export const VoteDeleteButton = ({
               <DialogTitle className="text-xl">
                 投票を削除しますか？
               </DialogTitle>
-              <DialogClose />
             </DialogHeader>
             <DialogDescription className="text-base py-4">
               投票を削除すると、元に戻すことはできません。本当に削除してもよろしいですか？
@@ -89,15 +79,10 @@ export const VoteDeleteButton = ({
                   isDeletingRef.current = true;
 
                   try {
-                    const success = await handleDeleteVote(id, deleteId);
+                    const success = await handleDeleteVote(id);
                     if (success) {
-                      // サーバー側で削除成功した場合のみ localStorage から削除
-                      const myVotes = JSON.parse(
-                        localStorage.getItem("myVotes") || "{}",
-                      );
-                      delete myVotes[id];
-                      localStorage.setItem("myVotes", JSON.stringify(myVotes));
                       setIsDeleted(true);
+                      router.refresh();
                     } else {
                       toast.error("削除に失敗しました");
                       setIsDeleteButtonPressed(false);
@@ -120,4 +105,4 @@ export const VoteDeleteButton = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

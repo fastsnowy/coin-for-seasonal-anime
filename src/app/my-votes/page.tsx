@@ -1,5 +1,6 @@
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { VoteCardActions } from "@/components/vote-card-actions";
 import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -115,39 +116,46 @@ export default async function MyVotesPage() {
 
       <div className="space-y-3">
         {voteGroups.map((group) => (
-          <Link
+          <div
             key={group.createdId}
-            href={`/results?id=${group.createdId}`}
-            className="block rounded-xl border border-border bg-card p-4 hover:bg-accent/50 transition-colors"
+            className="rounded-xl border border-border bg-card p-4"
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="space-y-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                    {group.seasonLabel}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {group.animeCount}作品
+              <Link
+                href={`/results?id=${group.createdId}`}
+                className="flex-1 min-w-0 hover:opacity-80 transition-opacity"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      {group.seasonLabel}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {group.animeCount}作品
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(group.createdAt).toLocaleDateString("ja-JP", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </Link>
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <Coins className="w-4 h-4 text-coin" />
+                  <span className="font-bold text-lg tabular-nums text-coin">
+                    {group.totalCoins}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(group.createdAt).toLocaleDateString("ja-JP", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <Coins className="w-4 h-4 text-coin" />
-                <span className="font-bold text-lg tabular-nums text-coin">
-                  {group.totalCoins}
-                </span>
+                <VoteCardActions createdId={group.createdId} />
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 

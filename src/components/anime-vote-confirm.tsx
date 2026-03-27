@@ -11,9 +11,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { atomBetCoinValue } from "@/global/atom";
+import {
+  atomBetAnimeWorkId,
+  atomBetCoinValue,
+  atomResetBetCoins,
+} from "@/global/atom";
 import { createVoteAction } from "@/lib/vote-create-action";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 import { ChevronRight, Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -46,6 +51,8 @@ const createVote = async (
 
 export function VoteConfirm({ seasonName }: { seasonName: string }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
+  const resetAllBetCoins = useSetAtom(atomResetBetCoins);
+  const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
   const router = useRouter();
@@ -64,14 +71,7 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
       const result = await createVote(betCoinValue, seasonName);
 
       if (result) {
-        const { resultId, deleteId } = result;
-
-        const myVotes = JSON.parse(localStorage.getItem("myVotes") || "{}");
-        myVotes[resultId] = {
-          deleteId,
-          timestamp: new Date().toISOString(),
-        };
-        localStorage.setItem("myVotes", JSON.stringify(myVotes));
+        const { resultId } = result;
 
         import("canvas-confetti").then(({ default: confetti }) => {
           confetti({
@@ -88,6 +88,8 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
           });
         });
 
+        resetAllBetCoins();
+        resetBetAnimeWorkId();
         router.push(`/results?id=${resultId}`);
       } else {
         setIsSubmitting(false);

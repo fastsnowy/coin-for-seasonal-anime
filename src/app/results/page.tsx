@@ -1,6 +1,5 @@
 import { ResultsClient } from "@/components/results-client";
 import { Breadcrumb } from "@/components/breadcrumb";
-import { VoteDeleteWrapper } from "@/components/vote-delete-wrapper";
 import { DB_TABLES, DB_VIEWS } from "@/config/database";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
@@ -130,10 +129,6 @@ export default async function Page({
     .map((item) => item.annict_id)
     .filter((annictId): annictId is number => annictId !== null);
   const res = await getAnimeByIds(votedAnnictIds);
-  const deleteId =
-    "delete_id" in firstVote && typeof firstVote.delete_id === "string"
-      ? firstVote.delete_id
-      : "";
 
   const animeList = res.map((anime) => ({
     id: anime.id,
@@ -207,7 +202,6 @@ export default async function Page({
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <ShareButtons shareText={shareText} />
-                <VoteDeleteWrapper voteId={id} deleteId={deleteId} />
               </div>
             </div>
           </div>
