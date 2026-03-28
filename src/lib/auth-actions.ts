@@ -55,3 +55,29 @@ export async function signOut() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+export async function deleteAccount() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || user.is_anonymous) {
+    return { error: "認証されたユーザーのみ退会できます" };
+  }
+
+  const { error } = await supabase.from("user_withdrawals").upsert(
+    {
+      user_id: user.id,
+      withdrawn_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
+
+  if (error) {
+    return { error: "退会処理に失敗しました" };
+  }
+
+  await supabase.auth.signOut();
+  redirect("/");
+}

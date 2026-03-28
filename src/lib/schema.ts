@@ -172,6 +172,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_withdrawals: {
+        Row: {
+          user_id: string;
+          withdrawn_at: string;
+        };
+        Insert: {
+          user_id: string;
+          withdrawn_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          withdrawn_at?: string;
+        };
+        Relationships: [];
+      };
       howamun: {
         Row: {
           count: number | null;

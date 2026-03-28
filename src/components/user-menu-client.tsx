@@ -62,6 +62,15 @@ export function UserMenuClient({
           </>
         )}
 
+        {isLoggedIn && !isAnonymous && (
+          <DropdownMenuItem asChild>
+            <Link href="/mypage" className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              マイページ
+            </Link>
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem asChild>
           <Link href="/my-votes" className="cursor-pointer">
             <History className="mr-2 h-4 w-4" />
