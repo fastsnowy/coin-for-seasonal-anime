@@ -37,7 +37,7 @@ export function DeleteAccountDialog() {
           <DialogDescription className="text-sm leading-relaxed pt-2">
             退会すると現在のアカウントでは投票履歴にアクセスできなくなります。
             <br />
-            投票データは匿名として保持され、同じAnnictアカウントで再登録すると再び参照できます。
+            投票データは匿名として保持されますが、再登録しても過去の投票履歴は引き継がれません。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">

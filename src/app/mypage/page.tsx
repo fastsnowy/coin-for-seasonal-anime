@@ -117,7 +117,7 @@ export default async function MyPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                投票データは匿名の投票として保持されます。同じAnnictアカウントで再登録した場合は、過去の投票履歴を再び参照できます。
+                投票データは匿名の投票として保持されます。再登録しても過去の投票履歴は引き継がれません。
               </p>
               <DeleteAccountDialog />
             </CardContent>

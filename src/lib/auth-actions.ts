@@ -66,14 +66,21 @@ export async function deleteAccount() {
     return { error: "認証されたユーザーのみ退会できます" };
   }
 
-  const { error } = await supabase.from("user_withdrawals").upsert(
-    {
-      user_id: user.id,
-      withdrawn_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
+  const { data: identitiesData, error: identitiesError } =
+    await supabase.auth.getUserIdentities();
+  if (identitiesError) {
+    return { error: "連携情報の取得に失敗しました" };
+  }
+
+  const annictIdentity = identitiesData?.identities?.find(
+    (identity) => identity.provider === ANNICT_PROVIDER,
   );
 
+  if (!annictIdentity) {
+    return { error: "Annict連携が見つかりません" };
+  }
+
+  const { error } = await supabase.auth.unlinkIdentity(annictIdentity);
   if (error) {
     return { error: "退会処理に失敗しました" };
   }
