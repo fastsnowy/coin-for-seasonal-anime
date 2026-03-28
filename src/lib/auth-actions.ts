@@ -57,34 +57,38 @@ export async function signOut() {
 }
 
 export async function deleteAccount() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user || user.is_anonymous) {
-    return { error: "認証されたユーザーのみ退会できます" };
+    if (!user || user.is_anonymous) {
+      return { error: "認証されたユーザーのみ退会できます" };
+    }
+
+    const { error } = await supabase.functions.invoke("delete-user");
+    if (error) {
+      console.error("deleteAccount:invoke delete-user failed", {
+        userId: user.id,
+        error,
+      });
+      return { error: "退会処理に失敗しました" };
+    }
+
+    await supabase.auth.signOut();
+    redirect("/");
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      typeof error.digest === "string" &&
+      error.digest.includes("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    console.error("deleteAccount:unexpected error", error);
+    return { error: "退会処理中に予期しないエラーが発生しました" };
   }
-
-  const { data: identitiesData, error: identitiesError } =
-    await supabase.auth.getUserIdentities();
-  if (identitiesError) {
-    return { error: "連携情報の取得に失敗しました" };
-  }
-
-  const annictIdentity = identitiesData?.identities?.find(
-    (identity) => identity.provider === ANNICT_PROVIDER,
-  );
-
-  if (!annictIdentity) {
-    return { error: "Annict連携が見つかりません" };
-  }
-
-  const { error } = await supabase.auth.unlinkIdentity(annictIdentity);
-  if (error) {
-    return { error: "退会処理に失敗しました" };
-  }
-
-  await supabase.auth.signOut();
-  redirect("/");
 }
