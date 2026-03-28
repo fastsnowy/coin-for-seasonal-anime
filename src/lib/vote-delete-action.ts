@@ -2,15 +2,22 @@
 import { DB_TABLES } from "@/config/database";
 import { createSupabaseServerClient } from "./supabaseClient";
 
-export const handleDeleteVote = async (id: string, deleteId: string) => {
-  const supabase = createSupabaseServerClient();
+export const handleDeleteVote = async (createdId: string) => {
+  const supabase = await createSupabaseServerClient();
 
-  // すでに削除済みかどうか、または存在するかを確認する
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    console.error("User not authenticated");
+    return false;
+  }
+
   const { data: existingVotes, error: fetchError } = await supabase
     .from(DB_TABLES.COINS)
-    .select("deleted_at")
-    .eq("created_id", id)
-    .eq("delete_id", deleteId)
+    .select("deleted_at, user_id")
+    .eq("created_id", createdId)
     .limit(1);
 
   if (fetchError || !existingVotes || existingVotes.length === 0) {
@@ -18,24 +25,25 @@ export const handleDeleteVote = async (id: string, deleteId: string) => {
     return false;
   }
 
+  if (existingVotes[0].user_id !== user.id) {
+    console.error("User does not own this vote");
+    return false;
+  }
+
   if (existingVotes[0].deleted_at) {
-    console.log("Vote already deleted");
-    return true; // すでに削除済みの場合は成功とみなす
+    return true;
   }
 
   const { error } = await supabase
     .from(DB_TABLES.COINS)
-    .update({
-      deleted_at: new Date().toISOString(), // UTCタイムゾーンでの論理削除
-    })
-    .eq("created_id", id)
-    .eq("delete_id", deleteId); // 条件: created_id と delete_id が一致するレコード
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("created_id", createdId)
+    .eq("user_id", user.id);
 
   if (error) {
-    console.error("Failed to delete vote:", error); // エラーをログに出力
-    return false; // エラーが発生した場合は失敗
+    console.error("Failed to delete vote:", error);
+    return false;
   }
 
-  console.log("Vote deleted successfully");
-  return true; // 成功
+  return true;
 };

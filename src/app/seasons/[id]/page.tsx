@@ -2,17 +2,17 @@ import AnimeGrid from "@/components/anime-grid";
 import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
 import SeasonNavigation from "@/components/season-navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
 import type { Season } from "@/lib/seasons";
 import { DB_VIEWS } from "@/config/database";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
+
+import { SiteHeader } from "@/components/site-header";
 
 export async function generateMetadata({
   params,
@@ -51,7 +51,7 @@ export const revalidate = 360;
 export default async function SeasonPage({
   params,
 }: { params: Promise<{ id: string }> }) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   // URLパラメータから年と季節を取得
   const { id } = await params;
   const match = id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
@@ -90,17 +90,11 @@ export default async function SeasonPage({
   }
   return (
     <main className="min-h-dvh bg-background">
-      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto max-w-5xl px-4 h-12 flex items-center justify-between gap-3">
-          <Link href="/" className="text-sm font-bold truncate hover:text-foreground/80 transition-colors">
-            {siteName}
-          </Link>
-          <div className="flex items-center gap-1.5">
-            <SeasonNavigation />
-            <ThemeToggle />
-          </div>
+      <SiteHeader maxWidth="max-w-5xl">
+        <div className="flex-1 overflow-x-auto no-scrollbar">
+          <SeasonNavigation />
         </div>
-      </header>
+      </SiteHeader>
 
       <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
         <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />

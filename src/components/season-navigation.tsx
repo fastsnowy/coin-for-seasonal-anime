@@ -43,9 +43,11 @@ export default function SeasonNavigation() {
       if (match) {
         setSelectedYear(match[1]);
         setSelectedSeason(match[2] as Season);
+        resetAllBetCoins();
+        resetBetAnimeWorkId();
       }
     }
-  }, [params?.id, setSelectedYear, setSelectedSeason]);
+  }, [params?.id, setSelectedYear, setSelectedSeason, resetAllBetCoins, resetBetAnimeWorkId]);
 
   const years = Array.from(
     { length: thisYear - 1999 },
