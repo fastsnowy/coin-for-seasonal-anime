@@ -20,7 +20,9 @@ export async function loginWithAnnict() {
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: ANNICT_PROVIDER,
-    options: { redirectTo: `${baseUrl}/auth/callback` },
+    options: {
+      redirectTo: `${baseUrl}/auth/callback?intent=login`,
+    },
   });
 
   if (error || !data.url) {
@@ -36,7 +38,9 @@ export async function linkAnnict() {
 
   const { data, error } = await supabase.auth.linkIdentity({
     provider: ANNICT_PROVIDER,
-    options: { redirectTo: `${baseUrl}/auth/callback` },
+    options: {
+      redirectTo: `${baseUrl}/auth/callback?intent=link`,
+    },
   });
 
   if (error || !data.url) {

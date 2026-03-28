@@ -1,3 +1,4 @@
+import { redirectUrlWithAuthToast } from "@/lib/auth-redirect";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.verifyOtp({ token_hash, type });
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(redirectUrlWithAuthToast(origin, next));
     }
   }
 

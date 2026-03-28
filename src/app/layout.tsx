@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import { AuthSuccessToast } from "@/components/auth-success-toast";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { siteDescription, siteName } from "@/config/constant";
@@ -65,6 +67,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Suspense fallback={null}>
+            <AuthSuccessToast />
+          </Suspense>
           <Toaster richColors />
         </ThemeProvider>
       </body>
