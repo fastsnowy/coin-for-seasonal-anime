@@ -3,13 +3,15 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { siteName } from "@/config/constant";
 import { getCurrentSeason, getNextSeason } from "@/lib/seasons";
+import { getJSTDate } from "@/lib/date-utils";
+
 import { ArrowRight, Coins, Github, Info, Share2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   const current = getCurrentSeason();
   const next = getNextSeason();
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
 
   return (
     <main className="relative min-h-dvh bg-background">
@@ -138,7 +140,7 @@ export default function Home() {
             </a>
           </div>
           <p className="text-center text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} {siteName}
+            &copy; {getJSTDate().getFullYear()} {siteName}
           </p>
         </div>
       </footer>
