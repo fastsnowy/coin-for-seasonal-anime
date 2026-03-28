@@ -1,4 +1,6 @@
 import { type Season, getCurrentSeason } from "@/lib/seasons";
+import { getJSTDate } from "@/lib/date-utils";
+
 import { atom } from "jotai";
 import { atomFamily, atomWithReset } from "jotai/utils";
 
@@ -56,7 +58,7 @@ export const atomResetBetCoins = atom(null, (get, set) => {
   }
 });
 
-const now = new Date();
+const jstNow = getJSTDate();
 const currentSeason = getCurrentSeason();
-export const atomSelectYear = atom(now.getFullYear().toString());
+export const atomSelectYear = atom(jstNow.getFullYear().toString());
 export const atomSelectSeason = atom<Season>(currentSeason.id);

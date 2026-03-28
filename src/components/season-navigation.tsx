@@ -1,5 +1,8 @@
 "use client";
 
+import { getJSTDate } from "@/lib/date-utils";
+
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,7 +33,7 @@ const seasons = [
 export default function SeasonNavigation() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const thisYear = new Date().getFullYear();
+  const thisYear = getJSTDate().getFullYear();
 
   const [selectedYear, setSelectedYear] = useAtom(atomSelectYear);
   const [selectedSeason, setSelectedSeason] = useAtom(atomSelectSeason);

@@ -1,5 +1,8 @@
 "use client";
 
+import { getJSTDate } from "@/lib/date-utils";
+
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -29,7 +32,7 @@ export default function SeasonSelector({
   const [selectedTab, setSelectedTab] = useState<"current" | "next" | "past">(
     "current",
   );
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const [selectedSeason, setSelectedSeason] = useState<Season>("spring");
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
@@ -147,7 +150,7 @@ export default function SeasonSelector({
 }
 
 function getCurrentSeason() {
-  const month = new Date().getMonth() + 1;
+  const month = getJSTDate().getMonth() + 1;
   if (month >= 3 && month <= 5) return { id: "spring", name: "春" };
   if (month >= 6 && month <= 8) return { id: "summer", name: "夏" };
   if (month >= 9 && month <= 11) return { id: "autumn", name: "秋" };
@@ -156,7 +159,7 @@ function getCurrentSeason() {
 
 function getNextSeason() {
   const current = getCurrentSeason();
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
 
   switch (current.id) {
     case "spring":

@@ -1,4 +1,6 @@
+import { getJSTDate } from "./date-utils";
 export type Season = "spring" | "summer" | "autumn" | "winter";
+
 
 export type SeasonInfo = {
   id: Season;
@@ -6,7 +8,7 @@ export type SeasonInfo = {
 };
 
 export function getCurrentSeason(): SeasonInfo {
-  const month = new Date().getMonth() + 1;
+  const month = getJSTDate().getMonth() + 1;
   if (month >= 1 && month <= 3) return { id: "winter", name: "冬" };
   if (month >= 4 && month <= 6) return { id: "spring", name: "春" };
   if (month >= 7 && month <= 9) return { id: "summer", name: "夏" };
@@ -15,7 +17,7 @@ export function getCurrentSeason(): SeasonInfo {
 
 export function getNextSeason(): { id: Season; name: string; year: number } {
   const current = getCurrentSeason();
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
 
   switch (current.id) {
     case "winter":
@@ -45,7 +47,7 @@ export function getSeasonType(
   year: number,
   season: Season,
 ): "current" | "next" | "past" {
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
   const currentSeason = getCurrentSeason();
   const nextSeason = getNextSeason();
 

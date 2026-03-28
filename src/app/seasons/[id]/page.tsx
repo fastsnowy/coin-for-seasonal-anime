@@ -11,6 +11,8 @@ import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { getJSTDate } from "@/lib/date-utils";
+
 
 import { SiteHeader } from "@/components/site-header";
 
@@ -35,7 +37,7 @@ export async function generateMetadata({
 
 // 動的パラメータの生成（静的生成するパスを指定）
 export async function generateStaticParams() {
-  const currentYear = new Date().getFullYear();
+  const currentYear = getJSTDate().getFullYear();
   return [
     { id: `${currentYear}-winter` },
     { id: `${currentYear}-spring` },
