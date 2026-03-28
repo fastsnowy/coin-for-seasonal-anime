@@ -1,7 +1,7 @@
 # Supabase Migration Guide
 
 このプロジェクトで Supabase マイグレーションを進めるための実行手順です。  
-今回追加した `user_withdrawals` のマイグレーションにもそのまま使えます。
+今回追加した `pseudo_users` と `coins` 拡張のマイグレーションにもそのまま使えます。
 
 ## 前提
 
@@ -13,7 +13,8 @@
 
 今回追加済み:
 
-- `supabase/migrations/20260328000004_create_user_withdrawals.sql`
+- `supabase/migrations/20260328000005_add_on_delete_to_fk.sql`
+- `supabase/migrations/20260328000006_create_pseudo_users.sql`
 
 必要に応じて未適用のマイグレーション一覧を確認します。
 
@@ -60,13 +61,13 @@ mise run gen-schema
 
 ## 5. 確認ポイント（今回の変更）
 
-- `user_withdrawals` テーブルが作成されている
-- RLS が有効化されている
-- `select_own` / `insert_own` / `delete_own` ポリシーが存在する
-- `src/lib/schema.ts` に `user_withdrawals` 型が含まれている
+- `coins_prod` / `coins_dev` の `user_id` FK が `ON DELETE SET NULL` になっている
+- `pseudo_users` テーブルが作成されている
+- `coins_prod` / `coins_dev` に `pseudo_user_id` カラムが追加されている
+- `src/lib/schema.ts` に `pseudo_users` と `pseudo_user_id` が含まれている
 
 ## 6. 実装と整合する挙動
 
-- 退会時: `user_withdrawals` に `user_id` を記録し、`signOut`
-- 再登録時: OAuth callback 成功後に `user_withdrawals` レコードを削除して復元扱い
-- 投票データ (`coins`) は更新しない
+- 退会時: Edge Function が `pseudo_users` を作成し、対象ユーザーの `coins` を `pseudo_user_id` にマッピング
+- その後 `auth.admin.deleteUser()` により `user_id` は `NULL` になる
+- 投票データは匿名のまま保持され、同一退会者の投票は `pseudo_user_id` で追跡可能

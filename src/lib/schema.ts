@@ -76,6 +76,7 @@ export type Database = {
           delete_id: string;
           deleted_at: string | null;
           id: string;
+          pseudo_user_id: string | null;
           season: string;
           user_id: string | null;
         };
@@ -87,6 +88,7 @@ export type Database = {
           delete_id: string;
           deleted_at?: string | null;
           id?: string;
+          pseudo_user_id?: string | null;
           season: string;
           user_id?: string | null;
         };
@@ -98,6 +100,7 @@ export type Database = {
           delete_id?: string;
           deleted_at?: string | null;
           id?: string;
+          pseudo_user_id?: string | null;
           season?: string;
           user_id?: string | null;
         };
@@ -112,6 +115,7 @@ export type Database = {
           delete_id: string;
           deleted_at: string | null;
           id: string;
+          pseudo_user_id: string | null;
           season: string;
           user_id: string | null;
         };
@@ -123,6 +127,7 @@ export type Database = {
           delete_id: string;
           deleted_at?: string | null;
           id?: string;
+          pseudo_user_id?: string | null;
           season: string;
           user_id?: string | null;
         };
@@ -134,6 +139,7 @@ export type Database = {
           delete_id?: string;
           deleted_at?: string | null;
           id?: string;
+          pseudo_user_id?: string | null;
           season?: string;
           user_id?: string | null;
         };
@@ -172,17 +178,17 @@ export type Database = {
         };
         Relationships: [];
       };
-      user_withdrawals: {
+      pseudo_users: {
         Row: {
-          user_id: string;
+          id: string;
           withdrawn_at: string;
         };
         Insert: {
-          user_id: string;
+          id?: string;
           withdrawn_at?: string;
         };
         Update: {
-          user_id?: string;
+          id?: string;
           withdrawn_at?: string;
         };
         Relationships: [];
