@@ -6,6 +6,7 @@ import { AuthSuccessToast } from "@/components/auth-success-toast";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { siteDescription, siteName } from "@/config/constant";
+import { Analytics } from "@vercel/analytics/next";
 
 const fontDisplay = Bricolage_Grotesque({
   variable: "--font-display",
@@ -71,6 +72,7 @@ export default function RootLayout({
             <AuthSuccessToast />
           </Suspense>
           <Toaster richColors />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
