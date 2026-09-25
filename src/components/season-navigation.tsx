@@ -17,11 +17,11 @@ import {
   atomSelectSeason,
   atomSelectYear,
 } from "@/global/atom";
-import type { Season } from "@/lib/seasons";
-import { useAtom, useSetAtom } from "jotai";
+import { getCurrentSeason, type Season } from "@/lib/seasons";
+import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const seasons = [
   { id: "winter", name: "冬" },
@@ -30,27 +30,55 @@ const seasons = [
   { id: "autumn", name: "秋" },
 ];
 
+const SEASON_ID_PATTERN = /^(\d{4})-(spring|summer|autumn|winter)$/;
+
 export default function SeasonNavigation() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const thisYear = getJSTDate().getFullYear();
 
-  const [selectedYear, setSelectedYear] = useAtom(atomSelectYear);
-  const [selectedSeason, setSelectedSeason] = useAtom(atomSelectSeason);
+  const setSelectedYearAtom = useSetAtom(atomSelectYear);
+  const setSelectedSeasonAtom = useSetAtom(atomSelectSeason);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
 
-  useEffect(() => {
-    if (params?.id) {
-      const match = params.id.match(/^(\d{4})-(spring|summer|autumn|winter)$/);
-      if (match) {
-        setSelectedYear(match[1]);
-        setSelectedSeason(match[2] as Season);
-        resetAllBetCoins();
-        resetBetAnimeWorkId();
-      }
+  const routeId = params?.id ?? null;
+  const routeMatch = routeId?.match(SEASON_ID_PATTERN) ?? null;
+  const routeYear = routeMatch?.[1] ?? null;
+  const routeSeason = (routeMatch?.[2] as Season | undefined) ?? null;
+
+  // 表示中の年/季節をセレクトの初期値とし、ページ遷移時は追従させる
+  const [selectedYear, setSelectedYear] = useState(
+    routeYear ?? thisYear.toString(),
+  );
+  const [selectedSeason, setSelectedSeason] = useState<Season>(
+    routeSeason ?? getCurrentSeason().id,
+  );
+  const [syncedRouteId, setSyncedRouteId] = useState(routeId);
+
+  if (routeId !== syncedRouteId) {
+    setSyncedRouteId(routeId);
+    if (routeYear && routeSeason) {
+      setSelectedYear(routeYear);
+      setSelectedSeason(routeSeason);
     }
-  }, [params?.id, setSelectedYear, setSelectedSeason, resetAllBetCoins, resetBetAnimeWorkId]);
+  }
+
+  // 投票対象のシーズンは必ずURLと一致させる
+  useEffect(() => {
+    if (!routeYear || !routeSeason) return;
+    setSelectedYearAtom(routeYear);
+    setSelectedSeasonAtom(routeSeason);
+    resetAllBetCoins();
+    resetBetAnimeWorkId();
+  }, [
+    routeYear,
+    routeSeason,
+    setSelectedYearAtom,
+    setSelectedSeasonAtom,
+    resetAllBetCoins,
+    resetBetAnimeWorkId,
+  ]);
 
   const years = Array.from(
     { length: thisYear - 1999 },
@@ -58,14 +86,12 @@ export default function SeasonNavigation() {
   );
 
   const handleNavigate = () => {
-    resetAllBetCoins();
-    resetBetAnimeWorkId();
     router.push(`/seasons/${selectedYear}-${selectedSeason}`);
   };
 
   return (
     <div className="flex items-center gap-1.5 shrink-0">
-      <Select defaultValue={selectedYear} onValueChange={setSelectedYear}>
+      <Select value={selectedYear} onValueChange={setSelectedYear}>
         <SelectTrigger className="w-20 h-8 text-xs">
           <SelectValue placeholder="年" />
         </SelectTrigger>
@@ -77,7 +103,7 @@ export default function SeasonNavigation() {
       </Select>
 
       <Select
-        defaultValue={selectedSeason}
+        value={selectedSeason}
         onValueChange={(v) => setSelectedSeason(v as Season)}
       >
         <SelectTrigger className="w-16 h-8 text-xs">

@@ -36,8 +36,10 @@ export async function proxy(request: NextRequest) {
   return supabaseResponse;
 }
 
+// api・メタデータルートは匿名セッションを必要とせず、
+// Supabase が /api/annict-userinfo を叩くたびに匿名ユーザーが作られてしまうため除外する
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|auth/callback|auth/confirm|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!api/|icon|apple-icon|_next/static|_next/image|favicon.ico|auth/callback|auth/confirm|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
