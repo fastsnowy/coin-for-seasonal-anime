@@ -58,9 +58,11 @@ function prefersReducedMotion() {
 export function VoteConfirm({
   seasonName,
   onOpenChange,
+  onSubmittingChange,
 }: {
   seasonName: string;
   onOpenChange?: (open: boolean) => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 }) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
@@ -68,8 +70,10 @@ export function VoteConfirm({
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
+  const submittedItemsRef = useRef<BetAnimes>([]);
   const router = useRouter();
-  const totalCoins = betCoinValue.reduce(
+  const displayItems = isSubmitting ? submittedItemsRef.current : betCoinValue;
+  const totalCoins = displayItems.reduce(
     (acc, item) => acc + item.coin_value,
     0,
   );
@@ -79,11 +83,13 @@ export function VoteConfirm({
       return;
     }
 
+    submittedItemsRef.current = betCoinValue;
     setIsSubmitting(true);
     isSubmittingRef.current = true;
+    onSubmittingChange?.(true);
 
     try {
-      const result = await createVote(betCoinValue, seasonName);
+      const result = await createVote(submittedItemsRef.current, seasonName);
 
       if (result) {
         const { resultId } = result;
@@ -103,13 +109,17 @@ export function VoteConfirm({
         resetBetAnimeWorkId();
         router.push(`/results?id=${resultId}`);
       } else {
+        submittedItemsRef.current = [];
         setIsSubmitting(false);
         isSubmittingRef.current = false;
+        onSubmittingChange?.(false);
       }
     } catch (error) {
       console.error("投票エラー:", error);
+      submittedItemsRef.current = [];
       setIsSubmitting(false);
       isSubmittingRef.current = false;
+      onSubmittingChange?.(false);
     }
   };
 
@@ -152,9 +162,9 @@ export function VoteConfirm({
         </SheetHeader>
 
         <div className="mt-4 max-h-[50vh] space-y-2 overflow-y-auto overscroll-contain px-1">
-          {betCoinValue.length > 0 ? (
+          {displayItems.length > 0 ? (
             <>
-              {betCoinValue.map((item) => (
+              {displayItems.map((item) => (
                 <div
                   key={item.annict_id}
                   className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/50 p-3"
@@ -202,7 +212,7 @@ export function VoteConfirm({
           </SheetClose>
           <Button
             onClick={handleSubmit}
-            disabled={betCoinValue.length === 0 || isSubmitting}
+            disabled={displayItems.length === 0 || isSubmitting}
             className="flex-1 gap-1.5"
             aria-busy={isSubmitting}
           >

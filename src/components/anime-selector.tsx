@@ -24,6 +24,8 @@ export function AnimeSelector() {
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
   const seasonName = `${year}-${season}`;
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [frozenTotal, setFrozenTotal] = useState(0);
 
   const resetHandler = () => {
     resetAllBetCoins();
@@ -32,10 +34,11 @@ export function AnimeSelector() {
   };
 
   const selectCount = currentStatus.length;
-  const totalCoinValue = currentStatus.reduce(
+  const liveTotal = currentStatus.reduce(
     (acc, item) => acc + (item.coin_value || 0),
     0,
   );
+  const totalCoinValue = isSubmitting ? frozenTotal : liveTotal;
 
   if (selectCount === 0 && !confirmOpen) return null;
 
@@ -48,6 +51,7 @@ export function AnimeSelector() {
               size="icon"
               variant="ghost"
               onClick={resetHandler}
+              disabled={isSubmitting}
               aria-label="投票内容をリセット"
               className="h-9 w-9 shrink-0 rounded-lg text-muted-foreground hover:text-foreground"
             >
@@ -68,6 +72,10 @@ export function AnimeSelector() {
               <VoteConfirm
                 seasonName={seasonName}
                 onOpenChange={setConfirmOpen}
+                onSubmittingChange={(submitting) => {
+                  if (submitting) setFrozenTotal(liveTotal);
+                  setIsSubmitting(submitting);
+                }}
               />
             </div>
           </div>
