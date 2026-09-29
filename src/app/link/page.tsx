@@ -1,10 +1,13 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { siteName } from "@/config/constant";
 import { SiteHeader } from "@/components/site-header";
+import { Breadcrumb } from "@/components/breadcrumb";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AnnictOAuthButton } from "@/components/annict-oauth-button";
+import { getAuthErrorMessage } from "@/lib/auth-redirect";
 import { LogIn } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -31,9 +34,11 @@ export default async function LinkPage({
     <main className="min-h-dvh bg-background">
       <SiteHeader maxWidth="max-w-4xl" />
 
-      <div className="container mx-auto max-w-md px-4 py-16">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-extrabold tracking-tight mb-2">
+      <div className="container mx-auto max-w-md px-4 py-6">
+        <Breadcrumb items={[{ label: "アカウント連携" }]} />
+
+        <div className="py-10 text-center">
+          <h1 className="mb-2 text-2xl font-extrabold tracking-tight">
             アカウント連携
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -42,22 +47,28 @@ export default async function LinkPage({
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
-            連携エラーが発生しました。もう一度お試しください。
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>
+              {error === "exchange_failed" ||
+              error === "callback_exception" ||
+              error === "auth_callback_error"
+                ? getAuthErrorMessage(error)
+                : "連携エラーが発生しました。もう一度お試しください。"}
+            </AlertDescription>
+          </Alert>
         )}
 
         <AnnictOAuthButton mode="link" />
 
         <div className="mt-8 rounded-lg border border-border bg-muted/50 p-4">
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
             すでに別のデバイスでAnnictアカウントを連携済みの場合は、ログインページからログインしてください。
           </p>
           <Link
             href="/login"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
           >
-            <LogIn className="w-3.5 h-3.5" />
+            <LogIn className="h-3.5 w-3.5" />
             ログインページへ
           </Link>
         </div>

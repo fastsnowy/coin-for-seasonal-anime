@@ -92,6 +92,7 @@
   --chart-5: oklch(0.75 0.18 50);
   --coin: oklch(0.82 0.165 82);
   --coin-muted: oklch(0.82 0.165 82 / 12%);
+  color-scheme: dark;
 }
 
 @layer base {
@@ -102,6 +103,7 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    color-scheme: light;
   }
 
   body {
@@ -168,6 +170,20 @@
 
 .animate-glow-pulse {
   animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-slide-up-bar,
+  .animate-coin-bounce,
+  .animate-fade-in-up,
+  .animate-glow-pulse {
+    animation: none !important;
+    opacity: 1;
+  }
 }
 
 /* --- Utilities --- */

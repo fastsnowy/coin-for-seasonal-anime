@@ -1,6 +1,7 @@
 "use server";
 
 import { createSupabaseServerClient } from "./supabase/server";
+import { sanitizeNextPath } from "./auth-redirect";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
@@ -14,14 +15,16 @@ async function getBaseUrl() {
 
 const ANNICT_PROVIDER = "custom:annict" as const;
 
-export async function loginWithAnnict() {
+export async function loginWithAnnict(nextPath?: string) {
   const supabase = await createSupabaseServerClient();
   const baseUrl = await getBaseUrl();
+  const next = sanitizeNextPath(nextPath);
+  const nextQuery = next === "/" ? "" : `&next=${encodeURIComponent(next)}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: ANNICT_PROVIDER,
     options: {
-      redirectTo: `${baseUrl}/auth/callback?intent=login`,
+      redirectTo: `${baseUrl}/auth/callback?intent=login${nextQuery}`,
     },
   });
 

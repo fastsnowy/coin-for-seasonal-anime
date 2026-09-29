@@ -54,9 +54,45 @@ export const atomResetBetCoins = atom(null, (get, set) => {
       work_id: id,
       title: "",
       amount: 0,
-    }); // Reset each atomBetAnimeWork to initial state
+    });
   }
 });
+
+export const atomSetBetAmount = atom(
+  null,
+  (
+    get,
+    set,
+    payload: { id: number; title: string; amount: number },
+  ) => {
+    const { id, title, amount } = payload;
+    const ids = get(atomBetAnimeWorkId);
+
+    if (amount > 0) {
+      set(atomBetAnimeWork(id), {
+        work_id: id,
+        title,
+        amount,
+      });
+      if (!ids.includes(id)) {
+        set(atomBetAnimeWorkId, [...ids, id]);
+      }
+      return;
+    }
+
+    set(atomBetAnimeWork(id), {
+      work_id: id,
+      title: "",
+      amount: 0,
+    });
+    if (ids.includes(id)) {
+      set(
+        atomBetAnimeWorkId,
+        ids.filter((workId) => workId !== id),
+      );
+    }
+  },
+);
 
 const jstNow = getJSTDate();
 const currentSeason = getCurrentSeason();

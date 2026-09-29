@@ -1,9 +1,14 @@
 "use client";
 
-import { getJSTDate } from "@/lib/date-utils";
-
-
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -11,17 +16,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getJSTDate } from "@/lib/date-utils";
 import {
   atomBetAnimeWorkId,
+  atomBetCoinValue,
   atomResetBetCoins,
   atomSelectSeason,
   atomSelectYear,
 } from "@/global/atom";
 import { getCurrentSeason, type Season } from "@/lib/seasons";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 const seasons = [
   { id: "winter", name: "冬" },
@@ -36,18 +43,20 @@ export default function SeasonNavigation() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const thisYear = getJSTDate().getFullYear();
+  const [isPending, startTransition] = useTransition();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const setSelectedYearAtom = useSetAtom(atomSelectYear);
   const setSelectedSeasonAtom = useSetAtom(atomSelectSeason);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
+  const draftVotes = useAtomValue(atomBetCoinValue);
 
   const routeId = params?.id ?? null;
   const routeMatch = routeId?.match(SEASON_ID_PATTERN) ?? null;
   const routeYear = routeMatch?.[1] ?? null;
   const routeSeason = (routeMatch?.[2] as Season | undefined) ?? null;
 
-  // 表示中の年/季節をセレクトの初期値とし、ページ遷移時は追従させる
   const [selectedYear, setSelectedYear] = useState(
     routeYear ?? thisYear.toString(),
   );
@@ -64,7 +73,6 @@ export default function SeasonNavigation() {
     }
   }
 
-  // 投票対象のシーズンは必ずURLと一致させる
   useEffect(() => {
     if (!routeYear || !routeSeason) return;
     setSelectedYearAtom(routeYear);
@@ -85,19 +93,43 @@ export default function SeasonNavigation() {
     (_, i) => thisYear + 1 - i,
   );
 
+  const targetId = `${selectedYear}-${selectedSeason}`;
+
+  const navigateToSeason = () => {
+    startTransition(() => {
+      router.push(`/seasons/${targetId}`);
+    });
+  };
+
   const handleNavigate = () => {
-    router.push(`/seasons/${selectedYear}-${selectedSeason}`);
+    if (routeId === targetId || isPending) return;
+    if (draftVotes.length > 0) {
+      setConfirmOpen(true);
+      return;
+    }
+    navigateToSeason();
+  };
+
+  const handleConfirmNavigate = () => {
+    setConfirmOpen(false);
+    navigateToSeason();
   };
 
   return (
-    <div className="flex items-center gap-1.5 shrink-0">
-      <Select value={selectedYear} onValueChange={setSelectedYear}>
-        <SelectTrigger className="w-20 h-8 text-xs">
+    <div className="flex shrink-0 items-center gap-1.5">
+      <Select
+        value={selectedYear}
+        onValueChange={setSelectedYear}
+        disabled={isPending}
+      >
+        <SelectTrigger className="h-8 w-20 text-xs" aria-label="年">
           <SelectValue placeholder="年" />
         </SelectTrigger>
         <SelectContent>
           {years.map((y) => (
-            <SelectItem key={y} value={y.toString()}>{y}年</SelectItem>
+            <SelectItem key={y} value={y.toString()}>
+              {y}年
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -105,13 +137,16 @@ export default function SeasonNavigation() {
       <Select
         value={selectedSeason}
         onValueChange={(v) => setSelectedSeason(v as Season)}
+        disabled={isPending}
       >
-        <SelectTrigger className="w-16 h-8 text-xs">
+        <SelectTrigger className="h-8 w-16 text-xs" aria-label="季節">
           <SelectValue placeholder="季" />
         </SelectTrigger>
         <SelectContent>
           {seasons.map((s) => (
-            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+            <SelectItem key={s.id} value={s.id}>
+              {s.name}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -120,9 +155,44 @@ export default function SeasonNavigation() {
         size="sm"
         className="h-8 px-3 text-xs"
         onClick={handleNavigate}
+        disabled={isPending || routeId === targetId}
+        aria-busy={isPending}
       >
-        表示
+        {isPending ? (
+          <>
+            <span
+              className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+              aria-hidden="true"
+            />
+            Loading
+          </>
+        ) : (
+          "表示"
+        )}
       </Button>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>投票内容を破棄しますか？</DialogTitle>
+            <DialogDescription className="pt-2 leading-relaxed">
+              別のシーズンを表示すると、まだ確定していない投票内容は破棄されます。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setConfirmOpen(false)}
+            >
+              キャンセル
+            </Button>
+            <Button type="button" onClick={handleConfirmNavigate}>
+              破棄して表示
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

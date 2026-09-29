@@ -97,7 +97,7 @@ export function VoteDeleteDialog({
                 }}
                 type="button"
               >
-                {isDeleteButtonPressed ? "削除中..." : "削除する"}
+                {isDeleteButtonPressed ? "削除中…" : "削除する"}
               </Button>
             </DialogFooter>
           </>

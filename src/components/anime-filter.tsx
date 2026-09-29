@@ -97,12 +97,13 @@ export function AnimeFilter({
         <button
           type="button"
           onClick={() => onSortOrderChange(sortOrder === "desc" ? "asc" : "desc")}
-          className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          aria-label={sortOrder === "desc" ? "昇順に切り替える" : "降順に切り替える"}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           {sortOrder === "desc" ? (
-            <ArrowDown className="h-3.5 w-3.5" />
+            <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
           ) : (
-            <ArrowUp className="h-3.5 w-3.5" />
+            <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
           )}
         </button>
 
@@ -110,9 +111,10 @@ export function AnimeFilter({
           <button
             type="button"
             onClick={resetFilters}
-            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="フィルターをリセット"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <RotateCcw className="h-3.5 w-3.5" />
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         )}
       </div>

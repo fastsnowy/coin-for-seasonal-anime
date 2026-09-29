@@ -35,12 +35,12 @@ export default async function MyVotesPage() {
           title="ログインが必要です"
           description="投票履歴を確認するにはログインしてください。"
           action={
-            <Link href="/login">
-              <Button className="gap-2">
-                <LogIn className="w-4 h-4" />
+            <Button asChild className="gap-2">
+              <Link href="/login?next=/my-votes">
+                <LogIn className="h-4 w-4" />
                 ログイン
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           }
         />
       </PageShell>
@@ -62,12 +62,12 @@ export default async function MyVotesPage() {
           title="投票履歴がありません"
           description="まだ投票していません。アニメにコインを賭けてみましょう！"
           action={
-            <Link href="/">
-              <Button className="gap-2">
-                <Coins className="w-4 h-4" />
+            <Button asChild className="gap-2">
+              <Link href="/">
+                <Coins className="h-4 w-4" />
                 投票する
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           }
         />
       </PageShell>
@@ -107,12 +107,12 @@ export default async function MyVotesPage() {
           <p className="text-xs text-muted-foreground leading-relaxed mb-3">
             現在、匿名ユーザーとしてご利用中です。Annictアカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
           </p>
-          <Link href="/link">
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <LogIn className="w-3.5 h-3.5" />
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link href="/link">
+              <LogIn className="h-3.5 w-3.5" />
               Annictアカウントを連携
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       )}
     </PageShell>

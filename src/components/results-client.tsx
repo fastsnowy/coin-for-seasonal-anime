@@ -31,23 +31,29 @@ export function ResultsClient({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end gap-1 pb-3 border-b border-border/50">
+      <div
+        className="flex justify-end gap-1 border-b border-border/50 pb-3"
+        role="group"
+        aria-label="表示形式"
+      >
         {(["grid", "table"] as const).map((mode) => (
           <button
             key={mode}
             type="button"
             onClick={() => setViewMode(mode)}
+            aria-label={mode === "grid" ? "グリッド表示" : "一覧表示"}
+            aria-pressed={viewMode === mode}
             className={cn(
-              "h-8 w-8 rounded-md flex items-center justify-center transition-colors",
+              "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
               viewMode === mode
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
             {mode === "grid" ? (
-              <LayoutGrid className="h-3.5 w-3.5" />
+              <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
             ) : (
-              <List className="h-3.5 w-3.5" />
+              <List className="h-3.5 w-3.5" aria-hidden="true" />
             )}
           </button>
         ))}

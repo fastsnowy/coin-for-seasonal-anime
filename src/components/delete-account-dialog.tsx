@@ -68,7 +68,7 @@ export function DeleteAccountDialog() {
               }
             }}
           >
-            {isSubmitting ? "処理中..." : "退会する"}
+            {isSubmitting ? "処理中…" : "退会する"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -29,7 +29,7 @@ export default async function MyPage() {
   } = await supabase.auth.getUser();
 
   if (!user || user.is_anonymous) {
-    redirect("/login");
+    redirect("/login?next=/mypage");
   }
 
   const displayName =
@@ -136,12 +136,12 @@ export default async function MyPage() {
               <p className="text-sm text-muted-foreground">
                 まだ投票していません
               </p>
-              <Link href="/">
-                <Button size="sm" className="gap-1.5">
+              <Button asChild size="sm" className="gap-1.5">
+                <Link href="/">
                   アニメに賭ける
                   <ArrowRight className="h-3.5 w-3.5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           ) : (
             <ul className="space-y-3">
