@@ -38,26 +38,28 @@ export default function Home() {
             <br className="hidden sm:block" />
             期待度を表そう
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <Link href={`/seasons/${currentYear}-${current.id}`}>
-              <Button
-                size="lg"
-                className="h-12 px-8 text-base gap-2 font-semibold active:scale-[0.97] transition-all"
-              >
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="h-12 px-8 text-base font-semibold transition-transform active:scale-[0.97]"
+            >
+              <Link href={`/seasons/${currentYear}-${current.id}`}>
                 今期（{current.name}）に賭ける
                 <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href={`/seasons/${next.year}-${next.id}`}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-12 px-8 text-base gap-2 font-semibold active:scale-[0.97] transition-all"
-              >
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="h-12 px-8 text-base font-semibold transition-transform active:scale-[0.97]"
+            >
+              <Link href={`/seasons/${next.year}-${next.id}`}>
                 来期（{next.name}）に賭ける
                 <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -93,12 +95,12 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-8">
-            <Link href={`/seasons/${currentYear}-${current.id}`}>
-              <Button variant="outline" className="gap-2">
+          <div className="mt-8 text-center">
+            <Button asChild variant="outline" className="gap-2">
+              <Link href={`/seasons/${currentYear}-${current.id}`}>
                 さっそく投票する
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

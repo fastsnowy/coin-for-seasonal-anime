@@ -6,25 +6,25 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const config = {
-  login: {
-    action: loginWithAnnict,
-    label: "Annictでログイン",
-  },
-  link: {
-    action: linkAnnict,
-    label: "Annictアカウントを連携",
-  },
-} as const;
-
-export function AnnictOAuthButton({ mode }: { mode: "login" | "link" }) {
+export function AnnictOAuthButton({
+  mode,
+  nextPath,
+}: {
+  mode: "login" | "link";
+  nextPath?: string;
+}) {
   const [loading, setLoading] = useState(false);
-  const { action, label } = config[mode];
+  const idleLabel =
+    mode === "login" ? "Annictでログイン" : "Annictアカウントを連携";
+  const busyLabel = mode === "login" ? "ログイン中…" : "連携中…";
 
   const handleClick = async () => {
     setLoading(true);
     try {
-      const result = await action();
+      const result =
+        mode === "login"
+          ? await loginWithAnnict(nextPath)
+          : await linkAnnict();
       if (result?.error) {
         toast.error(result.error);
       }
@@ -39,16 +39,20 @@ export function AnnictOAuthButton({ mode }: { mode: "login" | "link" }) {
     <Button
       type="button"
       variant="outline"
-      className="w-full h-11 gap-2.5 font-semibold"
+      className="h-11 w-full gap-2.5 font-semibold"
       onClick={handleClick}
       disabled={loading}
+      aria-busy={loading}
     >
       {loading ? (
-        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+        <div
+          className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+          aria-hidden="true"
+        />
       ) : (
         <Icon icon="simple-icons:annict" className="h-4.5 w-4.5" />
       )}
-      {label}
+      {loading ? busyLabel : idleLabel}
     </Button>
   );
 }

@@ -5,32 +5,45 @@ import { getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
 import { siteName } from "@/config/constant";
+import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 import { CircleAlert } from "lucide-react";
 import { getSeasonName, type Season } from "@/lib/seasons";
 import { ShareButtons } from "@/components/share-buttons";
 
-function ErrorPage({ message }: { message: string }) {
+function ErrorPage({
+  message,
+  description,
+  actionHref = "/",
+  actionLabel = "トップページに戻る",
+}: {
+  message: string;
+  description: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
   return (
     <main className="min-h-dvh bg-background">
       <SiteHeader maxWidth="max-w-4xl" />
       <div className="container mx-auto max-w-4xl px-4 py-6">
         <Breadcrumb items={[{ label: "投票結果" }]} />
         <div className="flex flex-col items-center justify-center gap-6 py-24">
-          <CircleAlert className="w-12 h-12 text-muted-foreground/50" />
-          <div className="text-center space-y-2">
+          <CircleAlert className="h-12 w-12 text-muted-foreground/50" aria-hidden="true" />
+          <div className="space-y-2 text-center">
             <h1 className="text-xl font-bold">{message}</h1>
-            <p className="text-sm text-muted-foreground">
-              投票が削除されたか、URLが正しくない可能性があります。
-            </p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           </div>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
-          >
-            トップページに戻る
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild>
+              <Link href={actionHref}>{actionLabel}</Link>
+            </Button>
+            {actionHref !== "/" && (
+              <Button asChild variant="outline">
+                <Link href="/">トップページに戻る</Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </main>
@@ -82,8 +95,19 @@ export default async function Page({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const { id = "" } = await searchParams;
+  const { id } = await searchParams;
   const supabase = await createSupabaseServerClient();
+
+  if (!id) {
+    return (
+      <ErrorPage
+        message="投票結果のIDが指定されていません"
+        description="履歴から結果を開くか、URLをご確認ください。"
+        actionHref="/my-votes"
+        actionLabel="投票履歴を見る"
+      />
+    );
+  }
 
   const { data, error } = await supabase
     .from(DB_TABLES.COINS)
@@ -92,11 +116,25 @@ export default async function Page({
     .is("deleted_at", null);
 
   if (!data || error || data.length === 0) {
-    return <ErrorPage message="投票データが見つかりませんでした" />;
+    return (
+      <ErrorPage
+        message="投票データが見つかりませんでした"
+        description="投票が削除されたか、URLが正しくない可能性があります。"
+        actionHref="/my-votes"
+        actionLabel="投票履歴を見る"
+      />
+    );
   }
   const [firstVote] = data;
   if (!firstVote?.season) {
-    return <ErrorPage message="投票データが見つかりませんでした" />;
+    return (
+      <ErrorPage
+        message="投票データが見つかりませんでした"
+        description="投票が削除されたか、URLが正しくない可能性があります。"
+        actionHref="/my-votes"
+        actionLabel="投票履歴を見る"
+      />
+    );
   }
 
   const { data: coins, error: coinError } = await supabase
@@ -108,7 +146,12 @@ export default async function Page({
   if (coinError) console.error("Failed to fetch total coin data", coinError);
 
   if (!coins) {
-    return <ErrorPage message="データの取得に失敗しました" />;
+    return (
+      <ErrorPage
+        message="データの取得に失敗しました"
+        description="時間をおいて再度お試しください。"
+      />
+    );
   }
 
   const votedAnnictIds = data

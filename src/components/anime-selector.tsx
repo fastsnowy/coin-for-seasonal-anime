@@ -11,7 +11,7 @@ import { useAtomValue } from "jotai";
 import { useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { Coins, RotateCcw } from "lucide-react";
-import { useRef } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { VoteConfirm } from "./anime-vote-confirm";
 import { Button } from "./ui/button";
@@ -23,7 +23,9 @@ export function AnimeSelector() {
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
   const seasonName = `${year}-${season}`;
-  const prevTotalRef = useRef(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [frozenTotal, setFrozenTotal] = useState(0);
 
   const resetHandler = () => {
     resetAllBetCoins();
@@ -32,41 +34,49 @@ export function AnimeSelector() {
   };
 
   const selectCount = currentStatus.length;
-  const totalCoinValue = currentStatus.reduce(
+  const liveTotal = currentStatus.reduce(
     (acc, item) => acc + (item.coin_value || 0),
     0,
   );
+  const totalCoinValue = isSubmitting ? frozenTotal : liveTotal;
 
-  const totalChanged = totalCoinValue !== prevTotalRef.current;
-  prevTotalRef.current = totalCoinValue;
-
-  if (selectCount === 0) return null;
+  if (selectCount === 0 && !confirmOpen) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 animate-slide-up-bar">
-      <div className="bg-card/80 backdrop-blur-2xl border-t border-border/50 pb-safe">
+    <div className="fixed right-0 bottom-0 left-0 z-50 animate-slide-up-bar">
+      <div className="border-t border-border/50 bg-card/80 pb-safe backdrop-blur-2xl">
         <div className="container mx-auto max-w-5xl px-4 py-3">
           <div className="flex items-center gap-3">
             <Button
               size="icon"
               variant="ghost"
               onClick={resetHandler}
+              disabled={isSubmitting}
+              aria-label="投票内容をリセット"
               className="h-9 w-9 shrink-0 rounded-lg text-muted-foreground hover:text-foreground"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
             </Button>
 
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-coin-muted border border-coin/10">
-              <Coins className="w-4 h-4 shrink-0 text-coin" />
+            <div className="flex items-center gap-2 rounded-full border border-coin/10 bg-coin-muted px-4 py-1.5">
+              <Coins className="h-4 w-4 shrink-0 text-coin" aria-hidden="true" />
               <span
-                className={`font-bold text-lg text-coin tabular-nums ${totalChanged ? "animate-coin-bounce" : ""}`}
+                key={totalCoinValue}
+                className="animate-coin-bounce text-lg font-bold text-coin tabular-nums"
               >
                 {totalCoinValue}
               </span>
             </div>
 
             <div className="ml-auto">
-              <VoteConfirm seasonName={seasonName} />
+              <VoteConfirm
+                seasonName={seasonName}
+                onOpenChange={setConfirmOpen}
+                onSubmittingChange={(submitting) => {
+                  if (submitting) setFrozenTotal(liveTotal);
+                  setIsSubmitting(submitting);
+                }}
+              />
             </div>
           </div>
         </div>

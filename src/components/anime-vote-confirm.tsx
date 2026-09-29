@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { CoinStepper } from "@/components/coin-stepper";
 import {
   atomBetAnimeWorkId,
   atomBetCoinValue,
@@ -49,110 +50,151 @@ const createVote = async (
   }
 };
 
-export function VoteConfirm({ seasonName }: { seasonName: string }) {
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+export function VoteConfirm({
+  seasonName,
+  onOpenChange,
+  onSubmittingChange,
+}: {
+  seasonName: string;
+  onOpenChange?: (open: boolean) => void;
+  onSubmittingChange?: (submitting: boolean) => void;
+}) {
   const betCoinValue = useAtomValue(atomBetCoinValue);
   const resetAllBetCoins = useSetAtom(atomResetBetCoins);
   const resetBetAnimeWorkId = useResetAtom(atomBetAnimeWorkId);
+  const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
+  const submittedItemsRef = useRef<BetAnimes>([]);
   const router = useRouter();
-  const totalCoins = betCoinValue.reduce(
+  const displayItems = isSubmitting ? submittedItemsRef.current : betCoinValue;
+  const totalCoins = displayItems.reduce(
     (acc, item) => acc + item.coin_value,
     0,
   );
 
   const handleSubmit = async () => {
-    if (isSubmitting || isSubmittingRef.current) return;
+    if (isSubmitting || isSubmittingRef.current || betCoinValue.length === 0) {
+      return;
+    }
 
+    submittedItemsRef.current = betCoinValue;
     setIsSubmitting(true);
     isSubmittingRef.current = true;
+    onSubmittingChange?.(true);
 
     try {
-      const result = await createVote(betCoinValue, seasonName);
+      const result = await createVote(submittedItemsRef.current, seasonName);
 
       if (result) {
         const { resultId } = result;
 
-        import("canvas-confetti").then(({ default: confetti }) => {
-          confetti({
-            particleCount: 120,
-            spread: 80,
-            origin: { y: 0.85 },
-            colors: [
-              "#FFD700",
-              "#FFC107",
-              "#FFECB3",
-              "#FFFFFF",
-              "#FFF8E1",
-            ],
+        if (!prefersReducedMotion()) {
+          import("canvas-confetti").then(({ default: confetti }) => {
+            confetti({
+              particleCount: 120,
+              spread: 80,
+              origin: { y: 0.85 },
+              colors: ["#FFD700", "#FFC107", "#FFECB3", "#FFFFFF", "#FFF8E1"],
+            });
           });
-        });
+        }
 
         resetAllBetCoins();
         resetBetAnimeWorkId();
         router.push(`/results?id=${resultId}`);
       } else {
+        submittedItemsRef.current = [];
         setIsSubmitting(false);
         isSubmittingRef.current = false;
+        onSubmittingChange?.(false);
       }
     } catch (error) {
       console.error("投票エラー:", error);
+      submittedItemsRef.current = [];
       setIsSubmitting(false);
       isSubmittingRef.current = false;
+      onSubmittingChange?.(false);
     }
   };
 
   return (
-    <Sheet>
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        if (isSubmitting) return;
+        setOpen(next);
+        onOpenChange?.(next);
+      }}
+    >
       <SheetTrigger asChild>
         <Button
           size="lg"
-          className="h-10 px-5 gap-1.5 font-semibold active:scale-[0.97] transition-all"
+          className="h-10 gap-1.5 px-5 font-semibold transition-transform active:scale-[0.97]"
           disabled={betCoinValue.length === 0}
         >
           投票確定
           <ChevronRight className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-2xl">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl"
+        aria-busy={isSubmitting}
+        onPointerDownOutside={(event) => {
+          if (isSubmitting) event.preventDefault();
+        }}
+        onEscapeKeyDown={(event) => {
+          if (isSubmitting) event.preventDefault();
+        }}
+      >
         <SheetHeader className="text-center">
-          <div className="mx-auto w-10 h-1 bg-muted-foreground/20 rounded-full mb-3" />
+          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted-foreground/20" />
           <SheetTitle className="text-lg">投票内容の確認</SheetTitle>
-          <SheetDescription>以下の内容で投票します</SheetDescription>
+          <SheetDescription>
+            コイン数を調整してから投票できます
+          </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4 space-y-2 max-h-[50vh] overflow-y-auto px-1">
-          {betCoinValue.length > 0 ? (
+        <div className="mt-4 max-h-[50vh] space-y-2 overflow-y-auto overscroll-contain px-1">
+          {displayItems.length > 0 ? (
             <>
-              {betCoinValue.map((item) => (
+              {displayItems.map((item) => (
                 <div
                   key={item.annict_id}
-                  className="flex justify-between items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50"
+                  className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/50 p-3"
                 >
-                  <span className="text-sm flex-1 line-clamp-2 leading-snug">
+                  <span className="min-w-0 flex-1 line-clamp-2 text-sm leading-snug">
                     {item.title}
                   </span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Coins className="w-3.5 h-3.5 text-coin" />
-                    <span className="font-semibold text-sm tabular-nums text-coin">
-                      {item.coin_value}
-                    </span>
+                  <div className="w-36 shrink-0">
+                    <CoinStepper
+                      workId={item.annict_id}
+                      title={item.title}
+                      confirmOnZero
+                      disabled={isSubmitting}
+                    />
                   </div>
                 </div>
               ))}
 
-              <div className="flex justify-between items-center p-3 rounded-lg bg-coin-muted border border-coin/15 mt-3">
-                <span className="font-semibold text-sm">合計</span>
+              <div className="mt-3 flex items-center justify-between rounded-lg border border-coin/15 bg-coin-muted p-3">
+                <span className="text-sm font-semibold">合計</span>
                 <div className="flex items-center gap-2">
-                  <Coins className="w-5 h-5 text-coin" />
-                  <span className="font-bold text-xl text-coin tabular-nums">
+                  <Coins className="h-5 w-5 text-coin" aria-hidden="true" />
+                  <span className="text-xl font-bold text-coin tabular-nums">
                     {totalCoins}
                   </span>
                 </div>
               </div>
             </>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
+            <p className="py-8 text-center text-muted-foreground">
               現在、投票内容はありません。
             </p>
           )}
@@ -160,20 +202,31 @@ export function VoteConfirm({ seasonName }: { seasonName: string }) {
 
         <SheetFooter className="mt-5 gap-2 sm:gap-2">
           <SheetClose asChild>
-            <Button variant="outline" disabled={isSubmitting} className="flex-1">
+            <Button
+              variant="outline"
+              disabled={isSubmitting}
+              className="flex-1"
+            >
               キャンセル
             </Button>
           </SheetClose>
           <Button
             onClick={handleSubmit}
-            disabled={betCoinValue.length === 0 || isSubmitting}
+            disabled={displayItems.length === 0 || isSubmitting}
             className="flex-1 gap-1.5"
+            aria-busy={isSubmitting}
           >
             {isSubmitting ? (
-              "送信中..."
+              <>
+                <span
+                  className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+                  aria-hidden="true"
+                />
+                送信中…
+              </>
             ) : (
               <>
-                <Coins className="w-4 h-4" />
+                <Coins className="h-4 w-4" />
                 投票する
               </>
             )}

@@ -15,9 +15,10 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
         <li>
           <Link
             href="/"
-            className="hover:text-foreground transition-colors flex items-center gap-1"
+            aria-label="ホーム"
+            className="flex items-center gap-1 transition-colors hover:text-foreground"
           >
-            <Home className="h-3 w-3" />
+            <Home className="h-3 w-3" aria-hidden="true" />
             <span className="hidden sm:inline">ホーム</span>
           </Link>
         </li>

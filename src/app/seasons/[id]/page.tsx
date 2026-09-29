@@ -1,7 +1,6 @@
 import AnimeGrid from "@/components/anime-grid";
 import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
-import SeasonNavigation from "@/components/season-navigation";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
@@ -12,9 +11,6 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getJSTDate } from "@/lib/date-utils";
-
-
-import { SiteHeader } from "@/components/site-header";
 
 export async function generateMetadata({
   params,
@@ -83,22 +79,13 @@ export default async function SeasonPage({
 
   if (!coins) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">{siteName}</h1>
-        <SeasonNavigation />
-        <div className="text-center py-10">データの取得に失敗しました</div>
-      </main>
+      <div className="container mx-auto px-4 py-8">
+        <div className="py-10 text-center">データの取得に失敗しました</div>
+      </div>
     );
   }
   return (
-    <main className="min-h-dvh bg-background">
-      <SiteHeader maxWidth="max-w-5xl">
-        <div className="flex-1 overflow-x-auto no-scrollbar">
-          <SeasonNavigation />
-        </div>
-      </SiteHeader>
-
-      <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
+    <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
         <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
         <h2 className="text-center text-sm text-muted-foreground mb-5">
@@ -114,15 +101,14 @@ export default async function SeasonPage({
 
         <Suspense
           fallback={
-            <div className="flex flex-col items-center py-20 gap-3">
+            <div className="flex flex-col items-center gap-3 py-20">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-r-transparent" />
-              <p className="text-xs text-muted-foreground">読み込み中...</p>
+              <p className="text-xs text-muted-foreground">Loading</p>
             </div>
           }
         >
           <AnimeGrid animeList={animeList} coins={coins} />
         </Suspense>
-      </div>
-    </main>
+    </div>
   );
 }

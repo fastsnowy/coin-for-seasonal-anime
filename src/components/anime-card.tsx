@@ -1,19 +1,16 @@
 "use client";
-import { useAtom } from "jotai";
 import { memo } from "react";
 
+import { CoinStepper } from "@/components/coin-stepper";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
-import { atomBetAnimeWork, atomBetAnimeWorkId } from "@/global/atom";
 import type { Anime } from "@/lib/anime-data";
 import { cn } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { Coins, Eye } from "lucide-react";
 import Link from "next/link";
-import { NumberInput } from "./number-input";
 
-type workProps = { work: Anime };
-type animeCardProps = {
+type AnimeCardProps = {
   work: Anime;
   coins: {
     annict_id: number | null;
@@ -27,41 +24,20 @@ type animeCardProps = {
   }[];
 };
 
-const CoinStepper = ({ work }: workProps) => {
-  const [, setBetWorkId] = useAtom(atomBetAnimeWorkId);
-  const [betWork, setBetWork] = useAtom(atomBetAnimeWork(work.id));
-  return (
-    <NumberInput
-      min={0}
-      max={100}
-      stepper={10}
-      defaultValue={0}
-      value={betWork.amount}
-      onValueChange={(value) => {
-        if (value !== undefined) {
-          setBetWork((prev) => ({
-            ...prev,
-            work_id: work.id,
-            title: work.title,
-            amount: value,
-          }));
-        }
-        setBetWorkId((prev) => {
-          if (!prev.includes(work.id)) return [...prev, work.id];
-          return prev;
-        });
-      }}
-    />
-  );
-};
-const MemoCoinStepper = memo(CoinStepper);
+const MemoCoinStepper = memo(function MemoCoinStepper({
+  work,
+}: {
+  work: Anime;
+}) {
+  return <CoinStepper workId={work.id} title={work.title} />;
+});
 
 export function AnimeCard({
   work,
   coins,
   isVoted,
   votedCoins,
-}: animeCardProps) {
+}: AnimeCardProps) {
   const coinValue =
     coins.find((c) => c.annict_id === work.id)?.total_coin_value || 0;
   const votedCoinValue =
@@ -71,8 +47,9 @@ export function AnimeCard({
   return (
     <div
       className={cn(
-        "group rounded-xl overflow-hidden transition-all duration-300",
-        "bg-card border border-border",
+        "group overflow-hidden rounded-xl duration-300",
+        "border border-border bg-card",
+        "transition-[border-color,box-shadow]",
         hasVote
           ? "border-coin/25 shadow-[0_0_20px_-5px] shadow-coin/10"
           : "hover:border-border/80 hover:shadow-lg hover:shadow-black/10",
@@ -82,18 +59,20 @@ export function AnimeCard({
         href={work.officialSiteUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="block relative"
+        className="relative block"
       >
         <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
           <img
             src={work.image}
             alt={work.title}
-            className="object-cover w-full h-full group-hover:scale-[1.03] transition-transform duration-500"
+            width={320}
+            height={180}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         </AspectRatio>
         {coinValue > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-xs">
-            <Coins className="h-3 w-3 text-coin" />
+          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-xs backdrop-blur-sm">
+            <Coins className="h-3 w-3 text-coin" aria-hidden="true" />
             <span className="font-semibold text-white tabular-nums">
               {coinValue.toLocaleString()}
             </span>
@@ -101,15 +80,15 @@ export function AnimeCard({
         )}
       </a>
 
-      <div className="p-3 space-y-2">
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.5em]">
+      <div className="space-y-2 p-3">
+        <h3 className="line-clamp-2 min-h-[2.5em] text-sm leading-snug font-semibold">
           {work.title}
         </h3>
 
         <div className="flex items-center gap-1.5">
           <Badge
             variant="secondary"
-            className="text-[10px] px-1.5 py-0 h-[18px] font-medium"
+            className="h-[18px] px-1.5 py-0 text-[10px] font-medium"
           >
             {work.media}
           </Badge>
@@ -118,7 +97,8 @@ export function AnimeCard({
               href={`https://twitter.com/${work.twitterUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted transition-colors"
+              aria-label={`${work.title}のX`}
+              className="inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-muted"
             >
               <Icon icon="fa6-brands:x-twitter" className="h-3 w-3" />
             </Link>
@@ -127,31 +107,38 @@ export function AnimeCard({
             href={`https://annict.com/works/${work.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-6 w-6 rounded-md hover:bg-muted transition-colors"
+            aria-label={`${work.title}のAnnictページ`}
+            className="inline-flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-muted"
           >
             <Icon icon="uil:letter-english-a" className="h-3.5 w-3.5" />
           </Link>
           <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-            <Eye className="h-3 w-3" />
-            <span className="tabular-nums">{work.watchersCount.toLocaleString()}</span>
+            <Eye className="h-3 w-3" aria-hidden="true" />
+            <span className="tabular-nums">
+              {work.watchersCount.toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="px-3 pb-3 pt-1 border-t border-border/50">
+      <div className="border-t border-border/50 px-3 pt-1 pb-3">
         {isVoted ? (
           <div
             className={cn(
-              "flex items-center justify-center gap-2 py-2.5 rounded-lg",
-              hasVote
-                ? "bg-coin-muted"
-                : "bg-muted/50",
+              "flex items-center justify-center gap-2 rounded-lg py-2.5",
+              hasVote ? "bg-coin-muted" : "bg-muted/50",
             )}
           >
-            <Coins className={cn("h-4 w-4", hasVote ? "text-coin" : "text-muted-foreground")} />
+            <Coins
+              className={cn(
+                "h-4 w-4",
+                hasVote ? "text-coin" : "text-muted-foreground",
+              )}
+              aria-hidden="true"
+            />
             <span
               className={cn(
-                "font-bold text-base tabular-nums",
+                "text-base font-bold tabular-nums",
                 hasVote ? "text-coin" : "text-muted-foreground",
               )}
             >

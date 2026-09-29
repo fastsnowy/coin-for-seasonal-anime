@@ -1,26 +1,22 @@
 import { Breadcrumb } from "@/components/breadcrumb";
+import { SiteHeader } from "@/components/site-header";
+import { Button } from "@/components/ui/button";
 import { VoteCardActions } from "@/components/vote-card-actions";
+import {
+  VoteGroupCard,
+  collectThumbnailAnnictIds,
+  groupVotes,
+} from "@/components/vote-group-card";
 import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
+import { type Anime, getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getSeasonName, type Season } from "@/lib/seasons";
-import { Coins, LogIn, History } from "lucide-react";
-import Link from "next/link";
+import { Coins, History, LogIn } from "lucide-react";
 import type { Metadata } from "next";
-import { Button } from "@/components/ui/button";
-import { SiteHeader } from "@/components/site-header";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: `投票履歴 | ${siteName}`,
-};
-
-type VoteGroup = {
-  createdId: string;
-  season: string;
-  seasonLabel: string;
-  totalCoins: number;
-  animeCount: number;
-  createdAt: string;
 };
 
 export default async function MyVotesPage() {
@@ -29,20 +25,22 @@ export default async function MyVotesPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isLinkedAccount = Boolean(user && !user.is_anonymous);
+
   if (!user) {
     return (
-      <PageShell>
+      <PageShell isLinkedAccount={false}>
         <EmptyState
           icon={<LogIn className="w-10 h-10 text-muted-foreground/40" />}
           title="ログインが必要です"
           description="投票履歴を確認するにはログインしてください。"
           action={
-            <Link href="/login">
-              <Button className="gap-2">
-                <LogIn className="w-4 h-4" />
+            <Button asChild className="gap-2">
+              <Link href="/login?next=/my-votes">
+                <LogIn className="h-4 w-4" />
                 ログイン
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           }
         />
       </PageShell>
@@ -58,53 +56,31 @@ export default async function MyVotesPage() {
 
   if (!votes || votes.length === 0) {
     return (
-      <PageShell>
+      <PageShell isLinkedAccount={isLinkedAccount}>
         <EmptyState
           icon={<History className="w-10 h-10 text-muted-foreground/40" />}
           title="投票履歴がありません"
           description="まだ投票していません。アニメにコインを賭けてみましょう！"
           action={
-            <Link href="/">
-              <Button className="gap-2">
-                <Coins className="w-4 h-4" />
+            <Button asChild className="gap-2">
+              <Link href="/">
+                <Coins className="h-4 w-4" />
                 投票する
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           }
         />
       </PageShell>
     );
   }
 
-  const grouped = new Map<string, VoteGroup>();
-  for (const vote of votes) {
-    const existing = grouped.get(vote.created_id);
-    if (existing) {
-      existing.totalCoins += vote.coin_value;
-      existing.animeCount += 1;
-    } else {
-      const seasonMatch = vote.season.match(
-        /^(\d{4})-(spring|summer|autumn|winter)$/,
-      );
-      const seasonLabel = seasonMatch
-        ? `${seasonMatch[1]}年${getSeasonName(seasonMatch[2] as Season)}`
-        : vote.season;
-
-      grouped.set(vote.created_id, {
-        createdId: vote.created_id,
-        season: vote.season,
-        seasonLabel,
-        totalCoins: vote.coin_value,
-        animeCount: 1,
-        createdAt: vote.created_at,
-      });
-    }
-  }
-
-  const voteGroups = Array.from(grouped.values());
+  const voteGroups = groupVotes(votes);
+  const animeById = await fetchAnimeByIds(
+    collectThumbnailAnnictIds(voteGroups),
+  );
 
   return (
-    <PageShell>
+    <PageShell isLinkedAccount={isLinkedAccount}>
       <div className="mt-6 mb-8 text-center space-y-1">
         <h1 className="text-2xl font-extrabold tracking-tight">投票履歴</h1>
         <p className="text-sm text-muted-foreground">
@@ -114,75 +90,56 @@ export default async function MyVotesPage() {
         </p>
       </div>
 
-      <div className="space-y-3">
+      <ul className="space-y-3">
         {voteGroups.map((group) => (
-          <div
-            key={group.createdId}
-            className="rounded-xl border border-border bg-card p-4"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <Link
-                href={`/results?id=${group.createdId}`}
-                className="flex-1 min-w-0 hover:opacity-80 transition-opacity"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                      {group.seasonLabel}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {group.animeCount}作品
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(group.createdAt).toLocaleDateString("ja-JP", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZone: "Asia/Tokyo",
-                    })}
-                  </p>
-                </div>
-              </Link>
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="flex items-center gap-1.5">
-                  <Coins className="w-4 h-4 text-coin" />
-                  <span className="font-bold text-lg tabular-nums text-coin">
-                    {group.totalCoins}
-                  </span>
-                </div>
-                <VoteCardActions createdId={group.createdId} />
-              </div>
-            </div>
-          </div>
+          <li key={group.createdId}>
+            <VoteGroupCard
+              group={group}
+              animeById={animeById}
+              actions={<VoteCardActions createdId={group.createdId} />}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {user.is_anonymous && (
         <div className="mt-8 rounded-lg border border-border bg-muted/50 p-4">
           <p className="text-xs text-muted-foreground leading-relaxed mb-3">
             現在、匿名ユーザーとしてご利用中です。Annictアカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
           </p>
-          <Link href="/link">
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <LogIn className="w-3.5 h-3.5" />
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link href="/link">
+              <LogIn className="h-3.5 w-3.5" />
               Annictアカウントを連携
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       )}
     </PageShell>
   );
 }
 
-function PageShell({ children }: { children: React.ReactNode }) {
+function PageShell({
+  children,
+  isLinkedAccount,
+}: {
+  children: React.ReactNode;
+  isLinkedAccount: boolean;
+}) {
   return (
     <main className="min-h-dvh bg-background">
       <SiteHeader maxWidth="max-w-4xl" />
       <div className="container mx-auto max-w-2xl px-4 py-6">
-        <Breadcrumb items={[{ label: "投票履歴" }]} />
+        <Breadcrumb
+          items={
+            isLinkedAccount
+              ? [
+                  { label: "マイページ", href: "/mypage" },
+                  { label: "投票履歴" },
+                ]
+              : [{ label: "投票履歴" }]
+          }
+        />
         {children}
       </div>
     </main>
@@ -210,4 +167,16 @@ function EmptyState({
       {action}
     </div>
   );
+}
+
+async function fetchAnimeByIds(annictIds: number[]) {
+  if (annictIds.length === 0) return new Map<number, Anime>();
+
+  try {
+    const animeList = await getAnimeByIds(annictIds);
+    return new Map(animeList.map((anime) => [anime.id, anime]));
+  } catch (error) {
+    console.error("Failed to fetch anime for vote history", error);
+    return new Map<number, Anime>();
+  }
 }
