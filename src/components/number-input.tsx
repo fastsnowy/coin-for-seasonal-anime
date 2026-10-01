@@ -66,7 +66,7 @@ export const NumberInput = ({
         disabled={disabled || value <= min}
         aria-label="コインを減らす"
         className={cn(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md duration-150",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full duration-150",
           "transition-[transform,background-color,border-color,opacity] active:scale-90",
           "border border-border bg-secondary text-secondary-foreground",
           "disabled:pointer-events-none disabled:opacity-30",
@@ -101,7 +101,7 @@ export const NumberInput = ({
         disabled={disabled || value >= max}
         aria-label="コインを増やす"
         className={cn(
-          "flex h-7 w-7 shrink-0 items-center justify-center rounded-md duration-150",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full duration-150",
           "transition-[transform,background-color,border-color,opacity] active:scale-90",
           "border border-border bg-secondary text-secondary-foreground",
           "disabled:pointer-events-none disabled:opacity-30",

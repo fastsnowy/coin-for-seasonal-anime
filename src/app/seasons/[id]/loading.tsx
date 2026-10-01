@@ -1,3 +1,4 @@
+import { SeasonLoadingIndicator } from "@/components/season-loading-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CARD_SKELETON_IDS = [
@@ -25,9 +26,9 @@ function AnimeCardSkeleton() {
       </div>
       <div className="border-t border-border/50 px-3 pt-1 pb-3">
         <div className="flex items-center justify-between gap-2 py-0.5">
-          <Skeleton className="h-7 w-7 rounded-md" />
+          <Skeleton className="h-7 w-7 rounded-full" />
           <Skeleton className="h-4 w-10" />
-          <Skeleton className="h-7 w-7 rounded-md" />
+          <Skeleton className="h-7 w-7 rounded-full" />
         </div>
       </div>
     </div>
@@ -37,6 +38,7 @@ function AnimeCardSkeleton() {
 export default function SeasonLoading() {
   return (
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
+      <SeasonLoadingIndicator />
       <Skeleton className="mb-3 h-3 w-40" />
 
       <div className="mb-8 mt-6 space-y-2 border-l-2 border-border pl-4">
