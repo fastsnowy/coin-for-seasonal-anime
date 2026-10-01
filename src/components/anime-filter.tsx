@@ -131,14 +131,14 @@ export function AnimeFilter({
             {activeFilterCount > 0 && (
               <Badge
                 variant="default"
-                className="ml-0.5 h-4 min-w-4 rounded-full p-0 flex items-center justify-center text-[10px]"
+                className="ml-0.5 h-4 min-w-4 rounded-sm p-0 flex items-center justify-center text-[10px]"
               >
                 {activeFilterCount}
               </Badge>
             )}
           </button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-2xl">
+        <SheetContent side="bottom" className="rounded-t-xl">
           <SheetHeader className="text-center">
             <div className="mx-auto w-10 h-1 bg-muted-foreground/20 rounded-full mb-3" />
             <SheetTitle>フィルター</SheetTitle>

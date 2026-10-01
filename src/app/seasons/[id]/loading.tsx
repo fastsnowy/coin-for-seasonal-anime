@@ -11,7 +11,7 @@ const CARD_SKELETON_IDS = [
 
 function AnimeCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       <Skeleton className="aspect-video rounded-none" />
       <div className="space-y-2 p-3">
         <div className="min-h-[2.5em] space-y-1.5">
@@ -19,15 +19,15 @@ function AnimeCardSkeleton() {
           <Skeleton className="h-4 w-2/3" />
         </div>
         <div className="flex items-center gap-1.5">
-          <Skeleton className="h-4.5 w-10 rounded-full" />
+          <Skeleton className="h-4.5 w-10 rounded-sm" />
           <Skeleton className="ml-auto h-3 w-10" />
         </div>
       </div>
       <div className="border-t border-border/50 px-3 pt-1 pb-3">
         <div className="flex items-center justify-between gap-2 py-0.5">
-          <Skeleton className="h-7 w-7 rounded-full" />
+          <Skeleton className="h-7 w-7 rounded-md" />
           <Skeleton className="h-4 w-10" />
-          <Skeleton className="h-7 w-7 rounded-full" />
+          <Skeleton className="h-7 w-7 rounded-md" />
         </div>
       </div>
     </div>
@@ -39,8 +39,9 @@ export default function SeasonLoading() {
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
       <Skeleton className="mb-3 h-3 w-40" />
 
-      <div className="mb-5 flex justify-center">
-        <Skeleton className="h-5 w-28" />
+      <div className="mb-8 mt-6 space-y-2 border-l-2 border-border pl-4">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-8 w-64 max-w-full sm:h-9" />
       </div>
 
       <div className="mb-4 flex items-center justify-between gap-3">

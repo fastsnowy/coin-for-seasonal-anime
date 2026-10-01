@@ -34,13 +34,13 @@ export function VoteGroupCard({
   const restCount = group.items.length - thumbnails.length;
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:border-coin/30">
+    <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-coin/30">
       <div className="flex items-center justify-between gap-3">
         <Link
           href={`/results?id=${group.createdId}`}
           className="flex min-w-0 flex-1 items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+          <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
             {group.seasonLabel}
           </span>
           <span className="truncate text-xs text-muted-foreground">
@@ -76,7 +76,7 @@ export function VoteGroupCard({
                       className="h-full w-full object-cover"
                     />
                   ) : null}
-                  <span className="absolute bottom-1 right-1 rounded-full bg-black/65 px-1.5 text-[10px] font-semibold tabular-nums text-white backdrop-blur-sm">
+                  <span className="absolute bottom-1 right-1 rounded-md bg-black/65 px-1.5 text-[10px] font-semibold tabular-nums text-white backdrop-blur-sm">
                     {item.coinValue}
                   </span>
                 </AspectRatio>

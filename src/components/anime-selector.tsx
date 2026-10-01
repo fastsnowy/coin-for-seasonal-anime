@@ -44,7 +44,7 @@ export function AnimeSelector() {
 
   return (
     <div className="fixed right-0 bottom-0 left-0 z-50 animate-slide-up-bar">
-      <div className="border-t border-border/50 bg-card/80 pb-safe backdrop-blur-2xl">
+      <div className="border-t border-border bg-card pb-safe">
         <div className="container mx-auto max-w-5xl px-4 py-3">
           <div className="flex items-center gap-3">
             <Button
@@ -58,7 +58,7 @@ export function AnimeSelector() {
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
             </Button>
 
-            <div className="flex items-center gap-2 rounded-full border border-coin/10 bg-coin-muted px-4 py-1.5">
+            <div className="flex items-center gap-2 rounded-md bg-coin-muted px-3 py-1.5">
               <Coins className="h-4 w-4 shrink-0 text-coin" aria-hidden="true" />
               <span
                 key={totalCoinValue}

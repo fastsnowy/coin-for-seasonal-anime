@@ -1,6 +1,6 @@
 import type { Anime } from "@/lib/anime-data";
 import { cn } from "@/lib/utils";
-import { Award, Coins, Eye, Medal, Trophy } from "lucide-react";
+import { Coins, Eye } from "lucide-react";
 
 interface RankingSectionProps {
   animeList: Anime[];
@@ -10,12 +10,6 @@ interface RankingSectionProps {
     uu: number | null;
   }[];
 }
-
-const rankConfig = [
-  { icon: Trophy, color: "text-yellow-500", bg: "bg-yellow-500/10" },
-  { icon: Award, color: "text-gray-400", bg: "bg-gray-400/10" },
-  { icon: Medal, color: "text-amber-700", bg: "bg-amber-700/10" },
-];
 
 export default function RankingSection({
   animeList,
@@ -33,52 +27,61 @@ export default function RankingSection({
   if (ranked.length === 0 || ranked[0].totalCoins === 0) return null;
 
   return (
-    <div className="mb-6">
-      <div className="flex items-center gap-2 mb-3 px-0.5">
-        <Trophy className="h-4 w-4 text-coin" />
-        <h3 className="font-semibold text-sm">コインランキング</h3>
+    <section className="mb-8" aria-labelledby="coin-ranking-heading">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h3
+          id="coin-ranking-heading"
+          className="text-sm font-semibold tracking-wide"
+        >
+          コインランキング
+        </h3>
+        <span className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground">
+          TOP {ranked.length}
+        </span>
       </div>
-      <div className="flex gap-2.5 overflow-x-auto scroll-snap-x hide-scrollbar pb-1 -mx-1 px-1">
-        {ranked.map((anime, i) => {
-          const rank = rankConfig[i];
-          const RankIcon = rank.icon;
-          return (
-            <div
-              key={anime.id}
+      <ol className="grid border-y border-border sm:grid-cols-3">
+        {ranked.map((anime, i) => (
+          <li
+            key={anime.id}
+            className={cn(
+              "flex min-w-0 items-start gap-4 py-4 sm:py-5",
+              i > 0 &&
+                "border-t border-border sm:border-t-0 sm:border-l sm:pl-5",
+              i < ranked.length - 1 && "sm:pr-5",
+            )}
+          >
+            <span
+              aria-label={`${i + 1}位`}
               className={cn(
-                "shrink-0 scroll-snap-start rounded-xl border border-border bg-card p-3 w-[220px] sm:w-[240px]",
-                i === 0 && "border-coin/20 bg-coin-muted",
+                "shrink-0 text-4xl font-medium leading-none tracking-tighter tabular-nums",
+                i === 0 ? "text-coin" : "text-muted-foreground",
               )}
             >
-              <div className="flex items-start gap-2.5">
-                <div
-                  className={cn(
-                    "h-7 w-7 rounded-full flex items-center justify-center shrink-0",
-                    rank.bg,
-                  )}
-                >
-                  <RankIcon className={cn("h-3.5 w-3.5", rank.color)} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-sm line-clamp-1 mb-1">
-                    {anime.title}
-                  </h4>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1 text-coin font-medium">
-                      <Coins className="h-3 w-3" />
-                      {anime.totalCoins.toLocaleString()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {anime.watchersCount.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h4
+                className="mb-2 line-clamp-2 text-sm font-semibold leading-snug"
+                title={anime.title}
+              >
+                {anime.title}
+              </h4>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1 font-semibold text-foreground tabular-nums">
+                  <Coins className="h-3 w-3 text-coin" aria-hidden="true" />
+                  <span className="sr-only">コイン数 </span>
+                  {anime.totalCoins.toLocaleString()}
+                </span>
+                <span className="flex items-center gap-1 tabular-nums">
+                  <Eye className="h-3 w-3" aria-hidden="true" />
+                  <span className="sr-only">視聴者数 </span>
+                  {anime.watchersCount.toLocaleString()}
+                </span>
               </div>
             </div>
-          );
-        })}
-      </div>
-    </div>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

@@ -22,9 +22,8 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--coin-muted)_0%,transparent_70%)]" />
         <div className="relative container mx-auto max-w-3xl px-4 py-28 md:py-40 text-center">
-          <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-coin-muted mb-6">
+          <div className="inline-flex items-center justify-center rounded-xl border border-coin/15 bg-coin-muted p-3 mb-6">
             <Coins className="h-8 w-8 text-coin" />
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-2">
@@ -83,9 +82,9 @@ export default function Home() {
             ].map((item) => (
               <div
                 key={item.title}
-                className="rounded-xl border border-border bg-card p-6 space-y-3"
+                className="rounded-lg border border-border bg-card p-6 space-y-3"
               >
-                <div className="inline-flex p-2.5 rounded-lg bg-coin-muted">
+                <div className="inline-flex rounded-md bg-coin-muted p-2.5">
                   <item.icon className="h-5 w-5 text-coin" />
                 </div>
                 <h3 className="font-semibold">{item.title}</h3>
@@ -108,7 +107,7 @@ export default function Home() {
       {/* Disclaimer */}
       <section className="py-8 px-4 border-t border-border/50">
         <div className="container mx-auto max-w-2xl">
-          <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-5">
             <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div>
               <h3 className="text-sm font-semibold mb-1">注意事項</h3>

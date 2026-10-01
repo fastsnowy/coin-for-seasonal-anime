@@ -88,14 +88,18 @@ export default async function SeasonPage({
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
         <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
-        <h2 className="text-center text-sm text-muted-foreground mb-5">
-          {seasonType === "current"
-            ? "今期"
-            : seasonType === "next"
-              ? "来期"
-              : `${year}年 ${seasonName}`}
-          のアニメ
-        </h2>
+        <div className="mb-8 mt-6 border-l-2 border-coin pl-4">
+          <p className="mb-2 text-[10px] font-medium tracking-[0.2em] text-muted-foreground">
+            {seasonType === "current"
+              ? "今期のラインナップ"
+              : seasonType === "next"
+                ? "来期のラインナップ"
+                : "シーズンアーカイブ"}
+          </p>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {year}年 {seasonName}のアニメ
+          </h2>
+        </div>
 
         <RankingSection animeList={animeList} coins={coins} />
 
