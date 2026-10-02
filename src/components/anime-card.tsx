@@ -47,12 +47,12 @@ export function AnimeCard({
   return (
     <div
       className={cn(
-        "group overflow-hidden rounded-lg duration-200",
+        "group overflow-hidden rounded-xl duration-300",
         "border border-border bg-card",
-        "transition-colors",
+        "transition-[border-color,box-shadow]",
         hasVote
-          ? "border-coin/50"
-          : "hover:border-coin/40",
+          ? "border-coin/25 shadow-[0_0_20px_-5px] shadow-coin/10"
+          : "hover:border-border/80 hover:shadow-lg hover:shadow-black/10",
       )}
     >
       <a
@@ -71,7 +71,7 @@ export function AnimeCard({
           />
         </AspectRatio>
         {coinValue > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-xs backdrop-blur-sm">
+          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-xs backdrop-blur-sm">
             <Coins className="h-3 w-3 text-coin" aria-hidden="true" />
             <span className="font-semibold text-white tabular-nums">
               {coinValue.toLocaleString()}
@@ -125,7 +125,7 @@ export function AnimeCard({
         {isVoted ? (
           <div
             className={cn(
-              "flex items-center justify-center gap-2 rounded-md py-2.5",
+              "flex items-center justify-center gap-2 rounded-lg py-2.5",
               hasVote ? "bg-coin-muted" : "bg-muted/50",
             )}
           >

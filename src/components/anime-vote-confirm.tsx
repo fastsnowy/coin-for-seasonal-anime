@@ -144,7 +144,7 @@ export function VoteConfirm({
       </SheetTrigger>
       <SheetContent
         side="bottom"
-        className="rounded-t-xl"
+        className="rounded-t-2xl"
         aria-busy={isSubmitting}
         onPointerDownOutside={(event) => {
           if (isSubmitting) event.preventDefault();
