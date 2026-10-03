@@ -9,7 +9,7 @@ export function SeasonLoadingIndicator() {
         className="h-8 w-8 animate-spin rounded-full border-2 border-coin/20 border-t-coin motion-reduce:animate-none"
         aria-hidden="true"
       />
-      <p className="text-sm text-muted-foreground">シーズンを読み込んでいます</p>
+      <p className="text-sm text-muted-foreground">Loading</p>
     </div>
   );
 }
