@@ -1,3 +1,4 @@
+import { SeasonLoadingIndicator } from "@/components/season-loading-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CARD_SKELETON_IDS = [
@@ -37,6 +38,7 @@ function AnimeCardSkeleton() {
 export default function SeasonLoading() {
   return (
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
+      <SeasonLoadingIndicator />
       <Skeleton className="mb-3 h-3 w-40" />
 
       <div className="mb-5 flex justify-center">

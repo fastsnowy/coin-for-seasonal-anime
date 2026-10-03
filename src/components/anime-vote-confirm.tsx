@@ -154,7 +154,6 @@ export function VoteConfirm({
         }}
       >
         <SheetHeader className="text-center">
-          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted-foreground/20" />
           <SheetTitle className="text-lg">投票内容の確認</SheetTitle>
           <SheetDescription>
             コイン数を調整してから投票できます

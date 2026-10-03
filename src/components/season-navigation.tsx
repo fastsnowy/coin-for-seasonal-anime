@@ -29,6 +29,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
+import { SeasonLoadingIndicator } from "./season-loading-indicator";
 
 const seasons = [
   { id: "winter", name: "冬" },
@@ -156,20 +158,11 @@ export default function SeasonNavigation() {
         className="h-8 px-3 text-xs"
         onClick={handleNavigate}
         disabled={isPending || routeId === targetId}
-        aria-busy={isPending}
       >
-        {isPending ? (
-          <>
-            <span
-              className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
-              aria-hidden="true"
-            />
-            Loading
-          </>
-        ) : (
-          "表示"
-        )}
+        表示
       </Button>
+
+      {isPending && createPortal(<SeasonLoadingIndicator />, document.body)}
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="sm:max-w-md">
