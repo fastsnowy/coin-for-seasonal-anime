@@ -45,6 +45,9 @@ test("legacy import preserves source data and remains idempotent", async () => {
     const migration = await readFile(new URL("20260328000001_migrate_existing_data.sql", directory), "utf8");
     await db.exec(migration);
     await db.exec(migration);
+    const resync = await readFile(new URL("20260328000007_resync_bet_coins_to_coins_prod.sql", directory), "utf8");
+    await db.exec(resync);
+    await db.exec(resync);
     assert.deepEqual((await db.query("SELECT * FROM bet_coins ORDER BY annict_id")).rows, source.rows);
     const imported = await db.query<{ id: string; coin_value: number; delete_id: string }>("SELECT id,coin_value,delete_id FROM coins_prod");
     assert.equal(imported.rows.length, 1);
