@@ -3,21 +3,13 @@
 import { createSupabaseServerClient } from "./supabase/server";
 import { sanitizeNextPath } from "./auth-redirect";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-
-async function getBaseUrl() {
-  const headersList = await headers();
-  const origin =
-    headersList.get("origin") || headersList.get("x-forwarded-host") || "";
-  const protocol = headersList.get("x-forwarded-proto") || "https";
-  return origin.startsWith("http") ? origin : `${protocol}://${origin}`;
-}
+import { getSiteOrigin } from "./site-origin";
 
 const ANNICT_PROVIDER = "custom:annict" as const;
 
 export async function loginWithAnnict(nextPath?: string) {
   const supabase = await createSupabaseServerClient();
-  const baseUrl = await getBaseUrl();
+  const baseUrl = getSiteOrigin();
   const next = sanitizeNextPath(nextPath);
   const nextQuery = next === "/" ? "" : `&next=${encodeURIComponent(next)}`;
 
@@ -37,7 +29,7 @@ export async function loginWithAnnict(nextPath?: string) {
 
 export async function linkAnnict() {
   const supabase = await createSupabaseServerClient();
-  const baseUrl = await getBaseUrl();
+  const baseUrl = getSiteOrigin();
 
   const { data, error } = await supabase.auth.linkIdentity({
     provider: ANNICT_PROVIDER,

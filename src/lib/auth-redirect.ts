@@ -1,7 +1,8 @@
 export type AuthToastIntent = "login" | "link";
 
 export function sanitizeNextPath(next: string | null | undefined): string {
-  if (!next) return "/";
+  // Browsers remove tabs/newlines when parsing URLs, which can turn /<tab>/ into // .
+  if (!next || /[\u0000-\u0020\u007f]/.test(next)) return "/";
   if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
     return "/";
   }
@@ -11,6 +12,7 @@ export function sanitizeNextPath(next: string | null | undefined): string {
   try {
     const decoded = decodeURIComponent(next);
     if (
+      /[\u0000-\u001f\u007f]/.test(decoded) ||
       decoded.startsWith("//") ||
       decoded.includes("://") ||
       decoded.includes("\\")

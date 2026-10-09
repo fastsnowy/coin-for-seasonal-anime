@@ -2,18 +2,9 @@
 
 import { DB_TABLES } from "@/config/database";
 import type { TablesInsert } from "@/lib/schema";
-import { z } from "zod";
 import { createSupabaseServerClient } from "./supabaseClient";
 
-const voteItemSchema = z.object({
-  annict_id: z.number().int().positive(),
-  coin_value: z.number().int().min(1).max(100),
-});
-
-const createVoteInputSchema = z.object({
-  seasonName: z.string().regex(/^\d{4}-(spring|summer|autumn|winter)$/),
-  betAnimes: z.array(voteItemSchema).min(1),
-});
+import { createVoteInputSchema } from "./vote-input";
 
 const deleteIdCharacters = "0123456789abcdefghijklmnopqrstuvwxyz";
 const deleteIdLength = 7;
@@ -37,6 +28,8 @@ export async function createVoteAction(input: unknown) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) throw new Error("Authentication required");
+
   const resultId = crypto.randomUUID();
   const deleteId = generateDeleteId();
   const { seasonName, betAnimes } = parsedInput.data;
@@ -48,7 +41,7 @@ export async function createVoteAction(input: unknown) {
       season: seasonName,
       created_id: resultId,
       delete_id: deleteId,
-      user_id: user?.id ?? null,
+      user_id: user.id,
     }),
   );
 

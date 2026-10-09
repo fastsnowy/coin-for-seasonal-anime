@@ -10,7 +10,7 @@ const ANNICT_ME_URL = "https://api.annict.com/v1/me";
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
 
-  if (!authHeader) {
+  if (!authHeader || !/^Bearer \S+$/i.test(authHeader)) {
     return NextResponse.json(
       { error: "Missing authorization header" },
       { status: 401 },
@@ -19,11 +19,13 @@ export async function GET(request: Request) {
 
   const res = await fetch(ANNICT_ME_URL, {
     headers: { Authorization: authHeader },
+    cache: "no-store",
+    redirect: "error",
+    signal: AbortSignal.timeout(10000),
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    console.error("Annict /v1/me failed:", res.status, body);
+    console.error("Annict /v1/me failed:", res.status);
     return NextResponse.json(
       { error: "Failed to fetch Annict user info" },
       { status: res.status },
@@ -37,5 +39,5 @@ export async function GET(request: Request) {
     ...data,
     sub: String(data.id), // GoTrue は `sub` を一意識別子として使用
     email_verified: true, // メール確認フローをスキップ
-  });
+  }, { headers: { "Cache-Control": "private, no-store" } });
 }
