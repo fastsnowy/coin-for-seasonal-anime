@@ -1,10 +1,14 @@
--- Migrate existing production data from bet_coins to coins_prod.
--- Note: bet_coins does not have a delete_id column, so we use an empty string as default.
--- Rows with coin_value outside 1-100 are excluded to satisfy the check constraint.
--- The old tables (bet_coins, dev_coins) are kept as backup.
-
-INSERT INTO coins_prod (id, annict_id, coin_value, season, created_id, delete_id, user_id, created_at, deleted_at)
-SELECT id, annict_id, coin_value, season, created_id, '', NULL, created_at, deleted_at
-FROM bet_coins
-WHERE coin_value BETWEEN 1 AND 100
-ON CONFLICT (id) DO NOTHING;
+-- Import legacy production votes when upgrading an existing database.
+-- Fresh local databases have no bet_coins table and need no legacy import.
+-- Keep the source table unchanged; only valid coin values are copied.
+DO $$
+BEGIN
+  IF pg_catalog.to_regclass('public.bet_coins') IS NOT NULL THEN
+    INSERT INTO public.coins_prod (id, annict_id, coin_value, season, created_id, delete_id, user_id, created_at, deleted_at)
+    SELECT id, annict_id, coin_value, season, created_id, '', NULL, created_at, deleted_at
+    FROM public.bet_coins
+    WHERE coin_value BETWEEN 1 AND 100
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+END;
+$$;
