@@ -228,6 +228,25 @@ export type Database = {
       };
     };
     Views: {
+      public_coins_prod: {
+        Row: {
+          annict_id: number | null;
+          coin_value: number | null;
+          season: string | null;
+          created_id: string | null;
+        };
+        Relationships: [];
+      };
+      public_coins_dev: {
+        Row: {
+          annict_id: number | null;
+          coin_value: number | null;
+          season: string | null;
+          created_id: string | null;
+        };
+        Relationships: [];
+      };
+
       annict_coin_value_total: {
         Row: {
           annict_id: number | null;

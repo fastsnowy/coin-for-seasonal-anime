@@ -1,6 +1,6 @@
 import { ResultsClient } from "@/components/results-client";
 import { Breadcrumb } from "@/components/breadcrumb";
-import { DB_TABLES, DB_VIEWS } from "@/config/database";
+import { DB_VIEWS } from "@/config/database";
 import { getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
 import type { Metadata } from "next";
@@ -59,10 +59,9 @@ export async function generateMetadata({
   const supabase = await createSupabaseServerClient();
 
   const { data } = await supabase
-    .from(DB_TABLES.COINS)
+    .from(DB_VIEWS.PUBLIC_COINS)
     .select("coin_value, season")
-    .eq("created_id", id)
-    .is("deleted_at", null);
+    .eq("created_id", id);
 
   if (!data || data.length === 0) {
     return { title: `投票結果 | ${siteName}` };
@@ -110,10 +109,9 @@ export default async function Page({
   }
 
   const { data, error } = await supabase
-    .from(DB_TABLES.COINS)
-    .select("*")
-    .eq("created_id", id)
-    .is("deleted_at", null);
+    .from(DB_VIEWS.PUBLIC_COINS)
+    .select("annict_id, coin_value, season")
+    .eq("created_id", id);
 
   if (!data || error || data.length === 0) {
     return (

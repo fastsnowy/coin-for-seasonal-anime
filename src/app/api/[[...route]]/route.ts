@@ -18,14 +18,18 @@ const route = app
     });
     return c.json(urls);
   })
-  .get("annict/:season", async (c) => {
+  .get("/annict/:season", async (c) => {
+    const season = c.req.param("season");
+    if (!/^\d{4}-(spring|summer|autumn|winter)$/.test(season)) {
+      return c.json({ error: "Invalid season" }, 400);
+    }
     const res = await fetch("https://api.annict.com/graphql", {
       method: "POST",
       headers: {
         "content-type": "application/json",
         Authorization: `Bearer ${process.env.ANNICT_TOKEN}`,
       },
-      body: JSON.stringify(GET_ANIME_DETAILS(c.req.param("season"))),
+      body: JSON.stringify(GET_ANIME_DETAILS(season)),
     });
     if (!res.ok) {
       throw new Error("Failed to fetch data");
