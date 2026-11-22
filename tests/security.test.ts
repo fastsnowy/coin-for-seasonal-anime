@@ -126,7 +126,7 @@ test("OGP image proxy only serves small raster images", async () => {
   assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES)), false);
   assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES + 1)), true);
   assert.equal(exceedsImageLimit(null), false);
-  assert.equal(ogImageProxyPath("https://a.example/?x=1&y=2"), "/api/og-image?site=https%3A%2F%2Fa.example%2F%3Fx%3D1%26y%3D2");
+  assert.equal(ogImageProxyPath("https://a.example/?x=1&y=2", "k").startsWith("/api/og-image?site=https%3A%2F%2Fa.example%2F%3Fx%3D1%26y%3D2&sig="), true);
 });
 
 test("OGP image proxy rejects non-public sites and streamed bodies over the cap", async () => {
@@ -140,4 +140,31 @@ test("OGP image proxy rejects non-public sites and streamed bodies over the cap"
   assert.equal((await readBodyWithLimit(stream([60, 40]), 100, true))?.length, 100);
   assert.equal(await readBodyWithLimit(stream([60, 41]), 100, true), undefined);
   assert.equal((await readBodyWithLimit(stream([60, 60]), 100, false))?.length, 100);
+});
+
+test("OGP image proxy URLs must carry a valid HMAC signature", async () => {
+  const { signSite, verifySiteSignature } = await import("../src/lib/og-image-proxy");
+  const sig = signSite("https://a.example/", "secret");
+  assert.equal(verifySiteSignature("https://a.example/", sig, "secret"), true);
+  assert.equal(verifySiteSignature("https://b.example/", sig, "secret"), false);
+  assert.equal(verifySiteSignature("https://a.example/", sig, "other"), false);
+  assert.equal(verifySiteSignature("https://a.example/", `${sig}x`, "secret"), false);
+  assert.equal(verifySiteSignature("https://a.example/", "", "secret"), false);
+  assert.equal(verifySiteSignature("https://a.example/", null, "secret"), false);
+});
+
+test("SSRF guard blocks IPv6 forms that embed private IPv4 addresses", async () => {
+  const { isPrivateAddress, isPublicHttpUrl } = await import("../src/lib/og-image");
+  const blocked = [
+    "::ffff:7f00:1", "::ffff:a9fe:a9fe", "::ffff:a00:1", "::7f00:1", "64:ff9b::7f00:1", "::ffff:127.0.0.1",
+    "2002:7f00:1::", "2002:a9fe:a9fe::1", "::", "::1", "fe80::1", "fc00::1", "ff02::1", "100::1", "2001:db8::1",
+    "0.0.0.0", "100.64.0.1", "192.0.0.1", "192.0.2.1", "198.18.0.1", "198.51.100.1", "203.0.113.1", "240.0.0.1", "255.255.255.255",
+  ];
+  for (const ip of blocked) assert.equal(isPrivateAddress(ip), true, ip);
+  for (const ip of ["93.184.216.34", "2606:2800:220:1:248:1893:25c8:1946", "::ffff:5db8:d822", "64:ff9b::5db8:d822"]) {
+    assert.equal(isPrivateAddress(ip), false, ip);
+  }
+  for (const url of ["http://[::ffff:7f00:1]/", "http://[::ffff:127.0.0.1]/", "http://[::ffff:a9fe:a9fe]/", "http://[::7f00:1]/", "http://[64:ff9b::7f00:1]/"]) {
+    assert.equal(await isPublicHttpUrl(new URL(url)), false, url);
+  }
 });

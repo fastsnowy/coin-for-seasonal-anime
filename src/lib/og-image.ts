@@ -1,5 +1,5 @@
 import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { BlockList, isIP } from "node:net";
 import { toSafeHttpUrl } from "./safe-url";
 
 const FETCH_TIMEOUT_MS = 4_000;
@@ -78,19 +78,59 @@ function decodeHtml(bytes: Uint8Array, contentType: string | null): string {
   }
 }
 
-export function isPrivateAddress(address: string): boolean {
-  if (isIP(address) === 4) {
-    const [a, b] = address.split(".").map(Number);
-    return (
-      a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) ||
-      (a === 100 && b >= 64 && b <= 127) || a >= 224
-    );
+const blockedAddresses = new BlockList();
+for (const [net, prefix] of [
+  ["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16],
+  ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.0.2.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15],
+  ["198.51.100.0", 24], ["203.0.113.0", 24], ["224.0.0.0", 4], ["240.0.0.0", 4],
+] as const) {
+  blockedAddresses.addSubnet(net, prefix, "ipv4");
+}
+blockedAddresses.addAddress("255.255.255.255", "ipv4");
+for (const [net, prefix] of [
+  ["100::", 64], ["2001:db8::", 32], ["fc00::", 7], ["fe80::", 10], ["ff00::", 8],
+] as const) {
+  blockedAddresses.addSubnet(net, prefix, "ipv6");
+}
+blockedAddresses.addAddress("::", "ipv6");
+blockedAddresses.addAddress("::1", "ipv6");
+
+/** IPv6 アドレスを 8 個の 16bit 値に展開する (不正なら undefined) */
+function ipv6Groups(address: string): number[] | undefined {
+  let addr = address.toLowerCase().split("%")[0];
+  const dotted = /(\d+\.\d+\.\d+\.\d+)$/.exec(addr);
+  if (dotted) {
+    const o = dotted[1].split(".").map(Number);
+    addr = addr.slice(0, -dotted[1].length) + ((o[0] << 8) | o[1]).toString(16) + ":" + ((o[2] << 8) | o[3]).toString(16);
   }
-  const v6 = address.toLowerCase();
-  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(v6);
-  if (mapped) return isPrivateAddress(mapped[1]);
-  return v6 === "::" || v6 === "::1" || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6);
+  const halves = addr.split("::");
+  if (halves.length > 2) return undefined;
+  const head = halves[0] ? halves[0].split(":") : [];
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(":") : [];
+  const fill = halves.length === 2 ? 8 - head.length - tail.length : 0;
+  if (fill < 0) return undefined;
+  const groups = [...head, ...Array<string>(fill).fill("0"), ...tail].map((g) => Number.parseInt(g, 16));
+  return groups.length === 8 && groups.every((g) => g >= 0 && g <= 0xffff) ? groups : undefined;
+}
+
+/** IPv4 を埋め込む IPv6 形式 (mapped / compatible / NAT64 / 6to4) から IPv4 を取り出す */
+function embeddedIpv4(g: number[]): string | undefined {
+  const v4 = (hi: number, lo: number) => `${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`;
+  if (g.slice(0, 5).every((x) => x === 0) && (g[5] === 0xffff || g[5] === 0)) return v4(g[6], g[7]);
+  if (g[0] === 0x64 && g[1] === 0xff9b && g.slice(2, 6).every((x) => x === 0)) return v4(g[6], g[7]);
+  if (g[0] === 0x2002) return v4(g[1], g[2]);
+  return undefined;
+}
+
+export function isPrivateAddress(address: string): boolean {
+  const family = isIP(address);
+  if (family === 4) return blockedAddresses.check(address, "ipv4");
+  if (family !== 6) return true;
+  const groups = ipv6Groups(address);
+  if (!groups) return true;
+  const embedded = embeddedIpv4(groups);
+  if (embedded && blockedAddresses.check(embedded, "ipv4")) return true;
+  return blockedAddresses.check(address.split("%")[0], "ipv6");
 }
 
 /** サーバー側から取得してよい公開ホストかを確認する (SSRF対策) */
@@ -155,7 +195,7 @@ export async function readBodyWithLimit(
 export async function fetchPublic(
   startUrl: URL,
   accept: string,
-  init: { revalidate?: number } = {},
+  init: { revalidate?: number; signal?: AbortSignal } = {},
 ): Promise<{ res: Response; url: URL } | undefined> {
   let current = startUrl;
   let userAgent = USER_AGENT;
@@ -164,7 +204,7 @@ export async function fetchPublic(
     const res = await fetch(current, {
       redirect: "manual",
       headers: { "user-agent": userAgent, accept, "accept-language": "ja,en;q=0.8" },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      signal: AbortSignal.any([AbortSignal.timeout(FETCH_TIMEOUT_MS), ...(init.signal ? [init.signal] : [])]),
       ...(init.revalidate ? { next: { revalidate: init.revalidate } } : {}),
     });
     const location = res.headers.get("location");
@@ -185,10 +225,11 @@ export async function fetchPublic(
 }
 
 /** 公式サイトの OGP 画像URLをサーバー側で取得する。失敗時は undefined。 */
-export async function fetchOgImageUrl(siteUrl: string): Promise<string | undefined> {
+export async function fetchOgImageUrl(siteUrl: string, signal?: AbortSignal): Promise<string | undefined> {
   try {
     const fetched = await fetchPublic(new URL(siteUrl), "text/html,application/xhtml+xml", {
       revalidate: REVALIDATE_SECONDS,
+      signal,
     });
     if (!fetched || !fetched.res.ok) return undefined;
     const html = decodeHtml(await readLimited(fetched.res), fetched.res.headers.get("content-type"));

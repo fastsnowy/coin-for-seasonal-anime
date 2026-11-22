@@ -4,6 +4,7 @@ import { GET_ANIME_DETAILS, GET_ANIME_DETAILS_BY_IDS } from "@/gql";
 import { type Anime, PLACEHOLDER_IMAGE, toAnimeList } from "./annict-works";
 import { fetchOgImageUrl } from "./og-image";
 import { ogImageProxyPath } from "./og-image-proxy";
+import { getOgImageProxySecret } from "./og-image-secret";
 
 export type { Anime } from "./annict-works";
 
@@ -51,7 +52,7 @@ async function withOfficialSiteImages(animes: Anime[]): Promise<Anime[]> {
       const index = targets[cursor++];
       const image = await fetchOgImageUrl(result[index].officialSiteUrl as string);
       // 公式サイト側の CORP 設定でブラウザから直接表示できない場合があるため、同一オリジンのプロキシ経由にする
-      if (image) result[index] = { ...result[index], image: ogImageProxyPath(result[index].officialSiteUrl as string) };
+      if (image) result[index] = { ...result[index], image: ogImageProxyPath(result[index].officialSiteUrl as string, getOgImageProxySecret()) };
     }
   };
   await Promise.all(Array.from({ length: Math.min(OGP_FETCH_CONCURRENCY, targets.length) }, worker));

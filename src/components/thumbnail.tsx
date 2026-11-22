@@ -15,6 +15,10 @@ export function Thumbnail({ src, alt, ...props }: ThumbnailProps) {
   return (
     <img
       {...props}
+      ref={(img) => {
+        // ハイドレーション前に失敗した画像は onError が発火しないため、ここで検出する
+        if (img?.complete && img.naturalWidth === 0 && src !== PLACEHOLDER_IMAGE) setFailedSrc(src);
+      }}
       src={failed ? PLACEHOLDER_IMAGE : src}
       alt={alt}
       referrerPolicy="no-referrer"
