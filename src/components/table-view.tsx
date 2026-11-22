@@ -2,7 +2,7 @@
 
 import { AnimeInfoTile } from "./anime-info-tile";
 import { VotedCoinCount } from "./voted-coin-count";
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 
 type TableViewProps = {
   animeList: Anime[];

@@ -1,4 +1,4 @@
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 import { cn } from "@/lib/utils";
 import { Coins, Eye } from "lucide-react";
 

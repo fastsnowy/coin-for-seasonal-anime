@@ -1,5 +1,5 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { type Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 import { getSeasonName, type Season } from "@/lib/seasons";
 import { Coins } from "lucide-react";
 import Link from "next/link";

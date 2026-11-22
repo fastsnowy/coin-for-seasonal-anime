@@ -48,3 +48,40 @@ Annictユーザー情報のレスポンス・上流通信をキャッシュ禁�
   Git履歴全体の秘密情報監査は実施していない。
 - 本番へのDBマイグレーション適用とAPP_URL設定は
   [適用手順](../SUPABASE_MIGRATION.md#7-セキュリティ修正の適用2026-10-10) に記載。
+
+# 依存更新・リファクタリング（2026-11-22）
+
+## 依存関係
+
+- `pnpm audit` で検出された17件（Critical 2 / High 2 / Moderate 12 / Low 1）を解消し、0件に。
+  - Next.js 16.4.0 → 16.4.6（画像最適化API・`use cache` のRCE、Server ActionsのDoS ほか）
+  - React / React DOM 19.3.0 → 19.3.1、eslint-config-next 16.4.6
+  - Zod 3 → 4.6.7（巨大コレクション検証時のメモリ枯渇）。間接依存も overrides で固定
+  - `minimatch`（開発依存経由のReDoS）を overrides で 11.0.1 以上に固定
+- 未使用の依存（Hono、`@conform-to/*`、`uuid`、`react-number-format`、`supazod`）を削除。
+- Biome・Supabase CLI・型定義を devDependencies へ移動し、本番依存を最小化。
+- pnpm 12 では `package.json` の `pnpm.overrides` が読まれないため `pnpm-workspace.yaml` へ移行。
+  - `allowBuilds` でインストールスクリプトの実行を esbuild のみに限定。
+  - `minimumReleaseAge: 1440` で公開から1日未満のバージョンを解決しない（サプライチェーン対策）。
+
+## コード
+
+1. **未使用の公開APIを削除** — `/api/[[...route]]`（Hono）はアプリから参照されていないのに、
+   サーバーの `ANNICT_TOKEN` で Annict へ問い合わせる未認証エンドポイントと、
+   外部JSONをそのまま返すエンドポイントを公開していた。
+2. **外部URLの検証** — Annict から受け取る公式サイトURL・画像URLを http(s) に限定し、
+   X のユーザー名も形式検証。CSS `url()` への埋め込みは引用符付きに変更。
+3. **Annict取得処理の共通化** — 重複していた取得処理を `server-only` モジュールに集約し、
+   トークン未設定の検知、タイムアウト、リダイレクト禁止、レスポンス形式の検証を追加。
+4. **認証リダイレクト** — `/auth/callback`・`/auth/confirm` のリダイレクト先を
+   リクエストの Host ではなく設定済みオリジン（`APP_URL`）から構築。
+   `/auth/confirm` は `next` の検証と OTP 種別の許可リスト検証を追加。
+   OAuth プロバイダーのエラー文言をURLへ反映しないよう固定コードに変更。
+5. **投票削除** — `created_id` をUUIDとして検証し、取得時も `user_id` で絞り込み。
+   エラーログはエラーコードのみに縮小。
+
+## 検証
+
+- `pnpm test`（11件）、`pnpm typecheck`、`pnpm build`、`pnpm audit` が成功。
+- pnpm 10 でも `--frozen-lockfile` でインストールできることを確認。
+- 全体の lint に残るエラーは既存のもの（今回の変更ファイルはエラーなし）。
