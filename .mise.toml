@@ -1,6 +1,6 @@
 [tools]
-node = "20"
-pnpm = "latest"
+node = "22"
+pnpm = "12.22.0"
 supabase = "latest"
 
 [tasks.gen-schema]

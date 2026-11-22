@@ -1,6 +1,6 @@
 "use client";
 
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 import { useMemo, useState } from "react";
 
 import { AnimeCard } from "./anime-card";

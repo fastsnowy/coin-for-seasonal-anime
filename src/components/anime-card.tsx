@@ -4,7 +4,7 @@ import { memo } from "react";
 import { CoinStepper } from "@/components/coin-stepper";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 import { cn } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { Coins, Eye } from "lucide-react";
@@ -56,7 +56,7 @@ export function AnimeCard({
       )}
     >
       <a
-        href={work.officialSiteUrl}
+        href={work.officialSiteUrl ?? `https://annict.com/works/${work.id}`}
         target="_blank"
         rel="noopener noreferrer"
         className="relative block"
@@ -94,7 +94,7 @@ export function AnimeCard({
           </Badge>
           {work.twitterUrl && (
             <Link
-              href={`https://twitter.com/${work.twitterUrl}`}
+              href={`https://twitter.com/${encodeURIComponent(work.twitterUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${work.title}のX`}

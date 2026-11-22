@@ -3,11 +3,14 @@ import {
   sanitizeNextPath,
   type AuthToastIntent,
 } from "@/lib/auth-redirect";
+import { getSiteOrigin } from "@/lib/site-origin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // リダイレクト先は Host ヘッダーではなく設定済みのオリジンから組み立てる
+  const origin = getSiteOrigin();
   const code = searchParams.get("code");
   const next = sanitizeNextPath(searchParams.get("next"));
   const rawIntent = searchParams.get("intent");
@@ -23,7 +26,8 @@ export async function GET(request: Request) {
 
   if (errorParam) {
     console.error("OAuth callback error:", errorParam, errorDescription);
-    return redirectWithError(errorDescription || errorParam);
+    // プロバイダー由来の任意文字列は画面に反映せず、固定のエラーコードのみ渡す
+    return redirectWithError("auth_callback_error");
   }
 
   if (code) {

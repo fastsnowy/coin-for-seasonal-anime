@@ -152,20 +152,15 @@ export default async function Page({
     );
   }
 
-  const votedAnnictIds = data
-    .map((item) => item.annict_id)
-    .filter((annictId): annictId is number => annictId !== null);
-  const res = await getAnimeByIds(votedAnnictIds);
-
-  const animeList = res.map((anime) => ({
-    id: anime.id,
-    title: anime.title,
-    image: anime.image,
-    watchersCount: anime.watchersCount,
-    officialSiteUrl: anime.officialSiteUrl,
-    media: anime.media,
-    twitterUrl: anime.twitterUrl,
-  }));
+  // 同一作品への投票はまとめて1回だけ問い合わせる
+  const votedAnnictIds = [
+    ...new Set(
+      data
+        .map((item) => item.annict_id)
+        .filter((annictId): annictId is number => annictId !== null),
+    ),
+  ];
+  const animeList = await getAnimeByIds(votedAnnictIds);
 
   const totalCoins = data.reduce(
     (acc, item) => acc + ((item.coin_value as number) || 0),

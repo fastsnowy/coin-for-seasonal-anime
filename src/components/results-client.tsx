@@ -5,7 +5,7 @@ import { LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GridView } from "./grid-view";
 import { TableView } from "./table-view";
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 
 type ResultsClientProps = {
   animeList: Anime[];

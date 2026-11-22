@@ -1,7 +1,7 @@
 "use client";
 
-import type { Anime } from "@/lib/anime-data";
-import { cn } from "@/lib/utils";
+import type { Anime } from "@/lib/annict-works";
+import { toCssUrl } from "@/lib/safe-url";
 import { Coins, Eye } from "lucide-react";
 
 type AnimeInfoTileProps = {
@@ -14,7 +14,7 @@ export function AnimeInfoTile({ anime, totalCoins }: AnimeInfoTileProps) {
     <div className="flex-1 min-w-0 group relative flex items-center h-20 overflow-hidden rounded-lg border border-border">
       <div
         className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-        style={{ backgroundImage: `url(${anime.image})` }}
+        style={{ backgroundImage: toCssUrl(anime.image) }}
       />
       <div className="absolute inset-0 bg-black/65" />
 

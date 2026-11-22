@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimeCard } from "@/components/anime-card";
-import type { Anime } from "@/lib/anime-data";
+import type { Anime } from "@/lib/annict-works";
 
 type GridViewProps = {
   animeList: Anime[];

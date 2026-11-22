@@ -1,0 +1,16 @@
+# 依存パッケージのインストールスクリプトは明示的に許可したものだけ実行する
+allowBuilds:
+  '@biomejs/biome': false
+  esbuild: true
+  unrs-resolver: false
+
+# 公開直後の悪性バージョン混入（サプライチェーン攻撃）を避けるため、
+# 公開から1日以上経過したバージョンのみ解決する
+minimumReleaseAge: 1440
+
+overrides:
+  '@types/react': 19.3.0
+  '@types/react-dom': 19.3.0
+  # 間接依存の既知脆弱性（GHSA: zod メモリ枯渇 / minimatch ReDoS）を修正版へ固定
+  zod: ^4.6.7
+  minimatch@>=7 <11.0.1: ^11.0.1
