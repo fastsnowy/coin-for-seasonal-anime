@@ -11,7 +11,17 @@ import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
 import { type Anime, getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { ArrowRight, ChevronRight, Coins, History, UserCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { NumberRoll } from "@/components/ui/number-roll";
+import {
+  ArrowRight,
+  BadgeCheck,
+  ChevronRight,
+  Coins,
+  History,
+  ShieldCheck,
+  UserCircle,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -60,111 +70,193 @@ export default async function MyPage() {
       <SiteHeader maxWidth="max-w-4xl" />
       <div className="container mx-auto max-w-2xl px-4 py-6">
         <Breadcrumb items={[{ label: "マイページ" }]} />
+        <h1 className="sr-only">マイページ</h1>
 
-        <section className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--coin-muted)_0%,transparent_60%)]" />
-          <div className="relative p-5">
-            <div className="flex items-center gap-3">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-coin/30"
-                />
-              ) : (
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-muted ring-2 ring-coin/20">
-                  <UserCircle className="h-7 w-7 text-muted-foreground" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="truncate text-lg font-extrabold tracking-tight">
-                  {displayName}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Annictアカウント連携済み
-                </p>
-              </div>
-            </div>
-
-            <dl className="mt-5 grid grid-cols-3 divide-x divide-border border-t border-border pt-4">
-              <Stat label="投票回数" value={voteGroups.length} unit="回" />
-              <Stat label="シーズン" value={seasonCount} unit="期" />
-              <Stat label="コイン" value={totalCoins} unit="枚" accent />
-            </dl>
-          </div>
-        </section>
-
-        <section className="mt-6">
-          <Link
-            href="/my-votes"
-            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors hover:border-coin/30"
+        <div className="stagger-children mt-4 space-y-8 sm:mt-6">
+          <section
+            aria-label="プロフィール"
+            className="surface relative overflow-hidden rounded-2xl"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                <History className="h-4 w-4 text-muted-foreground" />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,var(--coin-muted)_0%,transparent_60%)]"
+            />
+            <div className="relative p-5">
+              <div className="flex items-center gap-3.5">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    className="size-14 shrink-0 rounded-full object-cover shadow-sm ring-2 ring-card outline outline-1 outline-coin/30"
+                  />
+                ) : (
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-muted ring-2 ring-coin/20">
+                    <UserCircle
+                      aria-hidden="true"
+                      className="size-7 text-muted-foreground"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0 space-y-1">
+                  <p className="truncate text-lg font-extrabold tracking-tight">
+                    {displayName}
+                  </p>
+                  <Badge variant="success">
+                    <BadgeCheck aria-hidden="true" />
+                    Annictアカウント連携済み
+                  </Badge>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold">投票履歴</p>
-                <p className="text-xs text-muted-foreground">
-                  {voteGroups.length > 0
-                    ? `全${voteGroups.length}件の投票を確認`
-                    : "過去の投票を確認"}
-                </p>
-              </div>
-            </div>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-          </Link>
-        </section>
 
-        <section className="mt-8">
-          <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-sm font-bold">最近の投票</h2>
-            {voteGroups.length > 0 && (
+              <dl className="mt-5 grid grid-cols-3 divide-x divide-border border-t border-border pt-4">
+                <Stat label="投票回数" value={voteGroups.length} unit="回" />
+                <Stat label="シーズン" value={seasonCount} unit="期" />
+                <Stat label="コイン" value={totalCoins} unit="枚" accent />
+              </dl>
+            </div>
+          </section>
+
+          <section aria-labelledby="recent-votes-heading">
+            <SectionHeading
+              id="recent-votes-heading"
+              action={
+                voteGroups.length > 0 ? (
+                  <Link
+                    href="/my-votes"
+                    className="-my-2 -mr-2 inline-flex min-h-10 items-center gap-0.5 rounded-md px-2 text-xs font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/35"
+                  >
+                    すべて見る
+                    <ChevronRight aria-hidden="true" className="size-3.5" />
+                  </Link>
+                ) : null
+              }
+            >
+              最近の投票
+            </SectionHeading>
+
+            {recentGroups.length === 0 ? (
+              <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border-strong bg-surface-sunken/60 px-6 py-12 text-center">
+                <span className="flex size-12 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
+                  <Coins aria-hidden="true" className="size-5 text-coin" />
+                </span>
+                <p className="text-sm text-muted-foreground">
+                  まだ投票していません
+                </p>
+                <Button asChild size="md">
+                  <Link href="/">
+                    アニメに賭ける
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {recentGroups.map((group) => (
+                  <li key={group.createdId}>
+                    <VoteGroupCard group={group} animeById={animeById} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section aria-labelledby="account-heading">
+            <SectionHeading id="account-heading">アカウント</SectionHeading>
+            <div className="surface divide-y divide-border overflow-hidden rounded-2xl">
               <Link
                 href="/my-votes"
-                className="inline-flex items-center gap-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                className="group/row flex min-h-14 items-center justify-between gap-3 px-4 py-3 outline-none transition-colors hover:bg-accent/60 focus-visible:bg-accent/60 focus-visible:ring-[3px] focus-visible:ring-ring/35 focus-visible:ring-inset"
               >
-                すべて見る
-                <ChevronRight className="h-3 w-3" />
+                <span className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-lg bg-surface-sunken text-muted-foreground">
+                    <History aria-hidden="true" className="size-4" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold">
+                      投票履歴
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {voteGroups.length > 0
+                        ? `全${voteGroups.length}件の投票を確認`
+                        : "過去の投票を確認"}
+                    </span>
+                  </span>
+                </span>
+                <ChevronRight
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out-quint group-hover/row:translate-x-0.5 motion-reduce:transition-none"
+                />
               </Link>
-            )}
-          </div>
-
-          {recentGroups.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-14">
-              <Coins className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">
-                まだ投票していません
-              </p>
-              <Button asChild size="sm" className="gap-1.5">
-                <Link href="/">
-                  アニメに賭ける
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <Link
+                href="/privacy"
+                className="group/row flex min-h-14 items-center justify-between gap-3 px-4 py-3 outline-none transition-colors hover:bg-accent/60 focus-visible:bg-accent/60 focus-visible:ring-[3px] focus-visible:ring-ring/35 focus-visible:ring-inset"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-lg bg-surface-sunken text-muted-foreground">
+                    <ShieldCheck aria-hidden="true" className="size-4" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold">
+                      プライバシーポリシー
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      保存する情報と取り扱いについて
+                    </span>
+                  </span>
+                </span>
+                <ChevronRight
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out-quint group-hover/row:translate-x-0.5 motion-reduce:transition-none"
+                />
+              </Link>
             </div>
-          ) : (
-            <ul className="space-y-3">
-              {recentGroups.map((group) => (
-                <li key={group.createdId}>
-                  <VoteGroupCard group={group} animeById={animeById} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+          </section>
 
-        <section className="mt-10 border-t border-border pt-6">
-          <h2 className="text-sm font-bold text-destructive">アカウント管理</h2>
-          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            退会すると現在のアカウントで投票履歴を参照できなくなります。投票データは匿名の投票として保持され、再登録しても過去の履歴は引き継がれません。
-          </p>
-          <div className="mt-3">
-            <DeleteAccountDialog />
-          </div>
-        </section>
+          <section aria-labelledby="danger-zone-heading">
+            <SectionHeading id="danger-zone-heading" tone="danger">
+              危険な操作
+            </SectionHeading>
+            <div className="rounded-2xl border border-destructive/25 bg-card shadow-xs">
+              <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-5">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold">退会</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    退会すると現在のアカウントで投票履歴を参照できなくなります。投票データは匿名の投票として保持され、再登録しても過去の履歴は引き継がれません。
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <DeleteAccountDialog />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </main>
+  );
+}
+
+function SectionHeading({
+  id,
+  children,
+  action,
+  tone = "default",
+}: {
+  id: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+  tone?: "default" | "danger";
+}) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-3 px-1">
+      <h2
+        id={id}
+        className={`text-xs font-semibold tracking-wide ${tone === "danger" ? "text-destructive" : "text-muted-foreground"}`}
+      >
+        {children}
+      </h2>
+      {action}
+    </div>
   );
 }
 
@@ -183,11 +275,10 @@ function Stat({
     <div className="px-3 first:pl-0 last:pr-0">
       <dt className="text-[11px] text-muted-foreground">{label}</dt>
       <dd className="mt-0.5 flex items-baseline gap-0.5">
-        <span
-          className={`text-2xl font-bold tabular-nums ${accent ? "text-coin" : ""}`}
-        >
-          {value.toLocaleString()}
-        </span>
+        <NumberRoll
+          value={value}
+          className={`text-2xl font-bold tracking-tight ${accent ? "text-coin-foreground" : ""}`}
+        />
         <span className="text-[11px] text-muted-foreground">{unit}</span>
       </dd>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { handleDeleteVote } from "@/lib/vote-delete-action";
+import { CircleCheck, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -30,20 +31,32 @@ export function VoteDeleteDialog({
   const router = useRouter();
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        // Keep the dialog open while the deletion is in flight.
+        if (!next && isDeletingRef.current && !isDeleted) return;
+        onOpenChange(next);
+      }}
+    >
       <DialogContent className="sm:max-w-md">
         {isDeleted ? (
           <>
-            <DialogHeader>
-              <DialogTitle className="text-xl">削除しました</DialogTitle>
+            <DialogHeader className="items-center sm:items-start">
+              <span
+                aria-hidden="true"
+                className="mb-1 flex size-11 items-center justify-center rounded-full bg-success-muted text-success"
+              >
+                <CircleCheck className="size-5" />
+              </span>
+              <DialogTitle>削除しました</DialogTitle>
+              <DialogDescription>投票の削除が完了しました。</DialogDescription>
             </DialogHeader>
-            <DialogDescription className="text-base py-4">
-              投票の削除が完了しました。
-            </DialogDescription>
-            <DialogFooter>
+            <DialogFooter className="mt-2">
               <DialogClose asChild>
                 <Button
                   variant="outline"
+                  size="md"
                   type="button"
                   onClick={() => {
                     router.push("/my-votes");
@@ -56,23 +69,34 @@ export function VoteDeleteDialog({
           </>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle className="text-xl">
-                投票を削除しますか？
-              </DialogTitle>
+            <DialogHeader className="items-center sm:items-start">
+              <span
+                aria-hidden="true"
+                className="mb-1 flex size-11 items-center justify-center rounded-full bg-destructive-muted text-destructive"
+              >
+                <Trash2 className="size-5" />
+              </span>
+              <DialogTitle>投票を削除しますか？</DialogTitle>
+              <DialogDescription>
+                投票を削除すると、元に戻すことはできません。本当に削除してもよろしいですか？
+              </DialogDescription>
             </DialogHeader>
-            <DialogDescription className="text-base py-4">
-              投票を削除すると、元に戻すことはできません。本当に削除してもよろしいですか？
-            </DialogDescription>
-            <DialogFooter className="gap-2">
+            <DialogFooter className="mt-2">
               <DialogClose asChild>
-                <Button variant="outline" type="button">
+                <Button
+                  variant="outline"
+                  size="md"
+                  type="button"
+                  disabled={isDeleteButtonPressed}
+                >
                   キャンセル
                 </Button>
               </DialogClose>
               <Button
                 variant="destructive"
-                disabled={isDeleteButtonPressed}
+                size="md"
+                loading={isDeleteButtonPressed}
+                icon={<Trash2 aria-hidden="true" />}
                 onClick={async () => {
                   if (isDeleteButtonPressed || isDeletingRef.current) return;
                   setIsDeleteButtonPressed(true);

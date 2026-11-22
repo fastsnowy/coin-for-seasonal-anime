@@ -3,13 +3,14 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-actions";
+import { cn } from "@/lib/utils";
 import { History, Link2, LogIn, LogOut, Shield, User } from "lucide-react";
 import Link from "next/link";
 
@@ -20,99 +21,163 @@ interface UserMenuClientProps {
   avatarUrl?: string;
 }
 
+function Avatar({
+  src,
+  name,
+  className,
+}: {
+  src?: string;
+  name?: string;
+  className?: string;
+}) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- external avatar host, tiny image
+      <img
+        src={src}
+        alt=""
+        referrerPolicy="no-referrer"
+        className={cn(
+          "shrink-0 rounded-full object-cover ring-1 ring-border",
+          className,
+        )}
+      />
+    );
+  }
+  const initial = name?.trim().charAt(0).toUpperCase();
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground ring-1 ring-border",
+        className,
+      )}
+    >
+      {initial ? (
+        <span className="text-[11px] font-semibold">{initial}</span>
+      ) : (
+        <User className="size-[55%]" />
+      )}
+    </span>
+  );
+}
+
 export function UserMenuClient({
   isLoggedIn,
   isAnonymous,
   displayName,
   avatarUrl,
 }: UserMenuClientProps) {
+  const isMember = isLoggedIn && !isAnonymous;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <User className="h-4 w-4" />
-          <span className="sr-only">ユーザーメニュー</span>
-        </Button>
+        <button
+          type="button"
+          aria-label={
+            isMember && displayName
+              ? `ユーザーメニュー（${displayName}）`
+              : "ユーザーメニュー"
+          }
+          className={cn(
+            "press flex size-10 items-center justify-center rounded-lg sm:size-9",
+            "text-muted-foreground hover:bg-accent hover:text-foreground data-[state=open]:bg-accent data-[state=open]:text-foreground",
+            "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/35",
+          )}
+        >
+          {isMember ? (
+            <Avatar src={avatarUrl} name={displayName} className="size-6" />
+          ) : (
+            <User className="size-4" aria-hidden="true" />
+          )}
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        {isLoggedIn && !isAnonymous ? (
-          <>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex items-center gap-2">
-                {avatarUrl && (
-                  <img
-                    src={avatarUrl}
-                    alt={displayName ?? "ユーザー"}
-                    className="h-6 w-6 rounded-full object-cover shrink-0"
-                  />
-                )}
-                <p className="text-xs text-muted-foreground truncate">
-                  {displayName}
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuLabel className="flex items-center gap-2.5 py-2 font-normal">
+          {isMember ? (
+            <>
+              <Avatar src={avatarUrl} name={displayName} className="size-8" />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {displayName ?? "ユーザー"}
+                </p>
+                <p className="text-xs text-muted-foreground">Annict連携済み</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <Avatar className="size-8" />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">
+                  ゲストユーザー
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Annict未連携
                 </p>
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-          </>
-        ) : (
-          <>
-            <DropdownMenuLabel className="font-normal">
-              <p className="text-xs text-muted-foreground">ゲストユーザー</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-          </>
-        )}
+            </>
+          )}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
 
-        {isLoggedIn && !isAnonymous && (
+        <DropdownMenuGroup>
+          {isMember && (
+            <DropdownMenuItem asChild>
+              <Link href="/mypage" className="cursor-pointer">
+                <User aria-hidden="true" />
+                マイページ
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild>
-            <Link href="/mypage" className="cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
-              マイページ
+            <Link href="/my-votes" className="cursor-pointer">
+              <History aria-hidden="true" />
+              投票履歴
             </Link>
           </DropdownMenuItem>
-        )}
-
-        <DropdownMenuItem asChild>
-          <Link href="/my-votes" className="cursor-pointer">
-            <History className="mr-2 h-4 w-4" />
-            投票履歴
-          </Link>
-        </DropdownMenuItem>
-
-        {isAnonymous || !isLoggedIn ? (
-          <>
-            <DropdownMenuItem asChild>
-              <Link href="/link" className="cursor-pointer">
-                <Link2 className="mr-2 h-4 w-4" />
-                Annictアカウント連携
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/login" className="cursor-pointer">
-                <LogIn className="mr-2 h-4 w-4" />
-                ログイン
-              </Link>
-            </DropdownMenuItem>
-          </>
-        ) : (
-          <DropdownMenuItem
-            onClick={async () => {
-              await signOut();
-            }}
-            className="cursor-pointer"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            ログアウト
-          </DropdownMenuItem>
-        )}
+          {!isMember && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href="/link" className="cursor-pointer">
+                  <Link2 aria-hidden="true" />
+                  Annictアカウント連携
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/login" className="cursor-pointer">
+                  <LogIn aria-hidden="true" />
+                  ログイン
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
           <Link href="/privacy" className="cursor-pointer">
-            <Shield className="mr-2 h-4 w-4" />
+            <Shield aria-hidden="true" />
             プライバシーポリシー
           </Link>
         </DropdownMenuItem>
+
+        {isMember && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={async () => {
+                await signOut();
+              }}
+              className="cursor-pointer"
+            >
+              <LogOut aria-hidden="true" />
+              ログアウト
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

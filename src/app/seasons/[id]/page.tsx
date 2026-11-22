@@ -1,12 +1,15 @@
 import AnimeGrid from "@/components/anime-grid";
 import { Breadcrumb } from "@/components/breadcrumb";
 import RankingSection from "@/components/ranking-section";
+import { BlurText } from "@/components/ui/blur-text";
+import { Spinner } from "@/components/ui/spinner";
 import { siteName } from "@/config/constant";
 import { getAnimeByYearAndSeason } from "@/lib/anime-data";
 import { getSeasonName, getSeasonType } from "@/lib/seasons";
 import type { Season } from "@/lib/seasons";
 import { DB_VIEWS } from "@/config/database";
 import { createSupabaseServerClient } from "@/lib/supabaseClient";
+import { CloudOff } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import type { Metadata } from "next";
@@ -79,36 +82,62 @@ export default async function SeasonPage({
 
   if (!coins) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="py-10 text-center">データの取得に失敗しました</div>
+      <div className="container mx-auto max-w-5xl px-4 py-8">
+        <div
+          role="alert"
+          className="mx-auto flex max-w-sm flex-col items-center gap-3 rounded-2xl border border-border bg-card px-6 py-12 text-center shadow-xs"
+        >
+          <span className="flex size-11 items-center justify-center rounded-full bg-destructive-muted text-destructive">
+            <CloudOff className="size-5" aria-hidden="true" />
+          </span>
+          <p className="text-sm font-medium">データの取得に失敗しました</p>
+          <p className="text-xs text-muted-foreground">
+            時間をおいてページを再読み込みしてください
+          </p>
+        </div>
       </div>
     );
   }
+
+  const heading = `${
+    seasonType === "current"
+      ? "今期"
+      : seasonType === "next"
+        ? "来期"
+        : `${year}年 ${seasonName}`
+  }のアニメ`;
+
   return (
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
-        <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
+      <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
-        <h2 className="text-center text-sm text-muted-foreground mb-5">
-          {seasonType === "current"
-            ? "今期"
-            : seasonType === "next"
-              ? "来期"
-              : `${year}年 ${seasonName}`}
-          のアニメ
-        </h2>
+      <header className="mb-6 mt-2">
+        <p className="text-xs font-semibold tracking-[0.18em] text-coin-foreground uppercase">
+          {year} {seasonName}
+        </p>
+        <BlurText
+          as="h1"
+          text={heading}
+          by="char"
+          className="mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+        />
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          気になる作品にコインを賭けて、期待度を表明しよう。
+        </p>
+      </header>
 
-        <RankingSection animeList={animeList} coins={coins} />
+      <RankingSection animeList={animeList} coins={coins} />
 
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center gap-3 py-20">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-r-transparent" />
-              <p className="text-xs text-muted-foreground">Loading</p>
-            </div>
-          }
-        >
-          <AnimeGrid animeList={animeList} coins={coins} />
-        </Suspense>
+      <Suspense
+        fallback={
+          <output className="flex flex-col items-center gap-3 py-20">
+            <Spinner className="size-5 text-coin" />
+            <span className="text-xs text-shimmer">作品を読み込み中</span>
+          </output>
+        }
+      >
+        <AnimeGrid animeList={animeList} coins={coins} />
+      </Suspense>
     </div>
   );
 }

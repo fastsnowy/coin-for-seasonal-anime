@@ -11,6 +11,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Deno edge functions: type-checked by the Supabase CLI, not this project.
+      "supabase/functions/**",
     ],
   },
 ];

@@ -2,7 +2,6 @@
 
 import { getJSTDate } from "@/lib/date-utils";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -72,7 +71,7 @@ export default function SeasonSelector({
   };
 
   return (
-    <div className="mb-8 bg-card rounded-lg p-4 shadow-sm">
+    <div className="surface mb-8 rounded-2xl p-4">
       <Tabs
         defaultValue="current"
         onValueChange={(value) =>
@@ -80,20 +79,20 @@ export default function SeasonSelector({
         }
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3" aria-label="シーズン">
           <TabsTrigger value="current">今期</TabsTrigger>
           <TabsTrigger value="next">来期</TabsTrigger>
           <TabsTrigger value="past">過去</TabsTrigger>
         </TabsList>
 
         <TabsContent value="current" className="pt-4">
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             {getCurrentSeason().name} {currentYear}
           </p>
         </TabsContent>
 
         <TabsContent value="next" className="pt-4">
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             {getNextSeason().name} {getNextSeason().year}
           </p>
         </TabsContent>
@@ -105,7 +104,7 @@ export default function SeasonSelector({
                 defaultValue={currentYear.toString()}
                 onValueChange={setSelectedYear}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full" aria-label="年">
                   <SelectValue placeholder="年を選択" />
                 </SelectTrigger>
                 <SelectContent>
@@ -123,7 +122,7 @@ export default function SeasonSelector({
                 defaultValue="spring"
                 onValueChange={(value) => setSelectedSeason(value as Season)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full" aria-label="季節">
                   <SelectValue placeholder="季節を選択" />
                 </SelectTrigger>
                 <SelectContent>
@@ -137,6 +136,8 @@ export default function SeasonSelector({
             </div>
 
             <Button
+              variant="solid"
+              size="md"
               className="w-full sm:w-auto"
               onClick={handlePastSeasonSelect}
             >

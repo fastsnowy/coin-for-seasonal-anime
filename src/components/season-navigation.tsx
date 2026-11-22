@@ -118,13 +118,19 @@ export default function SeasonNavigation() {
   };
 
   return (
-    <div className="flex shrink-0 items-center gap-1.5">
+    <fieldset
+      aria-label="シーズンを選択"
+      className="m-0 flex min-w-0 shrink-0 items-center gap-1.5 border-0 px-[3px] py-1"
+    >
       <Select
         value={selectedYear}
         onValueChange={setSelectedYear}
         disabled={isPending}
       >
-        <SelectTrigger className="h-8 w-20 text-xs" aria-label="年">
+        <SelectTrigger
+          className="w-[5.5rem] text-xs data-[size=default]:h-10 sm:data-[size=default]:h-8"
+          aria-label="年"
+        >
           <SelectValue placeholder="年" />
         </SelectTrigger>
         <SelectContent>
@@ -141,7 +147,10 @@ export default function SeasonNavigation() {
         onValueChange={(v) => setSelectedSeason(v as Season)}
         disabled={isPending}
       >
-        <SelectTrigger className="h-8 w-16 text-xs" aria-label="季節">
+        <SelectTrigger
+          className="w-16 text-xs data-[size=default]:h-10 sm:data-[size=default]:h-8"
+          aria-label="季節"
+        >
           <SelectValue placeholder="季" />
         </SelectTrigger>
         <SelectContent>
@@ -154,10 +163,17 @@ export default function SeasonNavigation() {
       </Select>
 
       <Button
-        size="sm"
-        className="h-8 px-3 text-xs"
+        variant={!isPending && routeId === targetId ? "outline" : "solid"}
+        size="md"
+        className="px-3.5 text-xs disabled:opacity-40 sm:h-8 sm:px-3"
         onClick={handleNavigate}
-        disabled={isPending || routeId === targetId}
+        disabled={!isPending && routeId === targetId}
+        loading={isPending}
+        aria-label={
+          routeId === targetId
+            ? "表示中のシーズン"
+            : `${selectedYear}年 ${seasons.find((s) => s.id === selectedSeason)?.name ?? ""}を表示`
+        }
       >
         表示
       </Button>
@@ -176,16 +192,22 @@ export default function SeasonNavigation() {
             <Button
               type="button"
               variant="outline"
+              size="md"
               onClick={() => setConfirmOpen(false)}
             >
               キャンセル
             </Button>
-            <Button type="button" onClick={handleConfirmNavigate}>
+            <Button
+              type="button"
+              variant="destructive"
+              size="md"
+              onClick={handleConfirmNavigate}
+            >
               破棄して表示
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </fieldset>
   );
 }

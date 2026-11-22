@@ -1,7 +1,6 @@
 "use client";
 
 import type { Anime } from "@/lib/anime-data";
-import { cn } from "@/lib/utils";
 import { Coins, Eye } from "lucide-react";
 
 type AnimeInfoTileProps = {
@@ -11,32 +10,38 @@ type AnimeInfoTileProps = {
 
 export function AnimeInfoTile({ anime, totalCoins }: AnimeInfoTileProps) {
   return (
-    <div className="flex-1 min-w-0 group relative flex items-center h-20 overflow-hidden rounded-lg border border-border">
+    <div className="group relative flex h-20 min-w-0 flex-1 items-center overflow-hidden rounded-xl border border-border bg-surface-sunken shadow-xs">
       <div
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+        aria-hidden="true"
+        className="absolute inset-0 bg-cover bg-center transition-[scale] duration-700 ease-out-quint group-hover:scale-105 motion-reduce:group-hover:scale-100"
         style={{ backgroundImage: `url(${anime.image})` }}
       />
-      <div className="absolute inset-0 bg-black/65" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/35"
+      />
 
-      <div className="relative w-full h-full flex flex-col justify-between p-3 text-white">
-        <div className="flex items-center justify-between text-[10px]">
-          <span className="flex items-center gap-1">
-            <Eye className="h-3 w-3" />
+      <div className="relative flex h-full w-full flex-col justify-between p-3 text-white">
+        <div className="flex items-center justify-between text-[11px] text-white/80">
+          <span className="flex items-center gap-1 tabular-nums">
+            <Eye className="size-3" aria-hidden="true" />
+            <span className="sr-only">視聴者数</span>
             {anime.watchersCount.toLocaleString()}
           </span>
           {totalCoins > 0 && (
-            <span className="flex items-center gap-1 text-coin">
-              <Coins className="h-3 w-3" />
+            <span className="flex items-center gap-1 font-medium text-coin tabular-nums">
+              <Coins className="size-3" aria-hidden="true" />
+              <span className="sr-only">合計コイン</span>
               {totalCoins.toLocaleString()}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded text-[9px] font-medium uppercase">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="shrink-0 rounded bg-white/15 px-1.5 py-0.5 text-[10px] font-medium uppercase ring-1 ring-white/10 backdrop-blur-sm">
             {anime.media}
           </span>
-          <h3 className="font-semibold text-xs leading-tight line-clamp-1">
+          <h3 className="line-clamp-1 text-sm leading-tight font-semibold">
             {anime.title}
           </h3>
         </div>

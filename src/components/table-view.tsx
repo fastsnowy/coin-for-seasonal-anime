@@ -19,25 +19,30 @@ type TableViewProps = {
 
 export function TableView({ animeList, coins, votedCoins }: TableViewProps) {
   return (
-    <div className="space-y-2 pb-20">
-      <div className="flex items-center justify-between gap-4 px-1 py-1.5 text-xs font-medium text-muted-foreground border-b border-border/50">
-        <span className="flex-1">作品名</span>
-        <span className="w-[72px] text-right shrink-0">コイン</span>
+    <div>
+      <div
+        aria-hidden="true"
+        className="mb-2 flex items-center justify-between gap-3 border-b border-border px-1 pb-2 text-[11px] font-medium tracking-wide text-muted-foreground"
+      >
+        <span className="flex-1">作品</span>
+        <span className="w-[72px] shrink-0 text-right">投票コイン</span>
       </div>
 
-      {animeList.map((anime) => {
-        const totalCoins =
-          coins.find((c) => c.annict_id === anime.id)?.total_coin_value || 0;
-        const votedCoinValue =
-          votedCoins?.find((c) => c.annict_id === anime.id)?.coin_value || 0;
+      <ul className="stagger-children space-y-2">
+        {animeList.map((anime) => {
+          const totalCoins =
+            coins.find((c) => c.annict_id === anime.id)?.total_coin_value || 0;
+          const votedCoinValue =
+            votedCoins?.find((c) => c.annict_id === anime.id)?.coin_value || 0;
 
-        return (
-          <div key={anime.id} className="flex items-center gap-3">
-            <AnimeInfoTile anime={anime} totalCoins={totalCoins} />
-            <VotedCoinCount votedCoins={votedCoinValue} />
-          </div>
-        );
-      })}
+          return (
+            <li key={anime.id} className="flex items-center gap-3">
+              <AnimeInfoTile anime={anime} totalCoins={totalCoins} />
+              <VotedCoinCount votedCoins={votedCoinValue} />
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

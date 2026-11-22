@@ -19,11 +19,15 @@ export function CoinStepper({
   title,
   confirmOnZero = false,
   disabled = false,
+  size = "md",
+  showMeter = true,
 }: {
   workId: number;
   title: string;
   confirmOnZero?: boolean;
   disabled?: boolean;
+  size?: "sm" | "md";
+  showMeter?: boolean;
 }) {
   const betWork = useAtomValue(atomBetAnimeWork(workId));
   const setBetAmount = useSetAtom(atomSetBetAmount);
@@ -41,6 +45,9 @@ export function CoinStepper({
         stepper={10}
         value={betWork.amount}
         disabled={disabled}
+        label={title}
+        size={size}
+        showMeter={showMeter}
         onValueChange={(value) => {
           if (value === undefined) return;
           if (confirmOnZero && value === 0 && betWork.amount > 0) {
@@ -62,6 +69,7 @@ export function CoinStepper({
             <Button
               type="button"
               variant="outline"
+              size="md"
               onClick={() => setPendingRemove(false)}
             >
               キャンセル
@@ -69,6 +77,7 @@ export function CoinStepper({
             <Button
               type="button"
               variant="destructive"
+              size="md"
               onClick={() => {
                 apply(0);
                 setPendingRemove(false);

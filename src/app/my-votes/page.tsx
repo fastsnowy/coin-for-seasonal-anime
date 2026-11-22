@@ -11,7 +11,9 @@ import { siteName } from "@/config/constant";
 import { DB_TABLES } from "@/config/database";
 import { type Anime, getAnimeByIds } from "@/lib/anime-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Coins, History, LogIn } from "lucide-react";
+import { BlurText } from "@/components/ui/blur-text";
+import { NumberRoll } from "@/components/ui/number-roll";
+import { ArrowRight, Coins, History, LinkIcon, LogIn } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -31,13 +33,13 @@ export default async function MyVotesPage() {
     return (
       <PageShell isLinkedAccount={false}>
         <EmptyState
-          icon={<LogIn className="w-10 h-10 text-muted-foreground/40" />}
+          icon={<LogIn aria-hidden="true" className="size-6" />}
           title="ログインが必要です"
           description="投票履歴を確認するにはログインしてください。"
           action={
-            <Button asChild className="gap-2">
+            <Button asChild variant="solid" size="md">
               <Link href="/login?next=/my-votes">
-                <LogIn className="h-4 w-4" />
+                <LogIn aria-hidden="true" />
                 ログイン
               </Link>
             </Button>
@@ -58,14 +60,15 @@ export default async function MyVotesPage() {
     return (
       <PageShell isLinkedAccount={isLinkedAccount}>
         <EmptyState
-          icon={<History className="w-10 h-10 text-muted-foreground/40" />}
+          icon={<History aria-hidden="true" className="size-6" />}
           title="投票履歴がありません"
           description="まだ投票していません。アニメにコインを賭けてみましょう！"
           action={
-            <Button asChild className="gap-2">
+            <Button asChild size="md">
               <Link href="/">
-                <Coins className="h-4 w-4" />
+                <Coins aria-hidden="true" />
                 投票する
+                <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           }
@@ -78,19 +81,69 @@ export default async function MyVotesPage() {
   const animeById = await fetchAnimeByIds(
     collectThumbnailAnnictIds(voteGroups),
   );
+  const totalCoins = voteGroups.reduce(
+    (sum, group) => sum + group.totalCoins,
+    0,
+  );
 
   return (
     <PageShell isLinkedAccount={isLinkedAccount}>
-      <div className="mt-6 mb-8 text-center space-y-1">
-        <h1 className="text-2xl font-extrabold tracking-tight">投票履歴</h1>
-        <p className="text-sm text-muted-foreground">
-          {user.is_anonymous
-            ? "匿名ユーザーとしての投票履歴です"
-            : `${(user.user_metadata?.name as string) ?? (user.user_metadata?.user_name as string) ?? "アカウント"} の投票履歴`}
-        </p>
-      </div>
+      <header className="mt-4 mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3 sm:mt-6">
+        <div className="min-w-0 space-y-1">
+          <BlurText
+            as="h1"
+            text="投票履歴"
+            className="text-2xl font-extrabold tracking-tight"
+          />
+          <p className="text-sm text-muted-foreground">
+            {user.is_anonymous
+              ? "匿名ユーザーとしての投票履歴です"
+              : `${(user.user_metadata?.name as string) ?? (user.user_metadata?.user_name as string) ?? "アカウント"} の投票履歴`}
+          </p>
+        </div>
+        <dl className="flex items-center gap-4 rounded-xl border border-border bg-surface-sunken px-4 py-2.5">
+          <div>
+            <dt className="text-[11px] text-muted-foreground">投票</dt>
+            <dd className="flex items-baseline gap-0.5 font-bold">
+              <NumberRoll value={voteGroups.length} className="text-lg" />
+              <span className="text-[11px] font-normal text-muted-foreground">
+                回
+              </span>
+            </dd>
+          </div>
+          <div aria-hidden="true" className="h-8 w-px bg-border" />
+          <div>
+            <dt className="text-[11px] text-muted-foreground">合計コイン</dt>
+            <dd className="flex items-baseline gap-0.5 font-bold text-coin-foreground">
+              <NumberRoll value={totalCoins} className="text-lg" />
+              <span className="text-[11px] font-normal text-muted-foreground">
+                枚
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </header>
 
-      <ul className="space-y-3">
+      {user.is_anonymous && (
+        <aside className="mb-6 flex flex-col gap-3 rounded-xl border border-coin/20 bg-coin-muted p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs leading-relaxed text-foreground/80">
+            現在、匿名ユーザーとしてご利用中です。Annictアカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            size="md"
+            className="shrink-0 self-start sm:self-auto"
+          >
+            <Link href="/link">
+              <LinkIcon aria-hidden="true" />
+              Annictアカウントを連携
+            </Link>
+          </Button>
+        </aside>
+      )}
+
+      <ul aria-label="投票一覧" className="stagger-children space-y-3">
         {voteGroups.map((group) => (
           <li key={group.createdId}>
             <VoteGroupCard
@@ -101,20 +154,6 @@ export default async function MyVotesPage() {
           </li>
         ))}
       </ul>
-
-      {user.is_anonymous && (
-        <div className="mt-8 rounded-lg border border-border bg-muted/50 p-4">
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-            現在、匿名ユーザーとしてご利用中です。Annictアカウントを連携すると、別のデバイスからも投票履歴を確認できるようになります。
-          </p>
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
-            <Link href="/link">
-              <LogIn className="h-3.5 w-3.5" />
-              Annictアカウントを連携
-            </Link>
-          </Button>
-        </div>
-      )}
     </PageShell>
   );
 }
@@ -158,14 +197,18 @@ function EmptyState({
   action: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-5 py-20">
-      {icon}
-      <div className="text-center space-y-1.5">
+    <section className="mt-6 flex flex-col items-center justify-center gap-5 rounded-2xl border border-dashed border-border-strong bg-surface-sunken/60 px-6 py-16 text-center animate-fade-up">
+      <span className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground shadow-sm">
+        {icon}
+      </span>
+      <div className="space-y-1.5">
         <h1 className="text-lg font-bold">{title}</h1>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="max-w-[32ch] text-sm leading-relaxed text-muted-foreground text-pretty">
+          {description}
+        </p>
       </div>
       {action}
-    </div>
+    </section>
   );
 }
 

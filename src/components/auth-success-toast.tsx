@@ -17,7 +17,12 @@ export function AuthSuccessToast() {
 
     toast.success(
       linked ? "Annictアカウントを連携しました" : "ログインしました",
-      { id: "auth-success-toast" },
+      {
+        id: "auth-success-toast",
+        description: linked
+          ? "これまでの投票履歴は引き継がれています"
+          : "おかえりなさい。投票履歴はマイページから確認できます",
+      },
     );
 
     const params = new URLSearchParams(searchParams.toString());
