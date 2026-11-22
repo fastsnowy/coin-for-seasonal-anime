@@ -1,7 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  SegmentedControl,
+  type SegmentOption,
+} from "@/components/ui/segmented-control";
 import {
   Select,
   SelectContent,
@@ -11,34 +14,36 @@ import {
 } from "@/components/ui/select";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
 import {
-  ArrowDown,
-  ArrowUp,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
   RotateCcw,
   SlidersHorizontal,
 } from "lucide-react";
 
 export type MediaType = "all" | "TV" | "OVA" | "MOVIE" | "WEB" | "OTHER";
 export type SortType = "coins" | "watchers" | "title";
+type SortOrder = "asc" | "desc";
 
 interface AnimeFilterProps {
   mediaType: MediaType;
   sortBy: SortType;
-  sortOrder: "asc" | "desc";
+  sortOrder: SortOrder;
   onMediaTypeChange: (value: MediaType) => void;
   onSortChange: (value: SortType) => void;
-  onSortOrderChange: (value: "asc" | "desc") => void;
+  onSortOrderChange: (value: SortOrder) => void;
   activeFilterCount: number;
 }
 
-const mediaTypes = [
+const mediaTypes: readonly SegmentOption<MediaType>[] = [
   { value: "all", label: "すべて" },
   { value: "TV", label: "TV" },
   { value: "OVA", label: "OVA" },
@@ -47,10 +52,23 @@ const mediaTypes = [
   { value: "OTHER", label: "他" },
 ];
 
-const sortOptions = [
+const sortOptions: readonly SegmentOption<SortType>[] = [
   { value: "coins", label: "コイン数" },
   { value: "watchers", label: "視聴者数" },
   { value: "title", label: "タイトル" },
+];
+
+const orderOptions: readonly SegmentOption<SortOrder>[] = [
+  {
+    value: "desc",
+    label: "降順",
+    icon: <ArrowDownWideNarrow aria-hidden="true" />,
+  },
+  {
+    value: "asc",
+    label: "昇順",
+    icon: <ArrowUpNarrowWide aria-hidden="true" />,
+  },
 ];
 
 export function AnimeFilter({
@@ -69,143 +87,163 @@ export function AnimeFilter({
   };
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       {/* Desktop */}
-      <div className="hidden md:flex items-center gap-1.5">
-        <Select value={mediaType} onValueChange={onMediaTypeChange}>
-          <SelectTrigger className="w-28 h-8 text-xs">
-            <SelectValue placeholder="メディア" />
-          </SelectTrigger>
-          <SelectContent>
-            {mediaTypes.map((t) => (
-              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="hidden items-center gap-2 md:flex">
+        <SegmentedControl
+          aria-label="メディアで絞り込み"
+          options={mediaTypes}
+          value={mediaType}
+          onValueChange={onMediaTypeChange}
+          size="sm"
+        />
 
-        <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-28 h-8 text-xs">
+        <span aria-hidden="true" className="h-5 w-px bg-border" />
+
+        <Select
+          value={sortBy}
+          onValueChange={(v) => onSortChange(v as SortType)}
+        >
+          <SelectTrigger size="sm" className="w-28 text-xs" aria-label="並び順">
             <SelectValue placeholder="並び順" />
           </SelectTrigger>
           <SelectContent>
             {sortOptions.map((o) => (
-              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="icon-sm"
           onClick={() => onSortOrderChange(sortOrder === "desc" ? "asc" : "desc")}
-          aria-label={sortOrder === "desc" ? "昇順に切り替える" : "降順に切り替える"}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label={
+            sortOrder === "desc"
+              ? "降順で表示中。昇順に切り替える"
+              : "昇順で表示中。降順に切り替える"
+          }
+          title={sortOrder === "desc" ? "降順" : "昇順"}
         >
           {sortOrder === "desc" ? (
-            <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
+            <ArrowDownWideNarrow aria-hidden="true" />
           ) : (
-            <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
+            <ArrowUpNarrowWide aria-hidden="true" />
           )}
-        </button>
+        </Button>
 
         {activeFilterCount > 0 && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={resetFilters}
-            aria-label="フィルターをリセット"
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            icon={<RotateCcw aria-hidden="true" />}
+            className="animate-scale-in text-muted-foreground"
           >
-            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-          </button>
+            リセット
+          </Button>
         )}
       </div>
 
       {/* Mobile */}
       <Sheet>
         <SheetTrigger asChild>
-          <button
-            type="button"
-            className="md:hidden h-8 px-3 rounded-lg border border-border text-xs flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+          <Button
+            variant="outline"
+            size="md"
+            className="md:hidden"
+            aria-label={
+              activeFilterCount > 0
+                ? `絞り込みと並び替え（${activeFilterCount}件変更中）`
+                : "絞り込みと並び替え"
+            }
           >
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            フィルター
+            <SlidersHorizontal aria-hidden="true" />
+            絞り込み
             {activeFilterCount > 0 && (
-              <Badge
-                variant="default"
-                className="ml-0.5 h-4 min-w-4 rounded-full p-0 flex items-center justify-center text-[10px]"
+              <span
+                aria-hidden="true"
+                className="flex size-5 animate-scale-in items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground tabular-nums"
               >
                 {activeFilterCount}
-              </Badge>
+              </span>
             )}
-          </button>
+          </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="rounded-t-2xl">
-          <SheetHeader className="text-center">
-            <div className="mx-auto w-10 h-1 bg-muted-foreground/20 rounded-full mb-3" />
-            <SheetTitle>フィルター</SheetTitle>
-            <SheetDescription>表示条件を変更</SheetDescription>
+        <SheetContent side="bottom" className="mx-auto w-full max-w-xl gap-0 rounded-t-2xl pb-safe sm:border-x">
+          <div
+            aria-hidden="true"
+            className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-muted-foreground/20"
+          />
+          <SheetHeader className="pb-2">
+            <SheetTitle>絞り込みと並び替え</SheetTitle>
+            <SheetDescription>表示する作品と順番を選べます</SheetDescription>
           </SheetHeader>
-          <div className="mt-4 space-y-5 px-1">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">メディア</p>
-              <div className="grid grid-cols-3 gap-1.5">
-                {mediaTypes.map((t) => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => onMediaTypeChange(t.value as MediaType)}
-                    className={cn(
-                      "h-9 rounded-lg text-sm font-medium transition-colors",
-                      mediaType === t.value
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">並び順</p>
-              <Select value={sortBy} onValueChange={onSortChange}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {sortOptions.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-5 px-4 py-2">
+            <fieldset className="space-y-2">
+              <legend className="mb-2 text-xs font-medium text-muted-foreground">
+                メディア
+              </legend>
+              <SegmentedControl
+                aria-label="メディア"
+                options={mediaTypes}
+                value={mediaType}
+                onValueChange={onMediaTypeChange}
+                size="lg"
+                fullWidth
+                className="[&>button]:px-1"
+              />
+            </fieldset>
 
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">順序</p>
-              <div className="grid grid-cols-2 gap-1.5">
-                {(["desc", "asc"] as const).map((order) => (
-                  <button
-                    key={order}
-                    type="button"
-                    onClick={() => onSortOrderChange(order)}
-                    className={cn(
-                      "h-9 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors",
-                      sortOrder === order
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {order === "desc" ? <ArrowDown className="h-3.5 w-3.5" /> : <ArrowUp className="h-3.5 w-3.5" />}
-                    {order === "desc" ? "降順" : "昇順"}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <fieldset className="space-y-2">
+              <legend className="mb-2 text-xs font-medium text-muted-foreground">
+                並び順
+              </legend>
+              <SegmentedControl
+                aria-label="並び順"
+                options={sortOptions}
+                value={sortBy}
+                onValueChange={onSortChange}
+                size="lg"
+                fullWidth
+              />
+            </fieldset>
 
-            {activeFilterCount > 0 && (
-              <Button variant="outline" onClick={resetFilters} className="w-full">
-                リセット
-              </Button>
-            )}
+            <fieldset className="space-y-2">
+              <legend className="mb-2 text-xs font-medium text-muted-foreground">
+                順序
+              </legend>
+              <SegmentedControl
+                aria-label="順序"
+                options={orderOptions}
+                value={sortOrder}
+                onValueChange={onSortOrderChange}
+                size="lg"
+                fullWidth
+              />
+            </fieldset>
           </div>
+
+          <SheetFooter className="flex-row gap-2 pt-4">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={resetFilters}
+              disabled={activeFilterCount === 0}
+              icon={<RotateCcw aria-hidden="true" />}
+              className="flex-1"
+            >
+              リセット
+            </Button>
+            <SheetClose asChild>
+              <Button variant="solid" size="lg" className="flex-1">
+                完了
+              </Button>
+            </SheetClose>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </div>

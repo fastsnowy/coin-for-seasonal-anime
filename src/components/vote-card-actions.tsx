@@ -20,20 +20,20 @@ export function VoteCardActions({ createdId }: { createdId: string }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground"
+            size="icon-md"
+            className="-mr-2 text-muted-foreground data-[state=open]:bg-accent data-[state=open]:text-foreground"
           >
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">メニュー</span>
+            <MoreHorizontal aria-hidden="true" />
+            <span className="sr-only">この投票のメニュー</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
+            variant="destructive"
             onSelect={() => setDeleteOpen(true)}
           >
-            <Trash2 className="h-4 w-4 mr-2" />
-            削除
+            <Trash2 aria-hidden="true" />
+            投票を削除
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

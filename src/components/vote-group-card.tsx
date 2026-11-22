@@ -1,7 +1,9 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { type Anime } from "@/lib/anime-data";
 import { getSeasonName, type Season } from "@/lib/seasons";
-import { Coins } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { NumberRoll } from "@/components/ui/number-roll";
+import { ChevronRight, Coins } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -32,69 +34,100 @@ export function VoteGroupCard({
 }) {
   const thumbnails = group.items.slice(0, THUMBNAILS_PER_VOTE);
   const restCount = group.items.length - thumbnails.length;
+  const href = `/results?id=${group.createdId}`;
+  const votedAt = formatVotedAt(group.createdAt);
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 transition-colors hover:border-coin/30">
-      <div className="flex items-center justify-between gap-3">
+    <article
+      aria-label={`${group.seasonLabel}の投票（${votedAt}）`}
+      className="surface group/vote relative rounded-2xl p-4 transition-[border-color,box-shadow] duration-200 ease-out-quint hover:border-border-strong hover:shadow-md has-[a:focus-visible]:border-border-strong sm:p-5"
+    >
+      <div className="flex items-start justify-between gap-3">
         <Link
-          href={`/results?id=${group.createdId}`}
-          className="flex min-w-0 flex-1 items-center gap-2 hover:opacity-80 transition-opacity"
+          href={href}
+          className="-m-1 flex min-w-0 flex-1 flex-col gap-1.5 rounded-lg p-1 outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:ring-[3px] focus-visible:ring-ring/35"
         >
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            {group.seasonLabel}
+          <span className="flex items-center gap-2">
+            <Badge variant="neutral">{group.seasonLabel}</Badge>
+            <ChevronRight
+              aria-hidden="true"
+              className="size-3.5 text-muted-foreground transition-transform duration-200 ease-out-quint group-hover/vote:translate-x-0.5 motion-reduce:transition-none"
+            />
+            <span className="sr-only">の結果を見る</span>
           </span>
-          <span className="truncate text-xs text-muted-foreground">
-            {formatVotedAt(group.createdAt)}
-          </span>
+          <time
+            dateTime={group.createdAt}
+            className="truncate text-xs text-muted-foreground"
+          >
+            {votedAt}
+          </time>
         </Link>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Coins className="h-4 w-4 text-coin" />
-          <span className="text-lg font-bold tabular-nums text-coin">
-            {group.totalCoins}
-          </span>
+        <div className="relative z-10 flex shrink-0 items-center gap-1">
+          <div className="flex flex-col items-end">
+            <span className="text-[11px] leading-none text-muted-foreground">
+              合計
+            </span>
+            <span className="mt-1 flex items-center gap-1 text-coin-foreground">
+              <Coins aria-hidden="true" className="size-4 text-coin" />
+              <NumberRoll
+                value={group.totalCoins}
+                className="text-xl font-bold leading-none tracking-tight"
+              />
+              <span className="sr-only">枚</span>
+            </span>
+          </div>
           {actions}
         </div>
       </div>
 
-      <Link
-        href={`/results?id=${group.createdId}`}
-        className="mt-3 block hover:opacity-90 transition-opacity"
-      >
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {thumbnails.map((item) => {
-            const anime = animeById.get(item.annictId);
-            return (
-              <div key={item.annictId} className="space-y-1">
-                <AspectRatio
-                  ratio={16 / 9}
-                  className="relative overflow-hidden rounded-lg bg-muted"
-                >
-                  {anime?.image ? (
-                    <img
-                      src={anime.image}
-                      alt={anime.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                  <span className="absolute bottom-1 right-1 rounded-full bg-black/65 px-1.5 text-[10px] font-semibold tabular-nums text-white backdrop-blur-sm">
-                    {item.coinValue}
-                  </span>
-                </AspectRatio>
-                <p className="line-clamp-1 text-[11px] text-muted-foreground">
-                  {anime?.title ?? `作品ID: ${item.annictId}`}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+      {thumbnails.length > 0 && (
+        <div className="pointer-events-none mt-4">
+          <ul
+            aria-label="投票した作品"
+            className="grid grid-cols-2 gap-2.5 sm:grid-cols-4"
+          >
+            {thumbnails.map((item) => {
+              const anime = animeById.get(item.annictId);
+              return (
+                <li key={item.annictId} className="min-w-0 space-y-1.5">
+                  <AspectRatio
+                    ratio={16 / 9}
+                    className="relative overflow-hidden rounded-lg bg-surface-sunken ring-1 ring-border ring-inset"
+                  >
+                    {anime?.image ? (
+                      <img
+                        src={anime.image}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-300 ease-out-quint group-hover/vote:scale-[1.02] motion-reduce:transition-none"
+                      />
+                    ) : null}
+                    <span className="absolute right-1 bottom-1 inline-flex items-center gap-0.5 rounded-full bg-black/65 px-1.5 py-px text-[10px] font-semibold tabular-nums text-white backdrop-blur-sm">
+                      <Coins
+                        aria-hidden="true"
+                        className="size-2.5 text-coin"
+                      />
+                      {item.coinValue}
+                      <span className="sr-only">枚</span>
+                    </span>
+                  </AspectRatio>
+                  <p className="line-clamp-1 text-[11px] text-muted-foreground">
+                    {anime?.title ?? `作品ID: ${item.annictId}`}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
 
-        {restCount > 0 && (
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            ほか{restCount}作品
-          </p>
-        )}
-      </Link>
-    </div>
+          {restCount > 0 && (
+            <p className="mt-2.5 text-[11px] text-muted-foreground">
+              ほか{restCount}作品
+            </p>
+          )}
+        </div>
+      )}
+    </article>
   );
 }
 

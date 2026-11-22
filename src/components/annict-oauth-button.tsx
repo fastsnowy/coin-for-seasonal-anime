@@ -3,8 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { loginWithAnnict, linkAnnict } from "@/lib/auth-actions";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+function isNextRedirectError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  if (!("digest" in error)) return false;
+  return (
+    typeof error.digest === "string" && error.digest.includes("NEXT_REDIRECT")
+  );
+}
 
 export function AnnictOAuthButton({
   mode,
@@ -16,43 +24,59 @@ export function AnnictOAuthButton({
   const [loading, setLoading] = useState(false);
   const idleLabel =
     mode === "login" ? "Annictでログイン" : "Annictアカウントを連携";
-  const busyLabel = mode === "login" ? "ログイン中…" : "連携中…";
+  const busyLabel = "Annictへ移動中…";
+
+  // Reset the busy state if the page is restored from the back/forward cache
+  // after the user returns from Annict without completing the flow.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setLoading(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
 
   const handleClick = async () => {
+    if (loading) return;
     setLoading(true);
     try {
       const result =
-        mode === "login"
-          ? await loginWithAnnict(nextPath)
-          : await linkAnnict();
+        mode === "login" ? await loginWithAnnict(nextPath) : await linkAnnict();
       if (result?.error) {
         toast.error(result.error);
+        setLoading(false);
       }
-    } catch {
-      // redirect throws NEXT_REDIRECT
-    } finally {
-      setLoading(false);
+      // On success the action redirects to Annict; keep the busy state until
+      // the browser navigates away so the button doesn't flash back.
+    } catch (error) {
+      if (!isNextRedirectError(error)) {
+        setLoading(false);
+      }
     }
   };
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className="h-11 w-full gap-2.5 font-semibold"
-      onClick={handleClick}
-      disabled={loading}
-      aria-busy={loading}
-    >
-      {loading ? (
-        <div
-          className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-          aria-hidden="true"
-        />
-      ) : (
-        <Icon icon="simple-icons:annict" className="h-4.5 w-4.5" />
-      )}
-      {loading ? busyLabel : idleLabel}
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant="solid"
+        size="lg"
+        className="w-full font-semibold"
+        onClick={handleClick}
+        loading={loading}
+        icon={
+          <Icon
+            icon="simple-icons:annict"
+            className="size-[18px]"
+            aria-hidden="true"
+          />
+        }
+      >
+        {loading ? busyLabel : idleLabel}
+      </Button>
+      <span className="sr-only" role="status" aria-live="polite">
+        {loading ? busyLabel : ""}
+      </span>
+    </>
   );
 }

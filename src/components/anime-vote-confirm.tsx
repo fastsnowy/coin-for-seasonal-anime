@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { CoinStepper } from "@/components/coin-stepper";
+import { NumberRoll } from "@/components/ui/number-roll";
 import {
   atomBetAnimeWorkId,
   atomBetCoinValue,
@@ -70,9 +71,11 @@ export function VoteConfirm({
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
-  const submittedItemsRef = useRef<BetAnimes>([]);
+  // Snapshot shown while submitting, so the list doesn't empty out when the
+  // draft is reset right before navigation.
+  const [submittedItems, setSubmittedItems] = useState<BetAnimes>([]);
   const router = useRouter();
-  const displayItems = isSubmitting ? submittedItemsRef.current : betCoinValue;
+  const displayItems = isSubmitting ? submittedItems : betCoinValue;
   const totalCoins = displayItems.reduce(
     (acc, item) => acc + item.coin_value,
     0,
@@ -83,13 +86,14 @@ export function VoteConfirm({
       return;
     }
 
-    submittedItemsRef.current = betCoinValue;
+    const items = betCoinValue;
+    setSubmittedItems(items);
     setIsSubmitting(true);
     isSubmittingRef.current = true;
     onSubmittingChange?.(true);
 
     try {
-      const result = await createVote(submittedItemsRef.current, seasonName);
+      const result = await createVote(items, seasonName);
 
       if (result) {
         const { resultId } = result;
@@ -109,14 +113,14 @@ export function VoteConfirm({
         resetBetAnimeWorkId();
         router.push(`/results?id=${resultId}`);
       } else {
-        submittedItemsRef.current = [];
+        setSubmittedItems([]);
         setIsSubmitting(false);
         isSubmittingRef.current = false;
         onSubmittingChange?.(false);
       }
     } catch (error) {
       console.error("投票エラー:", error);
-      submittedItemsRef.current = [];
+      setSubmittedItems([]);
       setIsSubmitting(false);
       isSubmittingRef.current = false;
       onSubmittingChange?.(false);
@@ -134,17 +138,17 @@ export function VoteConfirm({
     >
       <SheetTrigger asChild>
         <Button
-          size="lg"
-          className="h-10 gap-1.5 px-5 font-semibold transition-transform active:scale-[0.97]"
+          size="md"
+          className="rounded-xl px-4 font-semibold"
           disabled={betCoinValue.length === 0}
+          iconRight={<ChevronRight aria-hidden="true" />}
         >
-          投票確定
-          <ChevronRight className="h-4 w-4" />
+          確認する
         </Button>
       </SheetTrigger>
       <SheetContent
         side="bottom"
-        className="rounded-t-2xl"
+        className="mx-auto max-h-[90dvh] w-full max-w-xl gap-0 rounded-t-2xl pb-safe sm:border-x"
         aria-busy={isSubmitting}
         onPointerDownOutside={(event) => {
           if (isSubmitting) event.preventDefault();
@@ -153,22 +157,26 @@ export function VoteConfirm({
           if (isSubmitting) event.preventDefault();
         }}
       >
-        <SheetHeader className="text-center">
+        <div
+          aria-hidden="true"
+          className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-muted-foreground/20"
+        />
+        <SheetHeader className="pb-2">
           <SheetTitle className="text-lg">投票内容の確認</SheetTitle>
           <SheetDescription>
             コイン数を調整してから投票できます
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4 max-h-[50vh] space-y-2 overflow-y-auto overscroll-contain px-1">
-          {displayItems.length > 0 ? (
-            <>
+        {displayItems.length > 0 ? (
+          <>
+            <ul className="stagger-children min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain px-4 py-1">
               {displayItems.map((item) => (
-                <div
+                <li
                   key={item.annict_id}
-                  className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/50 p-3"
+                  className="flex items-center gap-3 rounded-xl border border-border bg-surface-sunken/60 py-2.5 pr-2.5 pl-3.5"
                 >
-                  <span className="min-w-0 flex-1 line-clamp-2 text-sm leading-snug">
+                  <span className="line-clamp-2 min-w-0 flex-1 text-sm leading-snug font-medium">
                     {item.title}
                   </span>
                   <div className="w-36 shrink-0">
@@ -177,58 +185,62 @@ export function VoteConfirm({
                       title={item.title}
                       confirmOnZero
                       disabled={isSubmitting}
+                      size="sm"
+                      showMeter={false}
                     />
                   </div>
-                </div>
+                </li>
               ))}
+            </ul>
 
-              <div className="mt-3 flex items-center justify-between rounded-lg border border-coin/15 bg-coin-muted p-3">
-                <span className="text-sm font-semibold">合計</span>
-                <div className="flex items-center gap-2">
-                  <Coins className="h-5 w-5 text-coin" aria-hidden="true" />
-                  <span className="text-xl font-bold text-coin tabular-nums">
-                    {totalCoins}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="py-8 text-center text-muted-foreground">
-              現在、投票内容はありません。
+            <div className="mx-4 mt-3 flex items-center justify-between rounded-xl border border-coin/20 bg-coin-muted px-4 py-3">
+              <span className="text-sm font-medium">
+                合計
+                <span className="ml-1.5 text-xs text-muted-foreground">
+                  {displayItems.length}作品
+                </span>
+              </span>
+              <span className="flex items-center gap-2 text-coin-foreground">
+                <Coins className="size-5 text-coin" aria-hidden="true" />
+                <NumberRoll
+                  value={totalCoins}
+                  className="text-xl font-semibold tracking-tight"
+                />
+                <span className="sr-only">コイン</span>
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+            <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              <Coins className="size-5" aria-hidden="true" />
+            </span>
+            <p className="text-sm text-muted-foreground">
+              選択中の作品はありません
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
-        <SheetFooter className="mt-5 gap-2 sm:gap-2">
+        <SheetFooter className="flex-row gap-2 pt-4">
           <SheetClose asChild>
             <Button
               variant="outline"
+              size="lg"
               disabled={isSubmitting}
               className="flex-1"
             >
-              キャンセル
+              戻る
             </Button>
           </SheetClose>
           <Button
+            size="lg"
             onClick={handleSubmit}
-            disabled={displayItems.length === 0 || isSubmitting}
-            className="flex-1 gap-1.5"
-            aria-busy={isSubmitting}
+            disabled={displayItems.length === 0}
+            loading={isSubmitting}
+            icon={<Coins aria-hidden="true" />}
+            className="flex-[1.4] font-semibold"
           >
-            {isSubmitting ? (
-              <>
-                <span
-                  className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-                  aria-hidden="true"
-                />
-                送信中…
-              </>
-            ) : (
-              <>
-                <Coins className="h-4 w-4" />
-                投票する
-              </>
-            )}
+            {isSubmitting ? "送信中…" : "投票する"}
           </Button>
         </SheetFooter>
       </SheetContent>
