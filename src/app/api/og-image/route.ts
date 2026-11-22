@@ -1,12 +1,12 @@
-import { fetchOgImageUrl, fetchPublic, isPublicHttpUrl, readBodyWithLimit } from "@/lib/og-image";
-import { exceedsImageLimit, MAX_IMAGE_BYTES, toAllowedImageType, verifySiteSignature } from "@/lib/og-image-proxy";
+import { fetchPublic, readBodyWithLimit } from "@/lib/og-image";
+import { exceedsImageLimit, MAX_IMAGE_BYTES, toAllowedImageType, verifyImageSignature } from "@/lib/og-image-proxy";
 import { getOgImageProxySecret } from "@/lib/og-image-secret";
 import { toSafeHttpUrl } from "@/lib/safe-url";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
 
-// HTML取得 + 画像取得の合計時間の上限
+// 画像取得の合計時間の上限 (リダイレクト含む)
 const TOTAL_BUDGET_MS = 8_000;
 
 const CACHE_CONTROL = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800";
@@ -19,26 +19,24 @@ function notFound() {
 }
 
 /**
- * 公式サイトの OGP 画像を同一オリジンで返す。
+ * 外部画像を同一オリジンで返す。
  * 一部サイトは画像に `Cross-Origin-Resource-Policy: same-origin` を付けており、
  * ブラウザから直接 <img> 表示できないため、サーバー経由で配信する。
- * `site` はサーバーが署名した URL (anime-data.ts が発行) のみ受け付ける。署名が無い/不一致なら
- * 外部へ一切取得に行かず 404 を返すため、任意サイトを中継するオープンプロキシにはならない。
+ * `u` はサーバーが署名した画像URL (anime-data.ts が発行) のみ受け付ける。署名が無い/不一致なら
+ * 外部へ一切取得に行かず 404 を返すため、任意URLを中継するオープンプロキシにはならない。
+ * 取得時も fetchPublic が公開ホストか (リダイレクト先含む) を検証する。
  */
 export async function GET(request: Request) {
   try {
     const params = new URL(request.url).searchParams;
-    const siteParam = params.get("site");
-    if (!siteParam || !verifySiteSignature(siteParam, params.get("sig"), getOgImageProxySecret())) {
+    const imageParam = params.get("u");
+    if (!imageParam || !verifyImageSignature(imageParam, params.get("sig"), getOgImageProxySecret())) {
       return notFound();
     }
-    const site = toSafeHttpUrl(siteParam);
-    if (!site || !(await isPublicHttpUrl(new URL(site)))) return notFound();
-
-    const signal = AbortSignal.timeout(TOTAL_BUDGET_MS);
-    const imageUrl = await fetchOgImageUrl(site, signal);
+    const imageUrl = toSafeHttpUrl(imageParam);
     if (!imageUrl) return notFound();
 
+    const signal = AbortSignal.timeout(TOTAL_BUDGET_MS);
     const fetched = await fetchPublic(new URL(imageUrl), "image/avif,image/webp,image/*;q=0.8", { signal });
     if (!fetched || !fetched.res.ok) return notFound();
     const { res } = fetched;

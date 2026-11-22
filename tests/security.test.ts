@@ -126,7 +126,7 @@ test("OGP image proxy only serves small raster images", async () => {
   assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES)), false);
   assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES + 1)), true);
   assert.equal(exceedsImageLimit(null), false);
-  assert.equal(ogImageProxyPath("https://a.example/?x=1&y=2", "k").startsWith("/api/og-image?site=https%3A%2F%2Fa.example%2F%3Fx%3D1%26y%3D2&sig="), true);
+  assert.equal(ogImageProxyPath("https://a.example/?x=1&y=2", "k").startsWith("/api/og-image?u=https%3A%2F%2Fa.example%2F%3Fx%3D1%26y%3D2&sig="), true);
 });
 
 test("OGP image proxy rejects non-public sites and streamed bodies over the cap", async () => {
@@ -143,14 +143,35 @@ test("OGP image proxy rejects non-public sites and streamed bodies over the cap"
 });
 
 test("OGP image proxy URLs must carry a valid HMAC signature", async () => {
-  const { signSite, verifySiteSignature } = await import("../src/lib/og-image-proxy");
-  const sig = signSite("https://a.example/", "secret");
-  assert.equal(verifySiteSignature("https://a.example/", sig, "secret"), true);
-  assert.equal(verifySiteSignature("https://b.example/", sig, "secret"), false);
-  assert.equal(verifySiteSignature("https://a.example/", sig, "other"), false);
-  assert.equal(verifySiteSignature("https://a.example/", `${sig}x`, "secret"), false);
-  assert.equal(verifySiteSignature("https://a.example/", "", "secret"), false);
-  assert.equal(verifySiteSignature("https://a.example/", null, "secret"), false);
+  const { signImageUrl, verifyImageSignature } = await import("../src/lib/og-image-proxy");
+  const sig = signImageUrl("https://a.example/", "secret");
+  assert.equal(verifyImageSignature("https://a.example/", sig, "secret"), true);
+  assert.equal(verifyImageSignature("https://b.example/", sig, "secret"), false);
+  assert.equal(verifyImageSignature("https://a.example/", sig, "other"), false);
+  assert.equal(verifyImageSignature("https://a.example/", `${sig}x`, "secret"), false);
+  assert.equal(verifyImageSignature("https://a.example/", "", "secret"), false);
+  assert.equal(verifyImageSignature("https://a.example/", null, "secret"), false);
+});
+
+test("only Annict's own hosts are served directly", async () => {
+  const { isAnnictImageUrl } = await import("../src/lib/og-image-proxy");
+  assert.equal(isAnnictImageUrl("https://image.annict.com/x/plain/s3://annict-user-contents/a.jpg"), true);
+  assert.equal(isAnnictImageUrl("https://annict.com/a.jpg"), true);
+  for (const url of ["https://image.annict.com.evil.com/a.jpg", "https://evilannict.com/a.jpg", "http://image.annict.com/a.jpg", "https://saikyosoubi.com/ogp02.jpg", "https://evil.com/?https://image.annict.com/", "nope"]) {
+    assert.equal(isAnnictImageUrl(url), false, url);
+  }
+});
+
+test("OGP extraction falls back to image_src and key-visual images", async () => {
+  const { extractOgImageUrl } = await import("../src/lib/og-image");
+  const page = "https://shioama-anime.com/";
+  const spa = `<link rel="stylesheet" href="/assets/main.css"><img src="/img/key_icon_3.png"><img src="/img/logo_kv.png"><img src="/img/kv.jpg"><img src="/img/kv2.jpg">`;
+  assert.equal(extractOgImageUrl(spa, page), "https://shioama-anime.com/img/kv.jpg");
+  assert.equal(extractOgImageUrl(`<img src="/a/header_logo.png"><img src="/img/icon.png"><img src="/img/key_icon.png">`, page), undefined);
+  assert.equal(extractOgImageUrl(`<link rel="image_src" href="/s/share.jpg"><img src="/img/kv.jpg">`, page), "https://shioama-anime.com/s/share.jpg");
+  assert.equal(extractOgImageUrl(`<meta property="og:image" content="/og.jpg"><link rel="image_src" href="/s.jpg">`, page), "https://shioama-anime.com/og.jpg");
+  assert.equal(extractOgImageUrl(`<img src="data:image/png;base64,AAAA" data-src="/img/mainvisual_01.webp"><img src="/img/kv.svg">`, page), "https://shioama-anime.com/img/mainvisual_01.webp");
+  assert.equal(extractOgImageUrl(`<img src="/img/kv.svg"><img src="data:image/gif;base64,AA">`, page), undefined);
 });
 
 test("SSRF guard blocks IPv6 forms that embed private IPv4 addresses", async () => {
