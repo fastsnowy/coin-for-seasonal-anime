@@ -61,44 +61,6 @@ export function extractOgImageUrl(html: string, pageUrl: string): string | undef
       // 次の候補へ
     }
   }
-  return extractFallbackImageUrl(html, pageUrl);
-}
-
-const KEY_VISUAL_NAME = /(?:^|[^a-z])(?:kv|mv|keyvisual|key[_-]visual|mainvisual|main[_-]visual|visual)\d*(?:[^a-z]|$)/i;
-const NON_VISUAL_NAME = /icon|logo|sprite|btn|button|arrow|favicon|banner/i;
-
-function resolveImage(raw: string | undefined, pageUrl: string): string | undefined {
-  if (!raw || /^data:/i.test(raw.trim())) return undefined;
-  try {
-    const url = new URL(decodeEntities(raw.trim()), pageUrl);
-    if (/\.svg$/i.test(url.pathname)) return undefined;
-    return toSafeHttpUrl(url.toString());
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * OGP が無いサイト向けの最終手段。`<link rel="image_src">`、次に
- * キービジュアルらしいファイル名 (kv, keyvisual, mainvisual, mv, visual) の最初の <img> を使う。
- */
-function extractFallbackImageUrl(html: string, pageUrl: string): string | undefined {
-  for (const m of html.matchAll(/<link\b[^>]*>/gi)) {
-    const attrs = parseAttributes(m[0].replace(/^<link/i, "<meta"));
-    if (attrs.get("rel")?.toLowerCase().split(/\s+/).includes("image_src")) {
-      const resolved = resolveImage(attrs.get("href"), pageUrl);
-      if (resolved) return resolved;
-    }
-  }
-  for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
-    const attrs = parseAttributes(m[0].replace(/^<img/i, "<meta"));
-    for (const raw of [attrs.get("src"), attrs.get("data-src")]) {
-      const resolved = resolveImage(raw, pageUrl);
-      if (!resolved) continue;
-      const name = decodeURIComponent(new URL(resolved).pathname.split("/").pop() ?? "").replace(/\.[a-z0-9]+$/i, "");
-      if (KEY_VISUAL_NAME.test(name) && !NON_VISUAL_NAME.test(name)) return resolved;
-    }
-  }
   return undefined;
 }
 
