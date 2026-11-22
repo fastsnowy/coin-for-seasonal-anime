@@ -167,7 +167,7 @@ test("SSRF guard blocks IPv6 forms that embed private IPv4 addresses", async () 
   const blocked = [
     "::ffff:7f00:1", "::ffff:a9fe:a9fe", "::ffff:a00:1", "::7f00:1", "64:ff9b::7f00:1", "::ffff:127.0.0.1",
     "2002:7f00:1::", "2002:a9fe:a9fe::1", "::", "::1", "fe80::1", "fc00::1", "ff02::1", "100::1", "2001:db8::1",
-    "0.0.0.0", "100.64.0.1", "192.0.0.1", "192.0.2.1", "198.18.0.1", "198.51.100.1", "203.0.113.1", "240.0.0.1", "255.255.255.255",
+    "2001:0:4136:e378:8000:63bf:3fff:fdd2", "64:ff9b:1::1", "fec0::1", "0.0.0.0", "100.64.0.1", "192.0.0.1", "192.0.2.1", "198.18.0.1", "198.51.100.1", "203.0.113.1", "240.0.0.1", "255.255.255.255",
   ];
   for (const ip of blocked) assert.equal(isPrivateAddress(ip), true, ip);
   for (const ip of ["93.184.216.34", "2606:2800:220:1:248:1893:25c8:1946", "::ffff:5db8:d822", "64:ff9b::5db8:d822"]) {
@@ -216,4 +216,28 @@ test("the SSRF-safe agent refuses to connect when a hostname resolves to loopbac
   } finally {
     server.close();
   }
+});
+
+test("OGP fetch failures are classified so only definitive results get cached", async () => {
+  const og = await import("../src/lib/og-image");
+  for (const status of [200, 204]) assert.equal(og.classifyOgStatus(status), "ok");
+  for (const status of [404, 410, 401, 451]) assert.equal(og.classifyOgStatus(status), "none");
+  for (const status of [403, 408, 429, 500, 502, 503]) assert.equal(og.classifyOgStatus(status), "transient");
+
+  // 非公開ホストは確定結果 (undefined) で、失敗としては記憶されない
+  og.clearOgFailures();
+  assert.equal(await og.fetchOgImageUrl("http://127.0.0.1/"), undefined);
+  assert.equal(og.isOgFailureCached("http://127.0.0.1/"), false);
+
+  // 負キャッシュ: 記憶中はネットワークに行かず即 throw し、期限後は解除、サイズは有界
+  og.rememberOgFailure("https://dead.example/", 1_000);
+  assert.equal(og.isOgFailureCached("https://dead.example/", 1_000 + 60_000), true);
+  assert.equal(og.isOgFailureCached("https://dead.example/", 1_000 + 5 * 60_000 + 1), false);
+  og.rememberOgFailure("https://dead.example/");
+  await assert.rejects(og.fetchOgImageUrl("https://dead.example/"), og.OgFetchTransientError);
+  og.clearOgFailures();
+  for (let i = 0; i < 600; i++) og.rememberOgFailure(`https://s${i}.example/`);
+  assert.equal(og.isOgFailureCached("https://s0.example/"), false);
+  assert.equal(og.isOgFailureCached("https://s599.example/"), true);
+  og.clearOgFailures();
 });

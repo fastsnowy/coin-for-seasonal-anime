@@ -89,7 +89,7 @@ for (const [net, prefix] of [
 }
 blockedAddresses.addAddress("255.255.255.255", "ipv4");
 for (const [net, prefix] of [
-  ["100::", 64], ["2001:db8::", 32], ["fc00::", 7], ["fe80::", 10], ["ff00::", 8],
+  ["100::", 64], ["2001::", 32], ["2001:db8::", 32], ["64:ff9b:1::", 48], ["fc00::", 7], ["fe80::", 10], ["fec0::", 10], ["ff00::", 8],
 ] as const) {
   blockedAddresses.addSubnet(net, prefix, "ipv6");
 }
@@ -266,17 +266,73 @@ export async function fetchPublic(
   return undefined;
 }
 
-/** 公式サイトの OGP 画像URLをサーバー側で取得する。失敗時は undefined。 */
+/** 一時的な失敗 (タイムアウト・接続/DNSエラー・5xx・429・403 等)。結果をキャッシュしてはいけない */
+export class OgFetchTransientError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "OgFetchTransientError";
+  }
+}
+
+/** HTML 取得の HTTP ステータスを分類する。ok: 解析する / none: OGP なしで確定 / transient: 再試行余地あり */
+export function classifyOgStatus(status: number): "ok" | "none" | "transient" {
+  if (status >= 200 && status < 300) return "ok";
+  if (status === 403 || status === 408 || status === 429 || status >= 500) return "transient";
+  return "none";
+}
+
+const NEGATIVE_CACHE_TTL_MS = 5 * 60 * 1000;
+const NEGATIVE_CACHE_MAX = 500;
+const failedSites = new Map<string, number>();
+
+/** 失敗したサイトを短時間だけ記憶し、落ちているサイトが SSR ごとに最大4秒を消費しないようにする */
+export function rememberOgFailure(siteUrl: string, now = Date.now()): void {
+  failedSites.delete(siteUrl);
+  failedSites.set(siteUrl, now + NEGATIVE_CACHE_TTL_MS);
+  while (failedSites.size > NEGATIVE_CACHE_MAX) {
+    const oldest = failedSites.keys().next().value;
+    if (oldest === undefined) break;
+    failedSites.delete(oldest);
+  }
+}
+
+export function isOgFailureCached(siteUrl: string, now = Date.now()): boolean {
+  const expiresAt = failedSites.get(siteUrl);
+  if (expiresAt === undefined) return false;
+  if (expiresAt <= now) {
+    failedSites.delete(siteUrl);
+    return false;
+  }
+  return true;
+}
+
+export function clearOgFailures(): void {
+  failedSites.clear();
+}
+
+/**
+ * 公式サイトの OGP 画像URLをサーバー側で取得する。
+ * 確定結果は値で返す: OGP あり / OGP なし (2xx で og:image 無し、404 等) / 非公開ホスト -> undefined。
+ * 一時的な失敗は OgFetchTransientError を投げる (呼び出し側のキャッシュに保存させないため)。
+ */
 export async function fetchOgImageUrl(siteUrl: string, signal?: AbortSignal): Promise<string | undefined> {
+  if (isOgFailureCached(siteUrl)) throw new OgFetchTransientError("recently failed");
   try {
-    const fetched = await fetchPublic(new URL(siteUrl), "text/html,application/xhtml+xml", {
-      signal,
-    });
-    if (!fetched || !fetched.res.ok) return undefined;
+    const fetched = await fetchPublic(new URL(siteUrl), "text/html,application/xhtml+xml", { signal });
+    if (!fetched) return undefined;
+    const kind = classifyOgStatus(fetched.res.status);
+    if (kind === "transient") {
+      await fetched.res.body?.cancel().catch(() => undefined);
+      throw new OgFetchTransientError(`status ${fetched.res.status}`);
+    }
+    if (kind === "none") {
+      await fetched.res.body?.cancel().catch(() => undefined);
+      return undefined;
+    }
     const html = decodeHtml(await readLimited(fetched.res), fetched.res.headers.get("content-type"));
     return extractOgImageUrl(html, fetched.url.toString());
-  } catch {
-    // タイムアウトや接続エラー時はプレースホルダ表示のままにする
+  } catch (err) {
+    rememberOgFailure(siteUrl);
+    throw err instanceof OgFetchTransientError ? err : new OgFetchTransientError("fetch failed", { cause: err });
   }
-  return undefined;
 }

@@ -42,7 +42,7 @@ async function fetchAnnictWorks(body: { query: string }): Promise<Anime[]> {
 const OGP_FETCH_CONCURRENCY = 8;
 const OGP_CACHE_SECONDS = 60 * 60 * 24;
 
-// undici の fetch は Next の fetch キャッシュを通らないため、結果を Data Cache に保存する (null = OGP なし)
+// undici の fetch は Next の fetch キャッシュを通らないため、確定した結果のみ Data Cache に保存する (null = OGP なし。一時的な失敗は throw されるので保存されない)
 const getCachedOgImageUrl = unstable_cache(
   async (siteUrl: string) => (await fetchOgImageUrl(siteUrl)) ?? null,
   ["og-image-url"],
@@ -69,7 +69,8 @@ async function withOfficialSiteImages(animes: Anime[]): Promise<Anime[]> {
   const worker = async () => {
     while (cursor < targets.length) {
       const index = targets[cursor++];
-      const image = await getCachedOgImageUrl(result[index].officialSiteUrl as string);
+      // 一時的な失敗 (throw) はキャッシュされず、この作品はプレースホルダのままにする
+      const image = await getCachedOgImageUrl(result[index].officialSiteUrl as string).catch(() => null);
       if (image) result[index] = { ...result[index], image: ogImageProxyPath(image, secret) };
     }
   };
