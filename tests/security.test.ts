@@ -114,3 +114,30 @@ test("Annict's shared no-image placeholder is not treated as a real image", () =
   });
   assert.equal(anime?.image, PLACEHOLDER_IMAGE);
 });
+
+test("OGP image proxy only serves small raster images", async () => {
+  const { toAllowedImageType, exceedsImageLimit, ogImageProxyPath, MAX_IMAGE_BYTES } = await import("../src/lib/og-image-proxy");
+  for (const type of ["image/jpeg", "IMAGE/PNG; charset=binary", "image/webp", "image/gif", "image/avif"]) {
+    assert.ok(toAllowedImageType(type), type);
+  }
+  for (const type of ["image/svg+xml", "text/html", "application/octet-stream", "image/x-icon", "", null]) {
+    assert.equal(toAllowedImageType(type), undefined, String(type));
+  }
+  assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES)), false);
+  assert.equal(exceedsImageLimit(String(MAX_IMAGE_BYTES + 1)), true);
+  assert.equal(exceedsImageLimit(null), false);
+  assert.equal(ogImageProxyPath("https://a.example/?x=1&y=2"), "/api/og-image?site=https%3A%2F%2Fa.example%2F%3Fx%3D1%26y%3D2");
+});
+
+test("OGP image proxy rejects non-public sites and streamed bodies over the cap", async () => {
+  const { isPublicHttpUrl, readBodyWithLimit } = await import("../src/lib/og-image");
+  for (const url of ["http://127.0.0.1/", "http://localhost/", "http://[::1]/", "http://169.254.169.254/latest", "http://10.0.0.1/", "https://example.com:8443/", "ftp://example.com/"]) {
+    assert.equal(await isPublicHttpUrl(new URL(url)), false, url);
+  }
+  assert.equal(await isPublicHttpUrl(new URL("http://93.184.216.34/")), true);
+  const stream = (sizes: number[]) =>
+    new Response(new ReadableStream({ start(c) { for (const n of sizes) c.enqueue(new Uint8Array(n)); c.close(); } }));
+  assert.equal((await readBodyWithLimit(stream([60, 40]), 100, true))?.length, 100);
+  assert.equal(await readBodyWithLimit(stream([60, 41]), 100, true), undefined);
+  assert.equal((await readBodyWithLimit(stream([60, 60]), 100, false))?.length, 100);
+});

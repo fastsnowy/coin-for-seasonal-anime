@@ -7,6 +7,9 @@ const MAX_HTML_BYTES = 256 * 1024;
 const MAX_REDIRECTS = 3;
 const REVALIDATE_SECONDS = 60 * 60 * 24;
 const USER_AGENT = "Mozilla/5.0 (compatible; AnicoyBot/1.0; +https://github.com/fastsnowy/coin-for-seasonal-anime)";
+// bot UA を 403 で弾く公式サイト向けのフォールバック
+const BROWSER_USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
 const IMAGE_META_KEYS = [
   "og:image:secure_url",
@@ -91,7 +94,7 @@ export function isPrivateAddress(address: string): boolean {
 }
 
 /** サーバー側から取得してよい公開ホストかを確認する (SSRF対策) */
-async function isPublicHttpUrl(url: URL): Promise<boolean> {
+export async function isPublicHttpUrl(url: URL): Promise<boolean> {
   if (url.protocol !== "http:" && url.protocol !== "https:") return false;
   if (url.port && url.port !== "80" && url.port !== "443") return false;
   const host = url.hostname.replace(/^\[|\]$/g, "");
@@ -106,18 +109,36 @@ async function isPublicHttpUrl(url: URL): Promise<boolean> {
 }
 
 async function readLimited(res: Response): Promise<Uint8Array> {
+  const bytes = await readBodyWithLimit(res, MAX_HTML_BYTES, false);
+  return bytes ?? new Uint8Array();
+}
+
+/**
+ * レスポンス本文を最大 maxBytes まで読む。
+ * strict=true で上限超過なら undefined (取得中止)、false なら先頭 maxBytes で切り詰める。
+ */
+export async function readBodyWithLimit(
+  res: Response,
+  maxBytes: number,
+  strict: boolean,
+): Promise<Uint8Array | undefined> {
   if (!res.body) return new Uint8Array();
   const reader = res.body.getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
-  while (total < MAX_HTML_BYTES) {
+  while (total < maxBytes || strict) {
     const { done, value } = await reader.read();
     if (done || !value) break;
     chunks.push(value);
     total += value.length;
+    if (strict && total > maxBytes) {
+      await reader.cancel().catch(() => undefined);
+      return undefined;
+    }
+    if (!strict && total >= maxBytes) break;
   }
   await reader.cancel().catch(() => undefined);
-  const out = new Uint8Array(Math.min(total, MAX_HTML_BYTES));
+  const out = new Uint8Array(Math.min(total, maxBytes));
   let offset = 0;
   for (const chunk of chunks) {
     const slice = chunk.subarray(0, out.length - offset);
@@ -127,31 +148,51 @@ async function readLimited(res: Response): Promise<Uint8Array> {
   return out;
 }
 
+/**
+ * 公開ホストにのみ GET する。リダイレクトは1ホップごとにSSRF検証し、最大 MAX_REDIRECTS 回まで。
+ * bot UA が 403 の場合はブラウザ風 UA で1回だけ再試行する。
+ */
+export async function fetchPublic(
+  startUrl: URL,
+  accept: string,
+  init: { revalidate?: number } = {},
+): Promise<{ res: Response; url: URL } | undefined> {
+  let current = startUrl;
+  let userAgent = USER_AGENT;
+  for (let i = 0; i <= MAX_REDIRECTS; i++) {
+    if (!(await isPublicHttpUrl(current))) return undefined;
+    const res = await fetch(current, {
+      redirect: "manual",
+      headers: { "user-agent": userAgent, accept, "accept-language": "ja,en;q=0.8" },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      ...(init.revalidate ? { next: { revalidate: init.revalidate } } : {}),
+    });
+    const location = res.headers.get("location");
+    if (res.status >= 300 && res.status < 400 && location) {
+      await res.body?.cancel().catch(() => undefined);
+      current = new URL(location, current);
+      continue;
+    }
+    if (res.status === 403 && userAgent === USER_AGENT) {
+      await res.body?.cancel().catch(() => undefined);
+      userAgent = BROWSER_USER_AGENT;
+      i--;
+      continue;
+    }
+    return { res, url: current };
+  }
+  return undefined;
+}
+
 /** 公式サイトの OGP 画像URLをサーバー側で取得する。失敗時は undefined。 */
 export async function fetchOgImageUrl(siteUrl: string): Promise<string | undefined> {
   try {
-    let current = new URL(siteUrl);
-    for (let i = 0; i <= MAX_REDIRECTS; i++) {
-      if (!(await isPublicHttpUrl(current))) return undefined;
-      const res = await fetch(current, {
-        redirect: "manual",
-        headers: {
-          "user-agent": USER_AGENT,
-          accept: "text/html,application/xhtml+xml",
-          "accept-language": "ja,en;q=0.8",
-        },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-        next: { revalidate: REVALIDATE_SECONDS },
-      });
-      const location = res.headers.get("location");
-      if (res.status >= 300 && res.status < 400 && location) {
-        current = new URL(location, current);
-        continue;
-      }
-      if (!res.ok) return undefined;
-      const html = decodeHtml(await readLimited(res), res.headers.get("content-type"));
-      return extractOgImageUrl(html, current.toString());
-    }
+    const fetched = await fetchPublic(new URL(siteUrl), "text/html,application/xhtml+xml", {
+      revalidate: REVALIDATE_SECONDS,
+    });
+    if (!fetched || !fetched.res.ok) return undefined;
+    const html = decodeHtml(await readLimited(fetched.res), fetched.res.headers.get("content-type"));
+    return extractOgImageUrl(html, fetched.url.toString());
   } catch {
     // タイムアウトや接続エラー時はプレースホルダ表示のままにする
   }
