@@ -1,11 +1,12 @@
+import { lookup as dnsLookup } from "node:dns";
 import { lookup } from "node:dns/promises";
 import { BlockList, isIP } from "node:net";
+import { Agent, fetch as undiciFetch } from "undici";
 import { toSafeHttpUrl } from "./safe-url";
 
 const FETCH_TIMEOUT_MS = 4_000;
 const MAX_HTML_BYTES = 256 * 1024;
 const MAX_REDIRECTS = 3;
-const REVALIDATE_SECONDS = 60 * 60 * 24;
 const USER_AGENT = "Mozilla/5.0 (compatible; AnicoyBot/1.0; +https://github.com/fastsnowy/coin-for-seasonal-anime)";
 // bot UA を 403 で弾く公式サイト向けのフォールバック
 const BROWSER_USER_AGENT =
@@ -148,6 +149,47 @@ export async function isPublicHttpUrl(url: URL): Promise<boolean> {
   }
 }
 
+type ResolvedAddress = { address: string; family: number };
+type Resolver = (hostname: string) => Promise<ResolvedAddress[]>;
+
+const resolveAll: Resolver = (hostname) =>
+  new Promise((resolve, reject) =>
+    dnsLookup(hostname, { all: true }, (err, addresses) => (err ? reject(err) : resolve(addresses))),
+  );
+
+/**
+ * 接続時に使う名前解決。ここで公開アドレスと確認できたものだけを socket に渡すので、
+ * 検証と接続で別々に名前解決する DNS rebinding (TOCTOU) が起きない。
+ * 1つでも private アドレスが含まれていれば拒否する (公開IPだけに絞ると、攻撃者の用意した
+ * 混在レコードを許容することになり、意図しない到達先が混ざる余地を残すため)。
+ */
+export function createSafeLookup(resolver: Resolver = resolveAll) {
+  return (
+    hostname: string,
+    options: { all?: boolean },
+    callback: (err: Error | null, address?: string | ResolvedAddress[], family?: number) => void,
+  ): void => {
+    resolver(hostname.replace(/^\[|\]$/g, "")).then(
+      (addresses) => {
+        if (addresses.length === 0 || addresses.some((a) => isPrivateAddress(a.address))) {
+          callback(new Error(`blocked address for ${hostname}`));
+        } else if (options?.all) {
+          callback(null, addresses);
+        } else {
+          callback(null, addresses[0].address, addresses[0].family);
+        }
+      },
+      (err: Error) => callback(err),
+    );
+  };
+}
+
+export function createSafeAgent(resolver?: Resolver): Agent {
+  return new Agent({ connect: { lookup: createSafeLookup(resolver) as never } });
+}
+
+const safeAgent = createSafeAgent();
+
 async function readLimited(res: Response): Promise<Uint8Array> {
   const bytes = await readBodyWithLimit(res, MAX_HTML_BYTES, false);
   return bytes ?? new Uint8Array();
@@ -195,18 +237,18 @@ export async function readBodyWithLimit(
 export async function fetchPublic(
   startUrl: URL,
   accept: string,
-  init: { revalidate?: number; signal?: AbortSignal } = {},
+  init: { signal?: AbortSignal; dispatcher?: Agent } = {},
 ): Promise<{ res: Response; url: URL } | undefined> {
   let current = startUrl;
   let userAgent = USER_AGENT;
   for (let i = 0; i <= MAX_REDIRECTS; i++) {
     if (!(await isPublicHttpUrl(current))) return undefined;
-    const res = await fetch(current, {
+    const res = (await undiciFetch(current.toString(), {
+      dispatcher: init.dispatcher ?? safeAgent,
       redirect: "manual",
       headers: { "user-agent": userAgent, accept, "accept-language": "ja,en;q=0.8" },
       signal: AbortSignal.any([AbortSignal.timeout(FETCH_TIMEOUT_MS), ...(init.signal ? [init.signal] : [])]),
-      ...(init.revalidate ? { next: { revalidate: init.revalidate } } : {}),
-    });
+    })) as unknown as Response;
     const location = res.headers.get("location");
     if (res.status >= 300 && res.status < 400 && location) {
       await res.body?.cancel().catch(() => undefined);
@@ -228,7 +270,6 @@ export async function fetchPublic(
 export async function fetchOgImageUrl(siteUrl: string, signal?: AbortSignal): Promise<string | undefined> {
   try {
     const fetched = await fetchPublic(new URL(siteUrl), "text/html,application/xhtml+xml", {
-      revalidate: REVALIDATE_SECONDS,
       signal,
     });
     if (!fetched || !fetched.res.ok) return undefined;

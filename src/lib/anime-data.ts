@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { GET_ANIME_DETAILS, GET_ANIME_DETAILS_BY_IDS } from "@/gql";
 import { type Anime, PLACEHOLDER_IMAGE, toAnimeList } from "./annict-works";
 import { fetchOgImageUrl } from "./og-image";
@@ -39,6 +40,14 @@ async function fetchAnnictWorks(body: { query: string }): Promise<Anime[]> {
 }
 
 const OGP_FETCH_CONCURRENCY = 8;
+const OGP_CACHE_SECONDS = 60 * 60 * 24;
+
+// undici の fetch は Next の fetch キャッシュを通らないため、結果を Data Cache に保存する (null = OGP なし)
+const getCachedOgImageUrl = unstable_cache(
+  async (siteUrl: string) => (await fetchOgImageUrl(siteUrl)) ?? null,
+  ["og-image-url"],
+  { revalidate: OGP_CACHE_SECONDS },
+);
 
 /**
  * 画像URLを整える。
@@ -60,7 +69,7 @@ async function withOfficialSiteImages(animes: Anime[]): Promise<Anime[]> {
   const worker = async () => {
     while (cursor < targets.length) {
       const index = targets[cursor++];
-      const image = await fetchOgImageUrl(result[index].officialSiteUrl as string);
+      const image = await getCachedOgImageUrl(result[index].officialSiteUrl as string);
       if (image) result[index] = { ...result[index], image: ogImageProxyPath(image, secret) };
     }
   };

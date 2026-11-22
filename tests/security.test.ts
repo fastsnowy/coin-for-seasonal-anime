@@ -177,3 +177,43 @@ test("SSRF guard blocks IPv6 forms that embed private IPv4 addresses", async () 
     assert.equal(await isPublicHttpUrl(new URL(url)), false, url);
   }
 });
+
+test("connect-time DNS lookup only returns validated public addresses", async () => {
+  const { createSafeLookup } = await import("../src/lib/og-image");
+  const run = (addrs: { address: string; family: number }[], all = false) =>
+    new Promise<{ err: Error | null; address?: unknown; family?: number }>((resolve) =>
+      createSafeLookup(async () => addrs)("h.example", { all }, (err, address, family) => resolve({ err, address, family })),
+    );
+  const pub = { address: "93.184.216.34", family: 4 };
+  assert.deepEqual(await run([pub]), { err: null, address: "93.184.216.34", family: 4 });
+  assert.deepEqual((await run([pub], true)).address, [pub]);
+  for (const bad of ["127.0.0.1", "169.254.169.254", "::ffff:7f00:1", "10.0.0.1", "::1"]) {
+    const family = bad.includes(":") ? 6 : 4;
+    assert.ok((await run([{ address: bad, family }])).err, bad);
+    assert.ok((await run([pub, { address: bad, family }])).err, `mixed ${bad}`);
+    assert.ok((await run([{ address: bad, family }, pub], true)).err, `mixed(all) ${bad}`);
+  }
+  assert.ok((await run([])).err);
+  const failing = await new Promise<Error | null>((resolve) =>
+    createSafeLookup(async () => { throw new Error("ENOTFOUND"); })("h.example", {}, (err) => resolve(err)),
+  );
+  assert.ok(failing);
+});
+
+test("the SSRF-safe agent refuses to connect when a hostname resolves to loopback", async () => {
+  const { createServer } = await import("node:http");
+  const { createSafeAgent } = await import("../src/lib/og-image");
+  const { fetch: undiciFetch } = await import("undici");
+  let hits = 0;
+  const server = createServer((_req, res) => { hits++; res.end("secret"); });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const { port } = server.address() as { port: number };
+  try {
+    // DNS は常に 127.0.0.1 を返す (rebinding 後を模擬)。URL 検証を通過した後でも接続が拒否される
+    const agent = createSafeAgent(async () => [{ address: "127.0.0.1", family: 4 }]);
+    await assert.rejects(undiciFetch(`http://rebind.example:${port}/`, { dispatcher: agent }));
+    assert.equal(hits, 0);
+  } finally {
+    server.close();
+  }
+});
