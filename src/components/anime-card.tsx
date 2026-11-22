@@ -65,6 +65,7 @@ export function AnimeCard({
           <img
             src={work.image}
             alt={work.title}
+            referrerPolicy="no-referrer"
             width={320}
             height={180}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"

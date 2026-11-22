@@ -90,3 +90,27 @@ test("vote deletion only accepts UUID group IDs", () => {
     assert.equal(voteGroupIdSchema.safeParse(id).success, false);
   }
 });
+
+test("OGP image extraction handles real-world meta variations", async () => {
+  const { extractOgImageUrl, isPrivateAddress } = await import("../src/lib/og-image");
+  const page = "https://example.jp/anime/top/";
+  assert.equal(extractOgImageUrl(`<meta property="og:image" content="https://cdn.example/a.jpg">`, page), "https://cdn.example/a.jpg");
+  assert.equal(extractOgImageUrl(`<meta content='/img/ogp.png' property='og:image'>`, page), "https://example.jp/img/ogp.png");
+  assert.equal(extractOgImageUrl(`<meta name="og:image" content="//cdn.example/b.png?a=1&amp;b=2" />`, page), "https://cdn.example/b.png?a=1&b=2");
+  assert.equal(extractOgImageUrl(`<meta name="twitter:image" content="ogp.jpg">`, page), "https://example.jp/anime/top/ogp.jpg");
+  assert.equal(extractOgImageUrl(`<meta property="og:image" content="javascript:alert(1)"><meta property=og:image:secure_url content=https://s.example/c.jpg>`, page), "https://s.example/c.jpg");
+  assert.equal(extractOgImageUrl(`<meta property="og:title" content="x">`, page), undefined);
+  for (const ip of ["127.0.0.1", "10.0.0.1", "192.168.1.1", "169.254.169.254", "172.16.0.1", "::1", "fd00::1", "::ffff:127.0.0.1"]) {
+    assert.equal(isPrivateAddress(ip), true, ip);
+  }
+  assert.equal(isPrivateAddress("93.184.216.34"), false);
+});
+
+test("Annict's shared no-image placeholder is not treated as a real image", () => {
+  const anime = toAnime({
+    __typename: "Work", annictId: 2, title: "t", officialSiteUrl: "https://site.example/", twitterUsername: "x",
+    watchersCount: 0, media: "TV",
+    image: { __typename: "WorkImage", facebookOgImageUrl: "https://image.annict.com/x/s:640:853/plain/s3://annict-user-contents/no-image.jpg", recommendedImageUrl: "" },
+  });
+  assert.equal(anime?.image, PLACEHOLDER_IMAGE);
+});

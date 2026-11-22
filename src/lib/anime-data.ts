@@ -1,7 +1,8 @@
 import "server-only";
 
 import { GET_ANIME_DETAILS, GET_ANIME_DETAILS_BY_IDS } from "@/gql";
-import { type Anime, toAnimeList } from "./annict-works";
+import { type Anime, PLACEHOLDER_IMAGE, toAnimeList } from "./annict-works";
+import { fetchOgImageUrl } from "./og-image";
 
 export type { Anime } from "./annict-works";
 
@@ -32,7 +33,27 @@ async function fetchAnnictWorks(body: { query: string }): Promise<Anime[]> {
   const json = (await res.json()) as {
     data?: { searchWorks?: { nodes?: unknown } };
   };
-  return toAnimeList(json.data?.searchWorks?.nodes);
+  return withOfficialSiteImages(toAnimeList(json.data?.searchWorks?.nodes));
+}
+
+const OGP_FETCH_CONCURRENCY = 8;
+
+/** Annict に画像が無い作品は、公式サイトの OGP 画像で補完する */
+async function withOfficialSiteImages(animes: Anime[]): Promise<Anime[]> {
+  const result = [...animes];
+  const targets = result.flatMap((anime, index) =>
+    anime.image === PLACEHOLDER_IMAGE && anime.officialSiteUrl ? [index] : [],
+  );
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < targets.length) {
+      const index = targets[cursor++];
+      const image = await fetchOgImageUrl(result[index].officialSiteUrl as string);
+      if (image) result[index] = { ...result[index], image };
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(OGP_FETCH_CONCURRENCY, targets.length) }, worker));
+  return result;
 }
 
 // 指定された年と季節のアニメを取得する関数

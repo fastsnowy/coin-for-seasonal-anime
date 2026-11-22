@@ -73,6 +73,7 @@ export function VoteGroupCard({
                     <img
                       src={anime.image}
                       alt={anime.title}
+                      referrerPolicy="no-referrer"
                       className="h-full w-full object-cover"
                     />
                   ) : null}
