@@ -1,4 +1,5 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BrandMark } from "@/components/site-header";
 import { BlurText } from "@/components/ui/blur-text";
 import { CircleAlert, type LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -35,9 +36,9 @@ export function AuthCard({
         <div className="relative flex flex-col items-center text-center">
           <span
             aria-hidden="true"
-            className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-coin/20 bg-coin-muted text-xl shadow-xs"
+            className="mb-4 flex size-12 items-center justify-center rounded-2xl border border-coin/20 bg-coin-muted shadow-xs"
           >
-            🪙
+            <BrandMark className="size-7" />
           </span>
           <BlurText
             as="h1"

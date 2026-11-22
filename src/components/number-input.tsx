@@ -31,7 +31,7 @@ const stepButton = cn(
   "active:not-disabled:scale-90 motion-reduce:active:scale-100",
   "focus-visible:ring-[3px] focus-visible:ring-ring/35",
   "disabled:cursor-not-allowed disabled:opacity-35",
-  // Expand the hit area to at least 44px without changing the visual size.
+  // Expand the hit area by 4px on each side without changing the visual size.
   "after:absolute after:-inset-1 after:content-['']",
 );
 

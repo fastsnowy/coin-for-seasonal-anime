@@ -111,12 +111,20 @@ export default async function SeasonPage({
     <div className="container mx-auto max-w-5xl px-4 pt-4 pb-8">
       <Breadcrumb items={[{ label: `${year}年 ${seasonName}` }]} />
 
-      <BlurText
-        as="h2"
-        text={heading}
-        by="char"
-        className="mb-5 text-center text-sm font-medium text-muted-foreground"
-      />
+      <header className="mb-6 mt-2">
+        <p className="text-xs font-semibold tracking-[0.18em] text-coin-foreground uppercase">
+          {year} {seasonName}
+        </p>
+        <BlurText
+          as="h1"
+          text={heading}
+          by="char"
+          className="mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+        />
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          気になる作品にコインを賭けて、期待度を表明しよう。
+        </p>
+      </header>
 
       <RankingSection animeList={animeList} coins={coins} />
 

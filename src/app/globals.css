@@ -320,14 +320,6 @@
   display: none;
 }
 
-.text-coin {
-  color: var(--coin);
-}
-
-.bg-coin-muted {
-  background-color: var(--coin-muted);
-}
-
 /* --- Design-system utilities --- */
 
 /* Shimmer sweep overlay (skeletons, loading surfaces). Element gets

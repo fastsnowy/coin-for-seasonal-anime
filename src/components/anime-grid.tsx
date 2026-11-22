@@ -68,7 +68,7 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
   return (
     <section aria-labelledby="anime-list-heading">
       <div className="sticky top-14 z-30 -mx-4 mb-4 flex items-center justify-between gap-3 border-b border-transparent bg-background/80 px-4 py-2.5 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
-        <h3
+        <h2
           id="anime-list-heading"
           className="flex items-baseline gap-1.5 text-sm font-semibold tracking-tight"
         >
@@ -77,7 +77,7 @@ export default function AnimeGrid({ animeList, coins }: AnimeGridProps) {
             <NumberRoll value={filteredAndSortedAnimeList.length} duration={400} />
             <span className="ml-0.5">件</span>
           </span>
-        </h3>
+        </h2>
         <AnimeFilter
           mediaType={mediaType}
           sortBy={sortBy}

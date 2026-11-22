@@ -92,16 +92,6 @@ export function AnimeCard({
           />
         </AspectRatio>
 
-        {coinValue > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs text-white shadow-sm ring-1 ring-white/10 backdrop-blur-md">
-            <Coins className="size-3 text-coin" aria-hidden="true" />
-            <span className="sr-only">合計</span>
-            <span className="font-semibold tabular-nums">
-              {coinValue.toLocaleString()}
-            </span>
-            <span className="sr-only">コイン</span>
-          </div>
-        )}
 
         <span
           aria-hidden="true"
@@ -110,6 +100,17 @@ export function AnimeCard({
           <ExternalLink className="size-3.5" />
         </span>
       </a>
+
+      {coinValue > 0 && (
+        <div className="pointer-events-none absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-xs text-white shadow-sm ring-1 ring-white/10 backdrop-blur-md">
+          <Coins className="size-3 text-coin" aria-hidden="true" />
+          <span className="sr-only">合計</span>
+          <span className="font-semibold tabular-nums">
+            {coinValue.toLocaleString()}
+          </span>
+          <span className="sr-only">コイン</span>
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col gap-2 px-3.5 pt-3 pb-2.5">
         <h3 className="line-clamp-2 min-h-[2.75em] text-sm leading-snug font-semibold tracking-tight">

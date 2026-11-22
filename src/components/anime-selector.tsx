@@ -50,7 +50,7 @@ export function AnimeSelector() {
       aria-label="投票内容"
       className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] animate-slide-up-bar"
     >
-      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2 rounded-2xl border border-border bg-card/85 p-2 shadow-xl backdrop-blur-2xl supports-[backdrop-filter]:bg-card/75">
+      <div className="pointer-events-auto mx-auto flex max-w-xl items-center gap-2 rounded-2xl border border-border bg-card/95 p-2 shadow-xl backdrop-blur-xl backdrop-saturate-150">
         <Button
           size="icon-md"
           variant="ghost"

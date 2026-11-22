@@ -120,7 +120,7 @@ export default function SeasonNavigation() {
   return (
     <fieldset
       aria-label="シーズンを選択"
-      className="m-0 flex min-w-0 shrink-0 items-center gap-1.5 border-0 p-0"
+      className="m-0 flex min-w-0 shrink-0 items-center gap-1.5 border-0 px-[3px] py-1"
     >
       <Select
         value={selectedYear}
@@ -163,9 +163,9 @@ export default function SeasonNavigation() {
       </Select>
 
       <Button
-        variant="solid"
+        variant={!isPending && routeId === targetId ? "outline" : "solid"}
         size="md"
-        className="px-3.5 text-xs sm:h-8 sm:px-3"
+        className="px-3.5 text-xs disabled:opacity-40 sm:h-8 sm:px-3"
         onClick={handleNavigate}
         disabled={!isPending && routeId === targetId}
         loading={isPending}

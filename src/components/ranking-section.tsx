@@ -40,12 +40,12 @@ export default function RankingSection({
   return (
     <section className="mb-8" aria-labelledby="coin-ranking-heading">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3
+        <h2
           id="coin-ranking-heading"
           className="text-sm font-semibold tracking-tight"
         >
           コインランキング
-        </h3>
+        </h2>
         <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold tracking-[0.14em] text-muted-foreground">
           TOP {ranked.length}
         </span>
@@ -88,7 +88,7 @@ export default function RankingSection({
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-3">
-                  <h4
+                  <h3
                     className={cn(
                       "line-clamp-1 text-sm leading-snug",
                       i === 0 ? "font-semibold" : "font-medium",
@@ -96,7 +96,7 @@ export default function RankingSection({
                     title={anime.title}
                   >
                     {anime.title}
-                  </h4>
+                  </h3>
                   <span
                     className={cn(
                       "flex shrink-0 items-baseline gap-0.5 text-sm font-semibold",
