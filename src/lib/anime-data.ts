@@ -1,7 +1,11 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { GET_ANIME_DETAILS, GET_ANIME_DETAILS_BY_IDS } from "@/gql";
-import { type Anime, toAnimeList } from "./annict-works";
+import { type Anime, PLACEHOLDER_IMAGE, toAnimeList } from "./annict-works";
+import { fetchOgImageUrl } from "./og-image";
+import { isAnnictImageUrl, ogImageProxyPath } from "./og-image-proxy";
+import { getOgImageProxySecret } from "./og-image-secret";
 
 export type { Anime } from "./annict-works";
 
@@ -32,7 +36,46 @@ async function fetchAnnictWorks(body: { query: string }): Promise<Anime[]> {
   const json = (await res.json()) as {
     data?: { searchWorks?: { nodes?: unknown } };
   };
-  return toAnimeList(json.data?.searchWorks?.nodes);
+  return withOfficialSiteImages(toAnimeList(json.data?.searchWorks?.nodes));
+}
+
+const OGP_FETCH_CONCURRENCY = 8;
+const OGP_CACHE_SECONDS = 60 * 60 * 24;
+
+// undici の fetch は Next の fetch キャッシュを通らないため、確定した結果のみ Data Cache に保存する (null = OGP なし。一時的な失敗は throw されるので保存されない)
+const getCachedOgImageUrl = unstable_cache(
+  async (siteUrl: string) => (await fetchOgImageUrl(siteUrl)) ?? null,
+  ["og-image-url"],
+  { revalidate: OGP_CACHE_SECONDS },
+);
+
+/**
+ * 画像URLを整える。
+ * - Annict に画像が無い作品は公式サイトの OGP 画像で補完する
+ * - Annict 以外のホストの画像 (公式サイトの OGP 等) は、CORP: same-origin や http による
+ *   ブラウザ側のブロックを避けるため、署名付きの同一オリジンプロキシ経由にする
+ */
+async function withOfficialSiteImages(animes: Anime[]): Promise<Anime[]> {
+  const secret = getOgImageProxySecret();
+  const result = animes.map((anime) =>
+    anime.image !== PLACEHOLDER_IMAGE && !isAnnictImageUrl(anime.image)
+      ? { ...anime, image: ogImageProxyPath(anime.image, secret) }
+      : anime,
+  );
+  const targets = result.flatMap((anime, index) =>
+    anime.image === PLACEHOLDER_IMAGE && anime.officialSiteUrl ? [index] : [],
+  );
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < targets.length) {
+      const index = targets[cursor++];
+      // 一時的な失敗 (throw) はキャッシュされず、この作品はプレースホルダのままにする
+      const image = await getCachedOgImageUrl(result[index].officialSiteUrl as string).catch(() => null);
+      if (image) result[index] = { ...result[index], image: ogImageProxyPath(image, secret) };
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(OGP_FETCH_CONCURRENCY, targets.length) }, worker));
+  return result;
 }
 
 // 指定された年と季節のアニメを取得する関数

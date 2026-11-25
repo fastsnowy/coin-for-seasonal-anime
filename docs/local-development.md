@@ -26,6 +26,9 @@ pnpm exec supabase start
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<Supabase の Publishable key または anon key>
 ANNICT_TOKEN=<Annict の個人用アクセストークン>
+# 任意: 公式サイト画像プロキシ (/api/og-image) の署名鍵。未設定なら ANNICT_TOKEN から派生し、
+# どちらも無ければプロセス毎のランダム値になる。本番では複数インスタンスでも URL が一致するよう必ず明示的に設定する (未設定だと ANNICT_TOKEN のローテーションでキャッシュ済みのプロキシ URL が無効になる)。
+OG_IMAGE_PROXY_SECRET=<十分に長いランダム文字列>
 ```
 
 ## 3. 開発サーバーを起動する

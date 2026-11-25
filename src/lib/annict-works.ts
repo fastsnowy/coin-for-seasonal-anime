@@ -13,6 +13,12 @@ export type Anime = {
 
 export const PLACEHOLDER_IMAGE = "/placeholder.svg?w=300";
 
+/** Annict は画像未登録の作品に共通の no-image.jpg を返すため、実画像として扱わない */
+function toAnnictImageUrl(value: unknown): string | undefined {
+  const url = toSafeHttpUrl(value);
+  return url && !url.includes("no-image.jpg") ? url : undefined;
+}
+
 const MEDIA_TYPES = new Set<Anime["media"]>(["TV", "OVA", "MOVIE", "WEB"]);
 
 /** Annict の作品データを画面表示用に変換し、外部由来のURLを検証する */
@@ -28,8 +34,8 @@ export function toAnime(work: AnnictWorks[number]): Anime | undefined {
     officialSiteUrl: toSafeHttpUrl(work.officialSiteUrl),
     twitterUrl: toSafeTwitterUsername(work.twitterUsername),
     image:
-      toSafeHttpUrl(work.image?.facebookOgImageUrl) ??
-      toSafeHttpUrl(work.image?.recommendedImageUrl) ??
+      toAnnictImageUrl(work.image?.facebookOgImageUrl) ??
+      toAnnictImageUrl(work.image?.recommendedImageUrl) ??
       PLACEHOLDER_IMAGE,
   };
 }

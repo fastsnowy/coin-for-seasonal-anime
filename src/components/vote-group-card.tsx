@@ -1,3 +1,4 @@
+import { Thumbnail } from "@/components/thumbnail";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import type { Anime } from "@/lib/annict-works";
 import { getSeasonName, type Season } from "@/lib/seasons";
@@ -70,7 +71,7 @@ export function VoteGroupCard({
                   className="relative overflow-hidden rounded-lg bg-muted"
                 >
                   {anime?.image ? (
-                    <img
+                    <Thumbnail
                       src={anime.image}
                       alt={anime.title}
                       className="h-full w-full object-cover"

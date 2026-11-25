@@ -3,6 +3,7 @@ import { memo } from "react";
 
 import { CoinStepper } from "@/components/coin-stepper";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Thumbnail } from "@/components/thumbnail";
 import { Badge } from "@/components/ui/badge";
 import type { Anime } from "@/lib/annict-works";
 import { cn } from "@/lib/utils";
@@ -62,7 +63,7 @@ export function AnimeCard({
         className="relative block"
       >
         <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
-          <img
+          <Thumbnail
             src={work.image}
             alt={work.title}
             width={320}
